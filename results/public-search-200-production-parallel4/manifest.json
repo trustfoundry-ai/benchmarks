@@ -1,0 +1,37 @@
+{
+  "artifacts": {
+    "raw": {
+      "path": "raw.jsonl",
+      "rows": 200,
+      "sha256": "1804738f0103b142b86967221f7003625b4f5d8d20e8e6799b99fca324a5446b"
+    },
+    "result": {
+      "path": "result.json",
+      "sha256": "16b0f87aeb7f19124a7b76581431f597cdd635f2d2ddb63fbc420a4437fc4836"
+    }
+  },
+  "generated_at": "2026-06-26T22:52:45.685Z",
+  "schema_version": "trustfoundry.benchmarks.result-manifest.v1",
+  "source_run_id": "public-search-200-production-parallel4",
+  "status": "self-reported",
+  "verification_inputs": {
+    "benchmark_config": {
+      "path": "configs/benchmarks/public-search-case-questions-200.json",
+      "sha256": "a96b15f64b2ad835e5a80fc3998665e94356f42ac41f223aaf1688fc70486cad"
+    },
+    "data_files": [
+      {
+        "path": "data/public-search-case-questions-5k/case_questions.jsonl",
+        "sha256": "b0f5c95eddeaf63800cdfc1b94215e2f25f4c184b884e2e3dd5c528d0196622e"
+      }
+    ],
+    "provider_config": {
+      "path": "configs/providers/trustfoundry-public-search-case-question.json",
+      "sha256": "eba031eb061373c8295484dc302afb6e7a6ec21dc3d62e38fef80ff407abb515"
+    },
+    "scorer_config": {
+      "path": "configs/scorers/search-recall.json",
+      "sha256": "e5fada8a38d3d2be44cf6ae109a6f8fddb33509b2ad851345ae6a93a39f296f2"
+    }
+  }
+}

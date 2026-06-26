@@ -1,0 +1,9 @@
+{
+  "_comment": "First 200 deterministic rows from the public 5k case-question search recall subset.",
+  "dataDir": "data/public-search-case-questions-5k",
+  "datasetSize": "public-case-questions-200",
+  "datasetNames": ["case_questions"],
+  "splits": ["test"],
+  "queryTransformId": "strip-synthetic-instruction-prefixes-v1",
+  "limit": 200
+}

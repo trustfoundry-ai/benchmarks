@@ -1,0 +1,5 @@
+{
+  "cutoffs": [1, 5, 10, 25],
+  "headline_cutoff": 25,
+  "mrr_decimal_places": 4
+}

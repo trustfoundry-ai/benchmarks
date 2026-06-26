@@ -1,0 +1,8 @@
+{
+  "_comment": "TrustFoundry public API search provider for case-question recall. Sends per-row state by default because the public API currently requires state for non-citation searches.",
+  "endpoint": "https://api.trustfoundry.ai/public/v1/search",
+  "api_key_env": "TF_API_KEY",
+  "request_timeout_ms": 60000,
+  "model_type": "case_question",
+  "state_filter_enabled": true
+}

@@ -1,0 +1,18 @@
+{
+  "name": "@trustfoundry-ai/benchmarks",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "bin": {
+    "trustfoundry-benchmarks": "bin/benchmarks.mjs"
+  },
+  "scripts": {
+    "benchmark": "node bin/benchmarks.mjs",
+    "test": "node --test",
+    "verify:results": "node scripts/verify-result-bundles.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.15.9"
+}
