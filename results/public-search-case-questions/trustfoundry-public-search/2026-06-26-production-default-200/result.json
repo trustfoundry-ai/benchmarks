@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-26T22:52:45.673Z",
+  "generated_at": "2026-06-26T23:33:42.946Z",
   "metadata": {
     "cutoffs": [
       1,
@@ -34,7 +34,7 @@
       "version": "public-search-case-questions-v1"
     },
     "harness": {
-      "commit": "ce5be238f12903b65fe481ebacaa4f5e15e9df4a",
+      "commit": "54d7816237e3d2684f4c435fb8dbf231c5184b97",
       "name": "@trustfoundry-ai/benchmarks"
     },
     "provider": {
@@ -52,7 +52,7 @@
       "target": "https://api.trustfoundry.ai/public/v1/search",
       "version": "trustfoundry-public-search-provider-v1"
     },
-    "run_id": "public-search-200-production-parallel4",
+    "run_id": "public-search-20260626T232832Z",
     "scheduler": {
       "caseCount": 200,
       "parallel": 4
@@ -63,76 +63,76 @@
   "summary": {
     "byDataset": {
       "case_questions": {
-        "hitAt1": 0.375,
-        "hitAt10": 0.505,
-        "hitAt25": 0.505,
-        "hitAt5": 0.485,
-        "meanResultCount": 10.225,
-        "mrr": 0.4241,
-        "overallScore": 0.505,
+        "hitAt1": 0.43,
+        "hitAt10": 0.615,
+        "hitAt25": 0.62,
+        "hitAt5": 0.595,
+        "meanResultCount": 10.455,
+        "mrr": 0.4961,
+        "overallScore": 0.62,
         "providerFailures": 0,
         "scored": 200,
-        "supportedScore": 0.505,
+        "supportedScore": 0.62,
         "total": 200
       }
     },
     "byDocType": {
       "case": {
-        "hitAt1": 0.375,
-        "hitAt10": 0.505,
-        "hitAt25": 0.505,
-        "hitAt5": 0.485,
-        "meanResultCount": 10.225,
-        "mrr": 0.4241,
-        "overallScore": 0.505,
+        "hitAt1": 0.43,
+        "hitAt10": 0.615,
+        "hitAt25": 0.62,
+        "hitAt5": 0.595,
+        "meanResultCount": 10.455,
+        "mrr": 0.4961,
+        "overallScore": 0.62,
         "providerFailures": 0,
         "scored": 200,
-        "supportedScore": 0.505,
+        "supportedScore": 0.62,
         "total": 200
       }
     },
     "byField": {
       "questions": {
-        "hitAt1": 0.375,
-        "hitAt10": 0.505,
-        "hitAt25": 0.505,
-        "hitAt5": 0.485,
-        "meanResultCount": 10.225,
-        "mrr": 0.4241,
-        "overallScore": 0.505,
+        "hitAt1": 0.43,
+        "hitAt10": 0.615,
+        "hitAt25": 0.62,
+        "hitAt5": 0.595,
+        "meanResultCount": 10.455,
+        "mrr": 0.4961,
+        "overallScore": 0.62,
         "providerFailures": 0,
         "scored": 200,
-        "supportedScore": 0.505,
+        "supportedScore": 0.62,
         "total": 200
       }
     },
     "byModelType": {
       "case_question": {
-        "hitAt1": 0.375,
-        "hitAt10": 0.505,
-        "hitAt25": 0.505,
-        "hitAt5": 0.485,
-        "meanResultCount": 10.225,
-        "mrr": 0.4241,
-        "overallScore": 0.505,
+        "hitAt1": 0.43,
+        "hitAt10": 0.615,
+        "hitAt25": 0.62,
+        "hitAt5": 0.595,
+        "meanResultCount": 10.455,
+        "mrr": 0.4961,
+        "overallScore": 0.62,
         "providerFailures": 0,
         "scored": 200,
-        "supportedScore": 0.505,
+        "supportedScore": 0.62,
         "total": 200
       }
     },
     "bySplit": {
       "test": {
-        "hitAt1": 0.375,
-        "hitAt10": 0.505,
-        "hitAt25": 0.505,
-        "hitAt5": 0.485,
-        "meanResultCount": 10.225,
-        "mrr": 0.4241,
-        "overallScore": 0.505,
+        "hitAt1": 0.43,
+        "hitAt10": 0.615,
+        "hitAt25": 0.62,
+        "hitAt5": 0.595,
+        "meanResultCount": 10.455,
+        "mrr": 0.4961,
+        "overallScore": 0.62,
         "providerFailures": 0,
         "scored": 200,
-        "supportedScore": 0.505,
+        "supportedScore": 0.62,
         "total": 200
       }
     },
@@ -152,15 +152,15 @@
       },
       "AR": {
         "hitAt1": 0,
-        "hitAt10": 0,
-        "hitAt25": 0,
-        "hitAt5": 0,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
         "meanResultCount": 10,
-        "mrr": 0,
-        "overallScore": 0,
+        "mrr": 0.25,
+        "overallScore": 1,
         "providerFailures": 0,
         "scored": 1,
-        "supportedScore": 0,
+        "supportedScore": 1,
         "total": 1
       },
       "AZ": {
@@ -178,15 +178,15 @@
       },
       "CA": {
         "hitAt1": 0.4,
-        "hitAt10": 0.4,
-        "hitAt25": 0.4,
-        "hitAt5": 0.4,
+        "hitAt10": 0.8,
+        "hitAt25": 0.8,
+        "hitAt5": 0.8,
         "meanResultCount": 10,
-        "mrr": 0.4,
-        "overallScore": 0.4,
+        "mrr": 0.55,
+        "overallScore": 0.8,
         "providerFailures": 0,
         "scored": 5,
-        "supportedScore": 0.4,
+        "supportedScore": 0.8,
         "total": 5
       },
       "CT": {
@@ -217,41 +217,41 @@
       },
       "FED": {
         "hitAt1": 0.3181818181818182,
-        "hitAt10": 0.4393939393939394,
-        "hitAt25": 0.4393939393939394,
-        "hitAt5": 0.42424242424242425,
-        "meanResultCount": 10.787878787878787,
-        "mrr": 0.3667,
-        "overallScore": 0.4393939393939394,
+        "hitAt10": 0.5151515151515151,
+        "hitAt25": 0.5303030303030303,
+        "hitAt5": 0.5151515151515151,
+        "meanResultCount": 11.378787878787879,
+        "mrr": 0.3916,
+        "overallScore": 0.5303030303030303,
         "providerFailures": 0,
         "scored": 66,
-        "supportedScore": 0.4393939393939394,
+        "supportedScore": 0.5303030303030303,
         "total": 66
       },
       "FL": {
-        "hitAt1": 0.5,
-        "hitAt10": 0.5,
-        "hitAt25": 0.5,
-        "hitAt5": 0.5,
+        "hitAt1": 0.75,
+        "hitAt10": 0.75,
+        "hitAt25": 0.75,
+        "hitAt5": 0.75,
         "meanResultCount": 10,
-        "mrr": 0.5,
-        "overallScore": 0.5,
+        "mrr": 0.75,
+        "overallScore": 0.75,
         "providerFailures": 0,
         "scored": 4,
-        "supportedScore": 0.5,
+        "supportedScore": 0.75,
         "total": 4
       },
       "GA": {
-        "hitAt1": 0.5,
-        "hitAt10": 0.75,
-        "hitAt25": 0.75,
+        "hitAt1": 0.625,
+        "hitAt10": 0.625,
+        "hitAt25": 0.625,
         "hitAt5": 0.625,
         "meanResultCount": 10,
-        "mrr": 0.5763,
-        "overallScore": 0.75,
+        "mrr": 0.625,
+        "overallScore": 0.625,
         "providerFailures": 0,
         "scored": 8,
-        "supportedScore": 0.75,
+        "supportedScore": 0.625,
         "total": 8
       },
       "IA": {
@@ -281,16 +281,16 @@
         "total": 1
       },
       "IL": {
-        "hitAt1": 0.3333333333333333,
-        "hitAt10": 0.5555555555555556,
-        "hitAt25": 0.5555555555555556,
-        "hitAt5": 0.4444444444444444,
+        "hitAt1": 0.5555555555555556,
+        "hitAt10": 0.8888888888888888,
+        "hitAt25": 0.8888888888888888,
+        "hitAt5": 0.6666666666666666,
         "meanResultCount": 10,
-        "mrr": 0.3842,
-        "overallScore": 0.5555555555555556,
+        "mrr": 0.613,
+        "overallScore": 0.8888888888888888,
         "providerFailures": 0,
         "scored": 9,
-        "supportedScore": 0.5555555555555556,
+        "supportedScore": 0.8888888888888888,
         "total": 9
       },
       "IN": {
@@ -307,42 +307,42 @@
         "total": 1
       },
       "KS": {
-        "hitAt1": 0,
-        "hitAt10": 0,
-        "hitAt25": 0,
-        "hitAt5": 0,
+        "hitAt1": 1,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
         "meanResultCount": 10,
-        "mrr": 0,
-        "overallScore": 0,
+        "mrr": 1,
+        "overallScore": 1,
         "providerFailures": 0,
         "scored": 1,
-        "supportedScore": 0,
+        "supportedScore": 1,
         "total": 1
       },
       "KY": {
         "hitAt1": 0,
-        "hitAt10": 0,
-        "hitAt25": 0,
+        "hitAt10": 0.3333333333333333,
+        "hitAt25": 0.3333333333333333,
         "hitAt5": 0,
         "meanResultCount": 10,
-        "mrr": 0,
-        "overallScore": 0,
+        "mrr": 0.0333,
+        "overallScore": 0.3333333333333333,
         "providerFailures": 0,
         "scored": 3,
-        "supportedScore": 0,
+        "supportedScore": 0.3333333333333333,
         "total": 3
       },
       "LA": {
         "hitAt1": 0.5,
-        "hitAt10": 0.75,
-        "hitAt25": 0.75,
-        "hitAt5": 0.75,
+        "hitAt10": 0.5,
+        "hitAt25": 0.5,
+        "hitAt5": 0.5,
         "meanResultCount": 10,
-        "mrr": 0.625,
-        "overallScore": 0.75,
+        "mrr": 0.5,
+        "overallScore": 0.5,
         "providerFailures": 0,
         "scored": 4,
-        "supportedScore": 0.75,
+        "supportedScore": 0.5,
         "total": 4
       },
       "MA": {
@@ -359,29 +359,29 @@
         "total": 1
       },
       "MD": {
-        "hitAt1": 0.6666666666666666,
-        "hitAt10": 0.6666666666666666,
-        "hitAt25": 0.6666666666666666,
-        "hitAt5": 0.6666666666666666,
+        "hitAt1": 1,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
         "meanResultCount": 10,
-        "mrr": 0.6666,
-        "overallScore": 0.6666666666666666,
+        "mrr": 1,
+        "overallScore": 1,
         "providerFailures": 0,
         "scored": 3,
-        "supportedScore": 0.6666666666666666,
+        "supportedScore": 1,
         "total": 3
       },
       "ME": {
         "hitAt1": 0,
-        "hitAt10": 0.6666666666666666,
-        "hitAt25": 0.6666666666666666,
-        "hitAt5": 0.6666666666666666,
+        "hitAt10": 0.3333333333333333,
+        "hitAt25": 0.3333333333333333,
+        "hitAt5": 0.3333333333333333,
         "meanResultCount": 10,
-        "mrr": 0.2333,
-        "overallScore": 0.6666666666666666,
+        "mrr": 0.1666,
+        "overallScore": 0.3333333333333333,
         "providerFailures": 0,
         "scored": 3,
-        "supportedScore": 0.6666666666666666,
+        "supportedScore": 0.3333333333333333,
         "total": 3
       },
       "MI": {
@@ -399,15 +399,15 @@
       },
       "MN": {
         "hitAt1": 0,
-        "hitAt10": 0.5,
-        "hitAt25": 0.5,
-        "hitAt5": 0.5,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
         "meanResultCount": 10,
-        "mrr": 0.1666,
-        "overallScore": 0.5,
+        "mrr": 0.4166,
+        "overallScore": 1,
         "providerFailures": 0,
         "scored": 2,
-        "supportedScore": 0.5,
+        "supportedScore": 1,
         "total": 2
       },
       "MS": {
@@ -437,16 +437,16 @@
         "total": 2
       },
       "NC": {
-        "hitAt1": 0.6666666666666666,
-        "hitAt10": 0.6666666666666666,
-        "hitAt25": 0.6666666666666666,
-        "hitAt5": 0.6666666666666666,
+        "hitAt1": 1,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
         "meanResultCount": 10,
-        "mrr": 0.6666,
-        "overallScore": 0.6666666666666666,
+        "mrr": 1,
+        "overallScore": 1,
         "providerFailures": 0,
         "scored": 3,
-        "supportedScore": 0.6666666666666666,
+        "supportedScore": 1,
         "total": 3
       },
       "ND": {
@@ -502,16 +502,16 @@
         "total": 1
       },
       "NY": {
-        "hitAt1": 0.2727272727272727,
-        "hitAt10": 0.36363636363636365,
-        "hitAt25": 0.36363636363636365,
-        "hitAt5": 0.3181818181818182,
+        "hitAt1": 0.3181818181818182,
+        "hitAt10": 0.45454545454545453,
+        "hitAt25": 0.45454545454545453,
+        "hitAt5": 0.4090909090909091,
         "meanResultCount": 10,
-        "mrr": 0.3,
-        "overallScore": 0.36363636363636365,
+        "mrr": 0.3587,
+        "overallScore": 0.45454545454545453,
         "providerFailures": 0,
         "scored": 22,
-        "supportedScore": 0.36363636363636365,
+        "supportedScore": 0.45454545454545453,
         "total": 22
       },
       "OH": {
@@ -520,7 +520,7 @@
         "hitAt25": 0.5833333333333334,
         "hitAt5": 0.5833333333333334,
         "meanResultCount": 10,
-        "mrr": 0.4722,
+        "mrr": 0.4652,
         "overallScore": 0.5833333333333334,
         "providerFailures": 0,
         "scored": 12,
@@ -528,29 +528,29 @@
         "total": 12
       },
       "OK": {
-        "hitAt1": 0,
-        "hitAt10": 0,
-        "hitAt25": 0,
-        "hitAt5": 0,
+        "hitAt1": 1,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
         "meanResultCount": 10,
-        "mrr": 0,
-        "overallScore": 0,
+        "mrr": 1,
+        "overallScore": 1,
         "providerFailures": 0,
         "scored": 1,
-        "supportedScore": 0,
+        "supportedScore": 1,
         "total": 1
       },
       "PA": {
-        "hitAt1": 0.2857142857142857,
-        "hitAt10": 0.5714285714285714,
-        "hitAt25": 0.5714285714285714,
-        "hitAt5": 0.5714285714285714,
+        "hitAt1": 0.42857142857142855,
+        "hitAt10": 0.8571428571428571,
+        "hitAt25": 0.8571428571428571,
+        "hitAt5": 0.8571428571428571,
         "meanResultCount": 10,
-        "mrr": 0.4285,
-        "overallScore": 0.5714285714285714,
+        "mrr": 0.6,
+        "overallScore": 0.8571428571428571,
         "providerFailures": 0,
         "scored": 7,
-        "supportedScore": 0.5714285714285714,
+        "supportedScore": 0.8571428571428571,
         "total": 7
       },
       "RI": {
@@ -593,16 +593,16 @@
         "total": 1
       },
       "TX": {
-        "hitAt1": 0.4444444444444444,
-        "hitAt10": 0.4444444444444444,
-        "hitAt25": 0.4444444444444444,
-        "hitAt5": 0.4444444444444444,
-        "meanResultCount": 9.222222222222221,
-        "mrr": 0.4444,
-        "overallScore": 0.4444444444444444,
+        "hitAt1": 0.5555555555555556,
+        "hitAt10": 0.6666666666666666,
+        "hitAt25": 0.6666666666666666,
+        "hitAt5": 0.6666666666666666,
+        "meanResultCount": 10,
+        "mrr": 0.6111,
+        "overallScore": 0.6666666666666666,
         "providerFailures": 0,
         "scored": 9,
-        "supportedScore": 0.4444444444444444,
+        "supportedScore": 0.6666666666666666,
         "total": 9
       },
       "VA": {
@@ -646,15 +646,15 @@
       },
       "WV": {
         "hitAt1": 0,
-        "hitAt10": 0,
-        "hitAt25": 0,
-        "hitAt5": 0,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
         "meanResultCount": 10,
-        "mrr": 0,
-        "overallScore": 0,
+        "mrr": 0.5,
+        "overallScore": 1,
         "providerFailures": 0,
         "scored": 1,
-        "supportedScore": 0,
+        "supportedScore": 1,
         "total": 1
       }
     },
@@ -696,7 +696,7 @@
         "target": "https://api.trustfoundry.ai/public/v1/search",
         "version": "trustfoundry-public-search-provider-v1"
       },
-      "runId": "public-search-200-production-parallel4",
+      "runId": "public-search-20260626T232832Z",
       "scheduler": {
         "caseCount": 200,
         "parallel": 4
@@ -714,31 +714,31 @@
         "version": "search-recall-v1"
       }
     },
-    "hitAt1": 0.375,
-    "hitAt10": 0.505,
-    "hitAt25": 0.505,
-    "hitAt5": 0.485,
+    "hitAt1": 0.43,
+    "hitAt10": 0.615,
+    "hitAt25": 0.62,
+    "hitAt5": 0.595,
     "latency_ms": {
-      "max": 12293,
-      "mean": 3462.085,
-      "min": 1254,
+      "max": 5166,
+      "mean": 3158.055,
+      "min": 1760,
       "n": 200,
-      "p50": 2140.5,
-      "p95": 7560.499999999994
+      "p50": 3121.5,
+      "p95": 4180.5999999999985
     },
-    "meanResultCount": 10.225,
-    "mrr": 0.4241,
+    "meanResultCount": 10.455,
+    "mrr": 0.4961,
     "overall": {
       "hit_at": {
-        "hit@1": 0.375,
-        "hit@10": 0.505,
-        "hit@25": 0.505,
-        "hit@5": 0.485
+        "hit@1": 0.43,
+        "hit@10": 0.615,
+        "hit@25": 0.62,
+        "hit@5": 0.595
       },
-      "mrr": 0.4241,
+      "mrr": 0.4961,
       "n": 200
     },
-    "overallScore": 0.505,
+    "overallScore": 0.62,
     "per_state": {
       "AL": {
         "hit_at": {
@@ -753,11 +753,11 @@
       "AR": {
         "hit_at": {
           "hit@1": 0,
-          "hit@10": 0,
-          "hit@25": 0,
-          "hit@5": 0
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
         },
-        "mrr": 0,
+        "mrr": 0.25,
         "n": 1
       },
       "AZ": {
@@ -773,11 +773,11 @@
       "CA": {
         "hit_at": {
           "hit@1": 0.4,
-          "hit@10": 0.4,
-          "hit@25": 0.4,
-          "hit@5": 0.4
+          "hit@10": 0.8,
+          "hit@25": 0.8,
+          "hit@5": 0.8
         },
-        "mrr": 0.4,
+        "mrr": 0.55,
         "n": 5
       },
       "CT": {
@@ -803,31 +803,31 @@
       "FED": {
         "hit_at": {
           "hit@1": 0.3181818181818182,
-          "hit@10": 0.4393939393939394,
-          "hit@25": 0.4393939393939394,
-          "hit@5": 0.42424242424242425
+          "hit@10": 0.5151515151515151,
+          "hit@25": 0.5303030303030303,
+          "hit@5": 0.5151515151515151
         },
-        "mrr": 0.3667,
+        "mrr": 0.3916,
         "n": 66
       },
       "FL": {
         "hit_at": {
-          "hit@1": 0.5,
-          "hit@10": 0.5,
-          "hit@25": 0.5,
-          "hit@5": 0.5
+          "hit@1": 0.75,
+          "hit@10": 0.75,
+          "hit@25": 0.75,
+          "hit@5": 0.75
         },
-        "mrr": 0.5,
+        "mrr": 0.75,
         "n": 4
       },
       "GA": {
         "hit_at": {
-          "hit@1": 0.5,
-          "hit@10": 0.75,
-          "hit@25": 0.75,
+          "hit@1": 0.625,
+          "hit@10": 0.625,
+          "hit@25": 0.625,
           "hit@5": 0.625
         },
-        "mrr": 0.5763,
+        "mrr": 0.625,
         "n": 8
       },
       "IA": {
@@ -852,12 +852,12 @@
       },
       "IL": {
         "hit_at": {
-          "hit@1": 0.3333333333333333,
-          "hit@10": 0.5555555555555556,
-          "hit@25": 0.5555555555555556,
-          "hit@5": 0.4444444444444444
+          "hit@1": 0.5555555555555556,
+          "hit@10": 0.8888888888888888,
+          "hit@25": 0.8888888888888888,
+          "hit@5": 0.6666666666666666
         },
-        "mrr": 0.3842,
+        "mrr": 0.613,
         "n": 9
       },
       "IN": {
@@ -872,32 +872,32 @@
       },
       "KS": {
         "hit_at": {
-          "hit@1": 0,
-          "hit@10": 0,
-          "hit@25": 0,
-          "hit@5": 0
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
         },
-        "mrr": 0,
+        "mrr": 1,
         "n": 1
       },
       "KY": {
         "hit_at": {
           "hit@1": 0,
-          "hit@10": 0,
-          "hit@25": 0,
+          "hit@10": 0.3333333333333333,
+          "hit@25": 0.3333333333333333,
           "hit@5": 0
         },
-        "mrr": 0,
+        "mrr": 0.0333,
         "n": 3
       },
       "LA": {
         "hit_at": {
           "hit@1": 0.5,
-          "hit@10": 0.75,
-          "hit@25": 0.75,
-          "hit@5": 0.75
+          "hit@10": 0.5,
+          "hit@25": 0.5,
+          "hit@5": 0.5
         },
-        "mrr": 0.625,
+        "mrr": 0.5,
         "n": 4
       },
       "MA": {
@@ -912,22 +912,22 @@
       },
       "MD": {
         "hit_at": {
-          "hit@1": 0.6666666666666666,
-          "hit@10": 0.6666666666666666,
-          "hit@25": 0.6666666666666666,
-          "hit@5": 0.6666666666666666
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
         },
-        "mrr": 0.6666,
+        "mrr": 1,
         "n": 3
       },
       "ME": {
         "hit_at": {
           "hit@1": 0,
-          "hit@10": 0.6666666666666666,
-          "hit@25": 0.6666666666666666,
-          "hit@5": 0.6666666666666666
+          "hit@10": 0.3333333333333333,
+          "hit@25": 0.3333333333333333,
+          "hit@5": 0.3333333333333333
         },
-        "mrr": 0.2333,
+        "mrr": 0.1666,
         "n": 3
       },
       "MI": {
@@ -943,11 +943,11 @@
       "MN": {
         "hit_at": {
           "hit@1": 0,
-          "hit@10": 0.5,
-          "hit@25": 0.5,
-          "hit@5": 0.5
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
         },
-        "mrr": 0.1666,
+        "mrr": 0.4166,
         "n": 2
       },
       "MS": {
@@ -972,12 +972,12 @@
       },
       "NC": {
         "hit_at": {
-          "hit@1": 0.6666666666666666,
-          "hit@10": 0.6666666666666666,
-          "hit@25": 0.6666666666666666,
-          "hit@5": 0.6666666666666666
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
         },
-        "mrr": 0.6666,
+        "mrr": 1,
         "n": 3
       },
       "ND": {
@@ -1022,12 +1022,12 @@
       },
       "NY": {
         "hit_at": {
-          "hit@1": 0.2727272727272727,
-          "hit@10": 0.36363636363636365,
-          "hit@25": 0.36363636363636365,
-          "hit@5": 0.3181818181818182
+          "hit@1": 0.3181818181818182,
+          "hit@10": 0.45454545454545453,
+          "hit@25": 0.45454545454545453,
+          "hit@5": 0.4090909090909091
         },
-        "mrr": 0.3,
+        "mrr": 0.3587,
         "n": 22
       },
       "OH": {
@@ -1037,27 +1037,27 @@
           "hit@25": 0.5833333333333334,
           "hit@5": 0.5833333333333334
         },
-        "mrr": 0.4722,
+        "mrr": 0.4652,
         "n": 12
       },
       "OK": {
         "hit_at": {
-          "hit@1": 0,
-          "hit@10": 0,
-          "hit@25": 0,
-          "hit@5": 0
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
         },
-        "mrr": 0,
+        "mrr": 1,
         "n": 1
       },
       "PA": {
         "hit_at": {
-          "hit@1": 0.2857142857142857,
-          "hit@10": 0.5714285714285714,
-          "hit@25": 0.5714285714285714,
-          "hit@5": 0.5714285714285714
+          "hit@1": 0.42857142857142855,
+          "hit@10": 0.8571428571428571,
+          "hit@25": 0.8571428571428571,
+          "hit@5": 0.8571428571428571
         },
-        "mrr": 0.4285,
+        "mrr": 0.6,
         "n": 7
       },
       "RI": {
@@ -1092,12 +1092,12 @@
       },
       "TX": {
         "hit_at": {
-          "hit@1": 0.4444444444444444,
-          "hit@10": 0.4444444444444444,
-          "hit@25": 0.4444444444444444,
-          "hit@5": 0.4444444444444444
+          "hit@1": 0.5555555555555556,
+          "hit@10": 0.6666666666666666,
+          "hit@25": 0.6666666666666666,
+          "hit@5": 0.6666666666666666
         },
-        "mrr": 0.4444,
+        "mrr": 0.6111,
         "n": 9
       },
       "VA": {
@@ -1133,11 +1133,11 @@
       "WV": {
         "hit_at": {
           "hit@1": 0,
-          "hit@10": 0,
-          "hit@25": 0,
-          "hit@5": 0
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
         },
-        "mrr": 0,
+        "mrr": 0.5,
         "n": 1
       }
     },
@@ -1155,12 +1155,12 @@
     "scored": 200,
     "strict_overall": {
       "hit_at": {
-        "hit@1": 0.375,
-        "hit@10": 0.505,
-        "hit@25": 0.505,
-        "hit@5": 0.485
+        "hit@1": 0.43,
+        "hit@10": 0.615,
+        "hit@25": 0.62,
+        "hit@5": 0.595
       },
-      "mrr": 0.4241,
+      "mrr": 0.4961,
       "n": 200
     },
     "strict_per_state": {
@@ -1177,11 +1177,11 @@
       "AR": {
         "hit_at": {
           "hit@1": 0,
-          "hit@10": 0,
-          "hit@25": 0,
-          "hit@5": 0
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
         },
-        "mrr": 0,
+        "mrr": 0.25,
         "n": 1
       },
       "AZ": {
@@ -1197,11 +1197,11 @@
       "CA": {
         "hit_at": {
           "hit@1": 0.4,
-          "hit@10": 0.4,
-          "hit@25": 0.4,
-          "hit@5": 0.4
+          "hit@10": 0.8,
+          "hit@25": 0.8,
+          "hit@5": 0.8
         },
-        "mrr": 0.4,
+        "mrr": 0.55,
         "n": 5
       },
       "CT": {
@@ -1227,31 +1227,31 @@
       "FED": {
         "hit_at": {
           "hit@1": 0.3181818181818182,
-          "hit@10": 0.4393939393939394,
-          "hit@25": 0.4393939393939394,
-          "hit@5": 0.42424242424242425
+          "hit@10": 0.5151515151515151,
+          "hit@25": 0.5303030303030303,
+          "hit@5": 0.5151515151515151
         },
-        "mrr": 0.3667,
+        "mrr": 0.3916,
         "n": 66
       },
       "FL": {
         "hit_at": {
-          "hit@1": 0.5,
-          "hit@10": 0.5,
-          "hit@25": 0.5,
-          "hit@5": 0.5
+          "hit@1": 0.75,
+          "hit@10": 0.75,
+          "hit@25": 0.75,
+          "hit@5": 0.75
         },
-        "mrr": 0.5,
+        "mrr": 0.75,
         "n": 4
       },
       "GA": {
         "hit_at": {
-          "hit@1": 0.5,
-          "hit@10": 0.75,
-          "hit@25": 0.75,
+          "hit@1": 0.625,
+          "hit@10": 0.625,
+          "hit@25": 0.625,
           "hit@5": 0.625
         },
-        "mrr": 0.5763,
+        "mrr": 0.625,
         "n": 8
       },
       "IA": {
@@ -1276,12 +1276,12 @@
       },
       "IL": {
         "hit_at": {
-          "hit@1": 0.3333333333333333,
-          "hit@10": 0.5555555555555556,
-          "hit@25": 0.5555555555555556,
-          "hit@5": 0.4444444444444444
+          "hit@1": 0.5555555555555556,
+          "hit@10": 0.8888888888888888,
+          "hit@25": 0.8888888888888888,
+          "hit@5": 0.6666666666666666
         },
-        "mrr": 0.3842,
+        "mrr": 0.613,
         "n": 9
       },
       "IN": {
@@ -1296,32 +1296,32 @@
       },
       "KS": {
         "hit_at": {
-          "hit@1": 0,
-          "hit@10": 0,
-          "hit@25": 0,
-          "hit@5": 0
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
         },
-        "mrr": 0,
+        "mrr": 1,
         "n": 1
       },
       "KY": {
         "hit_at": {
           "hit@1": 0,
-          "hit@10": 0,
-          "hit@25": 0,
+          "hit@10": 0.3333333333333333,
+          "hit@25": 0.3333333333333333,
           "hit@5": 0
         },
-        "mrr": 0,
+        "mrr": 0.0333,
         "n": 3
       },
       "LA": {
         "hit_at": {
           "hit@1": 0.5,
-          "hit@10": 0.75,
-          "hit@25": 0.75,
-          "hit@5": 0.75
+          "hit@10": 0.5,
+          "hit@25": 0.5,
+          "hit@5": 0.5
         },
-        "mrr": 0.625,
+        "mrr": 0.5,
         "n": 4
       },
       "MA": {
@@ -1336,22 +1336,22 @@
       },
       "MD": {
         "hit_at": {
-          "hit@1": 0.6666666666666666,
-          "hit@10": 0.6666666666666666,
-          "hit@25": 0.6666666666666666,
-          "hit@5": 0.6666666666666666
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
         },
-        "mrr": 0.6666,
+        "mrr": 1,
         "n": 3
       },
       "ME": {
         "hit_at": {
           "hit@1": 0,
-          "hit@10": 0.6666666666666666,
-          "hit@25": 0.6666666666666666,
-          "hit@5": 0.6666666666666666
+          "hit@10": 0.3333333333333333,
+          "hit@25": 0.3333333333333333,
+          "hit@5": 0.3333333333333333
         },
-        "mrr": 0.2333,
+        "mrr": 0.1666,
         "n": 3
       },
       "MI": {
@@ -1367,11 +1367,11 @@
       "MN": {
         "hit_at": {
           "hit@1": 0,
-          "hit@10": 0.5,
-          "hit@25": 0.5,
-          "hit@5": 0.5
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
         },
-        "mrr": 0.1666,
+        "mrr": 0.4166,
         "n": 2
       },
       "MS": {
@@ -1396,12 +1396,12 @@
       },
       "NC": {
         "hit_at": {
-          "hit@1": 0.6666666666666666,
-          "hit@10": 0.6666666666666666,
-          "hit@25": 0.6666666666666666,
-          "hit@5": 0.6666666666666666
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
         },
-        "mrr": 0.6666,
+        "mrr": 1,
         "n": 3
       },
       "ND": {
@@ -1446,12 +1446,12 @@
       },
       "NY": {
         "hit_at": {
-          "hit@1": 0.2727272727272727,
-          "hit@10": 0.36363636363636365,
-          "hit@25": 0.36363636363636365,
-          "hit@5": 0.3181818181818182
+          "hit@1": 0.3181818181818182,
+          "hit@10": 0.45454545454545453,
+          "hit@25": 0.45454545454545453,
+          "hit@5": 0.4090909090909091
         },
-        "mrr": 0.3,
+        "mrr": 0.3587,
         "n": 22
       },
       "OH": {
@@ -1461,27 +1461,27 @@
           "hit@25": 0.5833333333333334,
           "hit@5": 0.5833333333333334
         },
-        "mrr": 0.4722,
+        "mrr": 0.4652,
         "n": 12
       },
       "OK": {
         "hit_at": {
-          "hit@1": 0,
-          "hit@10": 0,
-          "hit@25": 0,
-          "hit@5": 0
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
         },
-        "mrr": 0,
+        "mrr": 1,
         "n": 1
       },
       "PA": {
         "hit_at": {
-          "hit@1": 0.2857142857142857,
-          "hit@10": 0.5714285714285714,
-          "hit@25": 0.5714285714285714,
-          "hit@5": 0.5714285714285714
+          "hit@1": 0.42857142857142855,
+          "hit@10": 0.8571428571428571,
+          "hit@25": 0.8571428571428571,
+          "hit@5": 0.8571428571428571
         },
-        "mrr": 0.4285,
+        "mrr": 0.6,
         "n": 7
       },
       "RI": {
@@ -1516,12 +1516,12 @@
       },
       "TX": {
         "hit_at": {
-          "hit@1": 0.4444444444444444,
-          "hit@10": 0.4444444444444444,
-          "hit@25": 0.4444444444444444,
-          "hit@5": 0.4444444444444444
+          "hit@1": 0.5555555555555556,
+          "hit@10": 0.6666666666666666,
+          "hit@25": 0.6666666666666666,
+          "hit@5": 0.6666666666666666
         },
-        "mrr": 0.4444,
+        "mrr": 0.6111,
         "n": 9
       },
       "VA": {
@@ -1557,15 +1557,15 @@
       "WV": {
         "hit_at": {
           "hit@1": 0,
-          "hit@10": 0,
-          "hit@25": 0,
-          "hit@5": 0
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
         },
-        "mrr": 0,
+        "mrr": 0.5,
         "n": 1
       }
     },
-    "supportedScore": 0.505,
+    "supportedScore": 0.62,
     "total": 200
   }
 }

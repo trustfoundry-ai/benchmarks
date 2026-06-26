@@ -98,19 +98,19 @@ Each run writes raw provider outputs and row-level scores so aggregate metrics c
 
 ## Example Result
 
-A 200-row production smoke run against TrustFoundry on June 26, 2026 produced:
+A 200-row production run against TrustFoundry on June 26, 2026, using the default harness config with no CLI overrides, produced:
 
 | Metric | Value |
 | --- | ---: |
 | Rows | 200 |
 | Provider failures | 0 |
-| `hit@1` | 0.375 |
-| `hit@5` | 0.485 |
-| `hit@10` | 0.505 |
-| `hit@25` | 0.505 |
-| `MRR` | 0.4241 |
-| Mean latency | 3462.085 ms |
-| p50 latency | 2140.5 ms |
-| p95 latency | 7560.5 ms |
+| `hit@1` | 0.43 |
+| `hit@5` | 0.595 |
+| `hit@10` | 0.615 |
+| `hit@25` | 0.62 |
+| `MRR` | 0.4961 |
+| Mean latency | 3158.055 ms |
+| p50 latency | 3121.5 ms |
+| p95 latency | 4180.6 ms |
 
-The corresponding verified result bundle contains `raw.jsonl`, `result.json`, `manifest.json`, and `checksums.txt`.
+The corresponding verified result bundle is published at `results/public-search-case-questions/trustfoundry-public-search/2026-06-26-production-default-200`.

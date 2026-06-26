@@ -3,16 +3,16 @@
     "raw": {
       "path": "raw.jsonl",
       "rows": 200,
-      "sha256": "1804738f0103b142b86967221f7003625b4f5d8d20e8e6799b99fca324a5446b"
+      "sha256": "195e548e8aaf276ff78e04bb0c0b63e2ea45b4bc92b5660caadbe42075ed524d"
     },
     "result": {
       "path": "result.json",
-      "sha256": "16b0f87aeb7f19124a7b76581431f597cdd635f2d2ddb63fbc420a4437fc4836"
+      "sha256": "ee37414654b675e13d481d4ef9f22307e6f868a31bf34d1afd1d39c74397d323"
     }
   },
-  "generated_at": "2026-06-26T22:52:45.685Z",
+  "generated_at": "2026-06-26T23:33:42.958Z",
   "schema_version": "trustfoundry.benchmarks.result-manifest.v1",
-  "source_run_id": "public-search-200-production-parallel4",
+  "source_run_id": "public-search-20260626T232832Z",
   "status": "self-reported",
   "verification_inputs": {
     "benchmark_config": {
