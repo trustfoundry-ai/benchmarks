@@ -2,6 +2,10 @@ import path from 'node:path';
 
 import { exists, readJson, relativePath, sha256File, writeJson, writeJsonl } from './fs.mjs';
 import { getAdapter } from './registry.mjs';
+import {
+  SUPPORTED_CUTOFFS,
+  SUPPORTED_HEADLINE_CUTOFF
+} from '../adapters/scorers/search-recall.mjs';
 
 const DEFAULT_BENCHMARK_CONFIG = 'configs/benchmarks/public-search-case-questions-200.json';
 const DEFAULT_PROVIDER_CONFIG = 'configs/providers/trustfoundry-public-search-case-question.json';
@@ -14,6 +18,77 @@ function nowCompact() {
 function parsePositiveInteger(value, fallback) {
   const parsed = Number.parseInt(String(value ?? ''), 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+export function maxScorerCutoff(scorerConfig = {}) {
+  const cutoffs = Array.isArray(scorerConfig.cutoffs) ? scorerConfig.cutoffs : [];
+  const headline = scorerConfig.headline_cutoff ?? scorerConfig.headlineCutoff;
+  const candidates = [...cutoffs, headline]
+    .map((value) => Number.parseInt(String(value ?? ''), 10))
+    .filter((value) => Number.isFinite(value) && value > 0);
+  return candidates.length === 0 ? null : Math.max(...candidates);
+}
+
+export function readApiRequestLimit(scorerConfig = {}) {
+  const raw = scorerConfig.api_request_limit ?? scorerConfig.apiRequestLimit;
+  if (raw === undefined || raw === null) return null;
+  const parsed = Number.parseInt(String(raw), 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    throw new Error(
+      `Invalid api_request_limit ${JSON.stringify(raw)} in scorer config - must be a positive integer`
+    );
+  }
+  return parsed;
+}
+
+function sameIntegerSet(a, b) {
+  if (!Array.isArray(a) || !Array.isArray(b)) return false;
+  const sortA = [...a].map(Number).filter(Number.isFinite).sort((x, y) => x - y);
+  const sortB = [...b].map(Number).filter(Number.isFinite).sort((x, y) => x - y);
+  if (sortA.length !== sortB.length) return false;
+  return sortA.every((value, idx) => value === sortB[idx]);
+}
+
+export function validateScorerCutoffsMatchImplementation(scorerConfig = {}) {
+  const configuredCutoffs = scorerConfig.cutoffs;
+  const configuredHeadline =
+    scorerConfig.headline_cutoff ?? scorerConfig.headlineCutoff;
+
+  if (configuredCutoffs !== undefined && !sameIntegerSet(configuredCutoffs, SUPPORTED_CUTOFFS)) {
+    throw new Error(
+      `Scorer config invalid: cutoffs ${JSON.stringify(configuredCutoffs)} ` +
+        `differs from the scorer's implementation ${JSON.stringify(SUPPORTED_CUTOFFS)}. ` +
+        `The result-bundle schema currently pins hits@K to these specific K values; ` +
+        `update both src/adapters/scorers/search-recall.mjs and the artifact schema ` +
+        `together to change them.`
+    );
+  }
+  if (
+    configuredHeadline !== undefined &&
+    Number.parseInt(String(configuredHeadline), 10) !== SUPPORTED_HEADLINE_CUTOFF
+  ) {
+    throw new Error(
+      `Scorer config invalid: headline_cutoff ${configuredHeadline} ` +
+        `differs from the scorer's implementation ${SUPPORTED_HEADLINE_CUTOFF}.`
+    );
+  }
+}
+
+export function validateApiRequestLimitAgainstCutoffs(scorerConfig = {}) {
+  const apiRequestLimit = readApiRequestLimit(scorerConfig);
+  const maxCutoff = maxScorerCutoff(scorerConfig);
+  if (apiRequestLimit === null || maxCutoff === null) return { apiRequestLimit, maxCutoff };
+  if (apiRequestLimit < maxCutoff) {
+    throw new Error(
+      `Scorer config invalid: api_request_limit (${apiRequestLimit}) < ` +
+        `max(cutoffs plus headline_cutoff) (${maxCutoff}). ` +
+        `hits@${maxCutoff} cannot be satisfied because only ${apiRequestLimit} ` +
+        `results are requested per call. Raise api_request_limit (subject to the ` +
+        `public-api caller cap at https://api.trustfoundry.ai) or lower the ` +
+        `largest cutoff/headline_cutoff.`
+    );
+  }
+  return { apiRequestLimit, maxCutoff };
 }
 
 async function gitCommit(repoRoot) {
@@ -49,6 +124,16 @@ export async function loadRunInputs({
   const providerConfig = await readJson(providerConfigFile);
   const scorerConfig = await readJson(scorerConfigFile);
   if (limit !== null) benchmarkConfig.limit = limit;
+  // Validate the scorer config: its cutoffs must match the scorer's
+  // implementation (the result-bundle schema currently pins hits@K), and
+  // api_request_limit must be >= the largest hits@K cutoff. See
+  // configs/scorers/search-recall.json for the rationale and the link to the
+  // public-api caller cap at https://api.trustfoundry.ai.
+  validateScorerCutoffsMatchImplementation(scorerConfig);
+  const { apiRequestLimit } = validateApiRequestLimitAgainstCutoffs(scorerConfig);
+  if (apiRequestLimit !== null && providerConfig.limit === undefined) {
+    providerConfig.limit = apiRequestLimit;
+  }
   return {
     benchmarkConfig,
     providerConfig,

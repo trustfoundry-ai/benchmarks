@@ -1,4 +1,9 @@
 import path from 'node:path';
+import { createReadStream, createWriteStream } from 'node:fs';
+import { readFile, stat, unlink } from 'node:fs/promises';
+import { pipeline } from 'node:stream/promises';
+import { promisify } from 'node:util';
+import { createGzip, gunzip } from 'node:zlib';
 
 import {
   canonicalStringify,
@@ -13,6 +18,9 @@ import {
 } from './fs.mjs';
 import { getAdapter } from './registry.mjs';
 
+const LARGE_RAW_GZIP_THRESHOLD_BYTES = 95 * 1024 * 1024;
+const gunzipAsync = promisify(gunzip);
+
 function safeParseJson(text) {
   if (typeof text !== 'string') return null;
   try {
@@ -20,6 +28,33 @@ function safeParseJson(text) {
   } catch {
     return null;
   }
+}
+
+function parseJsonlText(text, file) {
+  return text
+    .split(/\r?\n/)
+    .filter((line) => line.trim())
+    .map((line, index) => {
+      try {
+        return JSON.parse(line);
+      } catch (error) {
+        throw new Error(`Invalid JSONL at ${file}:${index + 1}: ${error.message}`);
+      }
+    });
+}
+
+async function readRawJsonl(file) {
+  if (!file.endsWith('.gz')) return readJsonl(file);
+  const inflated = await gunzipAsync(await readFile(file));
+  return parseJsonlText(inflated.toString('utf8'), file);
+}
+
+async function gzipFile(source, target) {
+  await pipeline(
+    createReadStream(source),
+    createGzip({ level: 9 }),
+    createWriteStream(target)
+  );
 }
 
 function byCaseId(rows) {
@@ -168,9 +203,17 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
   const recomputed = await scoreRawRows({ rawRows, manifest });
   const result = resultEnvelope({ manifest, scores: recomputed });
 
-  const rawPath = path.join(resolvedOut, 'raw.jsonl');
+  let rawArtifactPath = 'raw.jsonl';
+  let rawPath = path.join(resolvedOut, rawArtifactPath);
   const resultPath = path.join(resolvedOut, 'result.json');
   await writeJsonl(rawPath, rawRows);
+  if ((await stat(rawPath)).size > LARGE_RAW_GZIP_THRESHOLD_BYTES) {
+    const gzPath = path.join(resolvedOut, 'raw.jsonl.gz');
+    await gzipFile(rawPath, gzPath);
+    await unlink(rawPath);
+    rawArtifactPath = 'raw.jsonl.gz';
+    rawPath = gzPath;
+  }
   await writeJson(resultPath, result);
 
   const bundleManifest = {
@@ -180,7 +223,7 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
     source_run_id: manifest.run_id ?? manifest.runId ?? null,
     artifacts: {
       raw: {
-        path: 'raw.jsonl',
+        path: rawArtifactPath,
         sha256: await sha256File(rawPath),
         rows: rawRows.length
       },
@@ -208,7 +251,7 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
   const manifestPath = path.join(resolvedOut, 'manifest.json');
   await writeJson(manifestPath, bundleManifest);
   const checksums = [
-    `${bundleManifest.artifacts.raw.sha256}  raw.jsonl`,
+    `${bundleManifest.artifacts.raw.sha256}  ${rawArtifactPath}`,
     `${bundleManifest.artifacts.result.sha256}  result.json`,
     `${await sha256File(manifestPath)}  manifest.json`
   ].join('\n');
@@ -229,15 +272,15 @@ async function verifyInputDigest(repoRoot, item, label) {
   assertEqual(await sha256File(file), item.sha256, `${label} digest mismatch`);
 }
 
-export async function verifyResultBundle({ repoRoot, bundleDir }) {
+export async function verifyResultBundle({ repoRoot, bundleDir, verifyInputs = true }) {
   const resolvedBundle = path.resolve(repoRoot, bundleDir);
   const manifest = await readJson(path.join(resolvedBundle, 'manifest.json'));
   const rawPath = path.join(resolvedBundle, manifest.artifacts?.raw?.path ?? 'raw.jsonl');
   const resultPath = path.join(resolvedBundle, manifest.artifacts?.result?.path ?? 'result.json');
-  assertEqual(await sha256File(rawPath), manifest.artifacts.raw.sha256, 'raw.jsonl digest mismatch');
+  assertEqual(await sha256File(rawPath), manifest.artifacts.raw.sha256, `${manifest.artifacts.raw.path} digest mismatch`);
   assertEqual(await sha256File(resultPath), manifest.artifacts.result.sha256, 'result.json digest mismatch');
 
-  const rawRows = await readJsonl(rawPath);
+  const rawRows = await readRawJsonl(rawPath);
   assertEqual(rawRows.length, manifest.artifacts.raw.rows, 'raw row count mismatch');
   const result = await readJson(resultPath);
   const recomputed = await scoreRawRows({
@@ -255,11 +298,13 @@ export async function verifyResultBundle({ repoRoot, bundleDir }) {
   const reportedSummary = canonicalStringify(result.summary);
   assertEqual(reportedSummary, recomputedSummary, 'result summary mismatch');
 
-  await verifyInputDigest(repoRoot, manifest.verification_inputs?.benchmark_config, 'benchmark config');
-  await verifyInputDigest(repoRoot, manifest.verification_inputs?.provider_config, 'provider config');
-  await verifyInputDigest(repoRoot, manifest.verification_inputs?.scorer_config, 'scorer config');
-  for (const dataFile of manifest.verification_inputs?.data_files ?? []) {
-    await verifyInputDigest(repoRoot, dataFile, `data file ${dataFile.path}`);
+  if (verifyInputs) {
+    await verifyInputDigest(repoRoot, manifest.verification_inputs?.benchmark_config, 'benchmark config');
+    await verifyInputDigest(repoRoot, manifest.verification_inputs?.provider_config, 'provider config');
+    await verifyInputDigest(repoRoot, manifest.verification_inputs?.scorer_config, 'scorer config');
+    for (const dataFile of manifest.verification_inputs?.data_files ?? []) {
+      await verifyInputDigest(repoRoot, dataFile, `data file ${dataFile.path}`);
+    }
   }
   return {
     ok: true,

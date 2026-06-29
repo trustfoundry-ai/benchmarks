@@ -334,6 +334,12 @@ export const searchRecallScorerAdapter = {
   }
 };
 
+// Exposed for runner-side config validation. If you change CUTOFFS or
+// HEADLINE_CUTOFF above, update configs/scorers/search-recall.json to match -
+// the runner refuses to start when these diverge.
+export const SUPPORTED_CUTOFFS = CUTOFFS;
+export const SUPPORTED_HEADLINE_CUTOFF = HEADLINE_CUTOFF;
+
 export const _internals = {
   resultCitations,
   resultDocumentIds,

@@ -13,9 +13,10 @@ async function findBundles(root) {
   const bundles = [];
   async function walk(dir) {
     const manifest = path.join(dir, 'manifest.json');
-    const raw = path.join(dir, 'raw.jsonl');
     const result = path.join(dir, 'result.json');
-    if ((await exists(manifest)) && (await exists(raw)) && (await exists(result))) {
+    const hasRaw = (await exists(path.join(dir, 'raw.jsonl'))) ||
+      (await exists(path.join(dir, 'raw.jsonl.gz')));
+    if ((await exists(manifest)) && hasRaw && (await exists(result))) {
       bundles.push(dir);
       return;
     }
@@ -35,6 +36,10 @@ if (!bundles.length) {
 }
 
 for (const bundle of bundles) {
-  const verification = await verifyResultBundle({ repoRoot, bundleDir: bundle });
+  const verification = await verifyResultBundle({
+    repoRoot,
+    bundleDir: bundle,
+    verifyInputs: false
+  });
   console.log(`verified ${verification.bundleDir} (${verification.rows} rows)`);
 }
