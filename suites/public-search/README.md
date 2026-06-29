@@ -1,4 +1,4 @@
-# Public Search Case-Question Recall
+# TrustFoundry Legal Search
 
 This suite evaluates whether a search API returns the expected case-law document or citation for a legal question. Each row contains a generated question, an expected TrustFoundry document UUID, accepted citation metadata, and jurisdiction metadata. The TrustFoundry provider calls:
 
@@ -117,21 +117,6 @@ The scorer can match either an expected document UUID or an accepted citation. T
 
 Each run writes raw provider outputs and row-level scores so aggregate metrics can be recomputed from the evidence.
 
-## Example Result
+## Example Test Results
 
-A 200-row production run against TrustFoundry on June 26, 2026, using the default harness config with no CLI overrides, produced:
-
-| Metric | Value |
-| --- | ---: |
-| Rows | 200 |
-| Provider failures | 0 |
-| `hit@1` | 0.43 |
-| `hit@5` | 0.595 |
-| `hit@10` | 0.615 |
-| `hit@25` | 0.62 |
-| `MRR` | 0.4961 |
-| Mean latency | 3158.055 ms |
-| p50 latency | 3121.5 ms |
-| p95 latency | 4180.6 ms |
-
-The corresponding verified result bundle is published at `results/public-search-case-questions/trustfoundry-public-search/2026-06-26-production-default-200`.
+For example output, inspect the scored summary at [`result.json`](../../results/public-search-case-questions/trustfoundry-public-search/2026-06-28-production-default-c8-5k/result.json). The full checked-in bundle also includes the raw row evidence, manifest, and checksums.

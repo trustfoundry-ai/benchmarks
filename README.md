@@ -4,18 +4,63 @@ This repository contains public benchmark harnesses for metrics TrustFoundry run
 
 ## Latest Benchmarks
 
-These are the latest published benchmark runs in this repository. The raw results used to calculate each row of stats are linked in the `Raw Results` column; each checked-in bundle includes `manifest.json`, `checksums.txt`, scored results, and row-level raw evidence.
+These are the latest canonical benchmark runs in this repository. Each checked-in bundle includes `manifest.json`, `checksums.txt`, scored results, and row-level raw evidence.
 
-| Suite | Run | Rows | Concurrency | Provider Failures | Hit@1 | Hit@10 | Hit@25 | MRR | p50 Latency | p95 Latency | Raw Results |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| Public Search Case-Question Recall | `2026-06-28-production-default-c8-5k` | 5,000 | 8 | 0 | 0.3864 | 0.638 | 0.7106 | 0.4716 | 927 ms | 1408.1 ms | [`results/.../2026-06-28-production-default-c8-5k`](results/public-search-case-questions/trustfoundry-public-search/2026-06-28-production-default-c8-5k/) |
-| Public Search Case-Question Recall | `2026-06-28-production-default-c8-200` | 200 | 8 | 0 | 0.385 | 0.635 | 0.715 | 0.4712 | 907.5 ms | 1683.15 ms | [`results/.../2026-06-28-production-default-c8-200`](results/public-search-case-questions/trustfoundry-public-search/2026-06-28-production-default-c8-200/) |
+<table>
+  <thead>
+    <tr>
+      <th colspan="7" align="left">TrustFoundry Legal Search</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th>Dataset</th>
+      <th>Recall@1</th>
+      <th>Recall@25</th>
+      <th>MRR</th>
+      <th>Latency (p50)</th>
+      <th>Latency (p95)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2026-06-28</td>
+      <td>5000 case questions</td>
+      <td>0.3864</td>
+      <td>0.7106</td>
+      <td>0.4716</td>
+      <td>927 ms</td>
+      <td>1408.1 ms</td>
+    </tr>
+    <tr>
+      <td colspan="7">Raw and scored results used to calculate these stats: <a href="results/public-search-case-questions/trustfoundry-public-search/2026-06-28-production-default-c8-5k/">5k result bundle</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<details>
+<summary>TrustFoundry Legal Search details</summary>
+
+Latest full run: `2026-06-28-production-default-c8-5k`
+
+- Dataset: 5000 case questions
+- Rows: 5,000
+- Concurrency: 8
+- Provider failures: 0
+- Recall@1: 0.3864
+- Recall@10: 0.638
+- Recall@25: 0.7106
+- MRR: 0.4716
+- Latency: p50 927 ms, p95 1408.1 ms
+- Raw/scored results: [5k result bundle](results/public-search-case-questions/trustfoundry-public-search/2026-06-28-production-default-c8-5k/)
+- Companion smoke run: [200-row c=8 result bundle](results/public-search-case-questions/trustfoundry-public-search/2026-06-28-production-default-c8-200/)
+
+</details>
 
 For full runs with large raw artifacts, raw rows may be stored as `raw.jsonl.gz`; `pnpm benchmark verify-result <bundle>` reads the manifest path directly.
 
 ## Suites
 
-- [Public Search Case-Question Recall](suites/public-search/README.md): search recall over a public 5,000-row case-law question dataset.
+- [TrustFoundry Legal Search](suites/public-search/README.md): legal search recall over a public 5,000-row case-law question dataset.
 
 ## Setup
 
