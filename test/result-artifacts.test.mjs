@@ -6,7 +6,12 @@ import test from 'node:test';
 import { promisify } from 'node:util';
 import { gzip } from 'node:zlib';
 
-import { publishResultBundle, verifyResultBundle } from '../src/core/artifacts.mjs';
+import {
+  buildRawRows,
+  publishResultBundle,
+  reconstructFromRawRows,
+  verifyResultBundle
+} from '../src/core/artifacts.mjs';
 import { sha256File, writeJson, writeJsonl, readJson } from '../src/core/fs.mjs';
 import { searchRecallScorerAdapter } from '../src/adapters/scorers/search-recall.mjs';
 
@@ -154,4 +159,75 @@ test('verifies result bundles with gzip-compressed raw rows', async () => {
   const verification = await verifyResultBundle({ repoRoot, bundleDir: outDir });
   assert.equal(verification.ok, true);
   assert.equal(verification.rows, 1);
+});
+
+test('raw rows preserve non-case legal search metadata for recomputation', () => {
+  const cases = [
+    {
+      caseId: 'law-1',
+      benchmarkId: 'trustfoundry-legal-search',
+      split: 'test',
+      prompt: 'query',
+      metadata: {
+        datasetIndex: 0,
+        datasetName: 'laws',
+        doc_type: 'law',
+        field: 'questions',
+        model_type: 'law_question',
+        datasource_id: 'me-laws',
+        authority_identifier: 'mainelegislature.org',
+        jurisdiction_id: 'me',
+        state: 'ME',
+        document_uuid: '22222222-2222-2222-2222-222222222222',
+        expected: { canonical_citation: 'Me. Stat. tit. 1, \u00a7 1', alternates: [] }
+      }
+    }
+  ];
+  const providerResults = [
+    {
+      caseId: 'law-1',
+      status: 'completed',
+      rawOutput: {
+        request: { query: 'query', model_type: 'law_question', state: 'ME' },
+        normalizedResults: [
+          { rank: 1, document_uuid: '22222222-2222-2222-2222-222222222222' }
+        ]
+      },
+      finalOutputText: JSON.stringify({
+        result_count: 1,
+        results: [
+          { rank: 1, document_uuid: '22222222-2222-2222-2222-222222222222' }
+        ]
+      }),
+      timing: { durationMs: 10 }
+    }
+  ];
+  const caseScores = [
+    {
+      caseId: 'law-1',
+      status: 'scored',
+      hitRank: 1,
+      hitAt1: true,
+      hitAt5: true,
+      hitAt10: true,
+      hitAt25: true,
+      reciprocalRank: 1
+    }
+  ];
+  const rawRows = buildRawRows({ cases, providerResults, caseScores });
+  assert.equal(rawRows[0].benchmark_id, 'trustfoundry-legal-search');
+  assert.deepEqual(rawRows[0].metadata, {
+    doc_type: 'law',
+    field: 'questions',
+    model_type: 'law_question',
+    datasource_id: 'me-laws',
+    authority_identifier: 'mainelegislature.org',
+    jurisdiction_id: 'me'
+  });
+
+  const reconstructed = reconstructFromRawRows(rawRows);
+  assert.equal(reconstructed.cases[0].benchmarkId, 'trustfoundry-legal-search');
+  assert.equal(reconstructed.cases[0].metadata.doc_type, 'law');
+  assert.equal(reconstructed.cases[0].metadata.model_type, 'law_question');
+  assert.equal(reconstructed.cases[0].metadata.datasource_id, 'me-laws');
 });

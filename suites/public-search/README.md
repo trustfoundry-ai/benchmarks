@@ -1,6 +1,6 @@
 # TrustFoundry Legal Search
 
-This suite evaluates whether a search API returns the expected case-law document or citation for a legal question. Each row contains a generated question, an expected TrustFoundry document UUID, accepted citation metadata, and jurisdiction metadata. The TrustFoundry provider calls:
+This suite evaluates whether a search API returns the expected legal document or citation for a generated legal search prompt. Public datasets cover case questions, case key facts, law questions, and regulation questions. Each row contains a generated query, an expected TrustFoundry document UUID, accepted citation metadata, and jurisdiction metadata. The TrustFoundry provider calls:
 
 ```text
 POST https://api.trustfoundry.ai/public/v1/search
@@ -22,13 +22,18 @@ pnpm install
 
 ## Run
 
-The repository includes one public data file for this suite:
+The repository includes these public data files:
 
 ```text
 data/public-search-case-questions-5k/case_questions.jsonl
+data/trustfoundry-legal-search-5k/case_key_facts.jsonl
+data/trustfoundry-legal-search-5k/laws.jsonl
+data/trustfoundry-legal-search-5k/regs.jsonl
 ```
 
-That file contains 5,000 rows. The smoke config and full config both reference the same file. The smoke config stops after the first deterministic 200 rows by setting `limit: 200`; there is no separate 200-row dataset to keep in sync.
+Each file contains 5,000 rows. Smoke configs and full configs reference the same files; smoke configs stop after the first deterministic 200 rows by setting `limit: 200`, so there are no separate 200-row datasets to keep in sync.
+
+The key-fact file is selected from the existing deterministic 10k source after excluding rows whose normalized query is empty. Law and regulation files are the first 5,000 rows from their deterministic 10k source files.
 
 ### Test Data Schema
 
@@ -36,14 +41,14 @@ Each line in `case_questions.jsonl` is one JSON object. The main fields are:
 
 | Field | Description |
 | --- | --- |
-| `query_text` | The legal question sent to the search API after the suite's query normalization step. |
-| `document_uuid` | TrustFoundry document UUID for the expected case. TrustFoundry runs can score against this because the public search API returns document UUIDs in results. |
-| `expected.canonical_citation` | Primary citation for the expected case. |
-| `expected.alternates` | Additional accepted citations for the expected case. |
+| `query_text` | The legal query sent to the search API after the suite's query normalization step. |
+| `document_uuid` | TrustFoundry document UUID for the expected document. TrustFoundry runs can score against this because the public search API returns document UUIDs in results. |
+| `expected.canonical_citation` | Primary citation for the expected document. |
+| `expected.alternates` | Additional accepted citations for the expected document. |
 | `geo_level_1_identifier` | Row-level state or `FED` jurisdiction value. The TrustFoundry provider sends this as the state filter when state filtering is enabled. |
-| `model_type` | Expected model type for the row, currently `case_question`. Provider configs must still declare the model type explicitly. |
+| `model_type` | Expected model type for the row: `case_question`, `case_key_fact`, `law_question`, or `reg_question`. The generic TrustFoundry provider config uses this row-level value. |
 | `doc_type` / `document_type` | Source document category metadata. |
-| `field` | Source field used to generate the query, currently `questions`. |
+| `field` | Source field used to generate the query, such as `questions` or `key_facts`. |
 | `split` | Dataset split, currently `test` for public rows. |
 | `source_dataset` / `source_index` | Provenance fields for tracing the row back to the source generation set. |
 
@@ -51,7 +56,7 @@ The scorer accepts either identifier path. The TrustFoundry adapter uses `docume
 
 ### Commands
 
-Smoke run, first deterministic 200 rows:
+Case-question smoke run, first deterministic 200 rows:
 
 ```bash
 pnpm benchmark run \
@@ -62,7 +67,7 @@ pnpm benchmark run \
   --force
 ```
 
-Full public 5k run:
+Case-question full public 5k run:
 
 ```bash
 pnpm benchmark run \
@@ -73,7 +78,31 @@ pnpm benchmark run \
   --force
 ```
 
-The provider config requires `model_type: "case_question"` and sends the row-level state filter by default.
+Key-fact, law, or regulation smoke run:
+
+```bash
+pnpm benchmark run \
+  --benchmark-config configs/benchmarks/trustfoundry-legal-search-laws-200.json \
+  --provider-config configs/providers/trustfoundry-public-search.json \
+  --out runs/legal-search-laws-200 \
+  --parallel 4 \
+  --force
+```
+
+Key-fact, law, or regulation full public 5k run:
+
+```bash
+pnpm benchmark run \
+  --benchmark-config configs/benchmarks/trustfoundry-legal-search-laws-5k.json \
+  --provider-config configs/providers/trustfoundry-public-search.json \
+  --out runs/legal-search-laws-5k \
+  --parallel 8 \
+  --force
+```
+
+Use the matching config names for other targets: `trustfoundry-legal-search-key-facts-*` or `trustfoundry-legal-search-regs-*`. The case-question provider config pins `model_type: "case_question"`; the generic provider config omits `model_type` and sends each row's `model_type`.
+
+The TrustFoundry public-search provider makes one retry for transient provider failures: fetch errors, streamed provider error events, missing result events, or HTTP 5xx responses. It does not retry validation errors or HTTP 4xx responses. If the retry succeeds, the row is scored from the successful response and latency includes the full elapsed time across both attempts; if it still fails, it is reported as a provider failure.
 
 ### Request limit and scorer cutoffs
 
@@ -116,6 +145,8 @@ The scorer can match either an expected document UUID or an accepted citation. T
 - `latency_ms`: request timing summary with min, mean, p50, p95, and max.
 
 Each run writes raw provider outputs and row-level scores so aggregate metrics can be recomputed from the evidence.
+
+Top-level `hit@k` and `MRR` are computed over successfully scored rows and report provider failures separately. Use `strict_overall` when provider failures should count as misses.
 
 ## Example Test Results
 

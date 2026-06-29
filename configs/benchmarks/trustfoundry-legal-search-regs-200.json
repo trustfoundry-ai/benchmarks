@@ -1,0 +1,11 @@
+{
+  "_comment": "First 200 deterministic regulation-question search rows from the public Legal Search 5k subset.",
+  "benchmarkId": "trustfoundry-legal-search",
+  "dataDir": "data/trustfoundry-legal-search-5k",
+  "files": ["regs.jsonl"],
+  "datasetSize": "trustfoundry-legal-search-regs-200",
+  "datasetNames": ["regs"],
+  "splits": ["test"],
+  "queryTransformId": "strip-synthetic-instruction-prefixes-v1",
+  "limit": 200
+}

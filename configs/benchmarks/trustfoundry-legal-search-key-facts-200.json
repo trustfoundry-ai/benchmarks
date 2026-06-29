@@ -1,0 +1,11 @@
+{
+  "_comment": "First 200 deterministic key-fact search rows from the public Legal Search 5k subset.",
+  "benchmarkId": "trustfoundry-legal-search",
+  "dataDir": "data/trustfoundry-legal-search-5k",
+  "files": ["case_key_facts.jsonl"],
+  "datasetSize": "trustfoundry-legal-search-key-facts-200",
+  "datasetNames": ["case_key_facts"],
+  "splits": ["test"],
+  "queryTransformId": "strip-synthetic-instruction-prefixes-v1",
+  "limit": 200
+}

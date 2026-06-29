@@ -80,10 +80,19 @@ export function buildRawRows({ cases, providerResults, caseScores }) {
     return {
       schema_version: 'trustfoundry.benchmarks.raw-row.v1',
       case_id: benchmarkCase.caseId,
+      benchmark_id: benchmarkCase.benchmarkId ?? null,
       row_index: benchmarkCase.metadata?.datasetIndex ?? null,
       split: benchmarkCase.split ?? null,
       dataset_name: benchmarkCase.metadata?.datasetName ?? null,
       prompt: benchmarkCase.prompt ?? '',
+      metadata: {
+        doc_type: benchmarkCase.metadata?.doc_type ?? null,
+        field: benchmarkCase.metadata?.field ?? null,
+        model_type: benchmarkCase.metadata?.model_type ?? null,
+        datasource_id: benchmarkCase.metadata?.datasource_id ?? null,
+        authority_identifier: benchmarkCase.metadata?.authority_identifier ?? null,
+        jurisdiction_id: benchmarkCase.metadata?.jurisdiction_id ?? null
+      },
       expected: {
         document_uuid: benchmarkCase.metadata?.document_uuid ?? null,
         canonical_citation: benchmarkCase.metadata?.expected?.canonical_citation ?? null,
@@ -125,15 +134,18 @@ export function buildRawRows({ cases, providerResults, caseScores }) {
 export function reconstructFromRawRows(rawRows) {
   const cases = rawRows.map((row) => ({
     caseId: row.case_id,
-    benchmarkId: 'public-search-case-questions',
+    benchmarkId: row.benchmark_id ?? 'public-search-case-questions',
     split: row.split,
     prompt: row.prompt,
     metadata: {
       datasetIndex: row.row_index,
       datasetName: row.dataset_name,
-      doc_type: 'case',
-      field: 'questions',
-      model_type: row.request?.model_type ?? 'case_question',
+      doc_type: row.metadata?.doc_type ?? 'case',
+      field: row.metadata?.field ?? 'questions',
+      model_type: row.metadata?.model_type ?? row.request?.model_type ?? 'case_question',
+      datasource_id: row.metadata?.datasource_id ?? null,
+      authority_identifier: row.metadata?.authority_identifier ?? null,
+      jurisdiction_id: row.metadata?.jurisdiction_id ?? null,
       state: row.expected?.state ?? row.request?.state ?? null,
       document_uuid: row.expected?.document_uuid ?? null,
       expected: {
