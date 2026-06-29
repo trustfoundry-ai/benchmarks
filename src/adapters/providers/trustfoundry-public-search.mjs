@@ -43,6 +43,10 @@ function maxResultsForConfig(config = {}) {
   return positiveInteger(config.max_results ?? config.maxResults ?? config.top_k ?? config.topK);
 }
 
+function requestLimitForConfig(config = {}) {
+  return positiveInteger(config.limit ?? config.requestLimit ?? config.request_limit);
+}
+
 function buildRequestBody(benchmarkCase, config = {}) {
   const body = {
     query: benchmarkCase.prompt ?? '',
@@ -63,6 +67,8 @@ function buildRequestBody(benchmarkCase, config = {}) {
     }
     body.state = state;
   }
+  const limit = requestLimitForConfig(config);
+  if (limit !== null) body.limit = limit;
   return body;
 }
 
@@ -264,7 +270,8 @@ export const trustfoundryPublicSearchProviderAdapter = {
         requestTimeoutMs: config.request_timeout_ms ?? DEFAULT_TIMEOUT_MS,
         modelType,
         stateFilterEnabled: configuredBool(config, 'state_filter_enabled', 'stateFilterEnabled', true),
-        maxResults: maxResultsForConfig(config)
+        maxResults: maxResultsForConfig(config),
+        limit: requestLimitForConfig(config)
       }
     };
   },
@@ -364,6 +371,7 @@ export const trustfoundryPublicSearchProviderAdapter = {
         state: request.state ?? null,
         eventCount: stream.events.length,
         maxResults,
+        requestLimit: request.limit ?? null,
         resultCount: envelope.result_count,
         totalAvailable: envelope.total_available,
         ttfbMs,
@@ -408,5 +416,6 @@ export const _internals = {
   normalizeEnvelope,
   normalizeState,
   readNdjsonResponse,
+  requestLimitForConfig,
   stateForCase
 };

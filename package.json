@@ -2,6 +2,7 @@
   "name": "@trustfoundry-ai/benchmarks",
   "version": "0.1.0",
   "private": false,
+  "license": "Apache-2.0",
   "type": "module",
   "bin": {
     "trustfoundry-benchmarks": "bin/benchmarks.mjs"

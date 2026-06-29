@@ -1,5 +1,5 @@
 {
-  "_comment": "TrustFoundry public API search provider for case-question recall. Sends per-row state by default because the public API currently requires state for non-citation searches.",
+  "_comment": "TrustFoundry public API search provider for case-question recall. Sends per-row state by default because the public API currently requires state for non-citation searches. The runner derives `limit` from the scorer's max cutoff (cutoffs ∪ headline_cutoff) so recall@K is always backed by enough returned results. If the derived limit exceeds the public-api caller cap (currently 25), the gateway returns 400 — loud surface that the caller cap or scorer cutoff needs updating.",
   "endpoint": "https://api.trustfoundry.ai/public/v1/search",
   "api_key_env": "TF_API_KEY",
   "request_timeout_ms": 60000,

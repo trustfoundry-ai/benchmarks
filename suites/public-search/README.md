@@ -75,6 +75,27 @@ pnpm benchmark run \
 
 The provider config requires `model_type: "case_question"` and sends the row-level state filter by default.
 
+### Request limit and scorer cutoffs
+
+Both knobs live in one place: [`configs/scorers/search-recall.json`](../../configs/scorers/search-recall.json).
+
+| Field | Purpose |
+| --- | --- |
+| `api_request_limit` | Number of results requested per `/public/v1/search` call (forwarded as `limit` in the request body). |
+| `cutoffs` | List of K values for `hits@K` reported in the scores file. |
+| `headline_cutoff` | The featured `hits@K` shown in the run summary. |
+
+**Public API cap.** `api_request_limit` must align with the caller-facing cap enforced by the public search API at <https://api.trustfoundry.ai>. The current cap is 25; raising `api_request_limit` past it causes every call to fail with HTTP 400.
+
+**Startup validation.** The runner refuses to start unless:
+
+1. `api_request_limit >= max(cutoffs plus headline_cutoff)`; otherwise `hits@K` for K > `api_request_limit` is meaningless because the API would never return enough results.
+2. `cutoffs` and `headline_cutoff` match the values the search-recall scorer is actually computing. The published result-bundle schema currently pins `hits@K` to `K in {1, 5, 10, 25}`; if you need different K values, update `src/adapters/scorers/search-recall.mjs` and the artifact schema together.
+
+Each validation error names both numbers and points back to <https://api.trustfoundry.ai>.
+
+Individual provider configs can still pin an explicit `limit` if an adapter needs different semantics; the explicit value wins over the scorer-driven default.
+
 Create a shareable result bundle from a run:
 
 ```bash

@@ -1,12 +1,16 @@
 import assert from 'node:assert/strict';
-import { mkdtemp } from 'node:fs/promises';
+import { mkdtemp, readFile, unlink, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
+import { promisify } from 'node:util';
+import { gzip } from 'node:zlib';
 
 import { publishResultBundle, verifyResultBundle } from '../src/core/artifacts.mjs';
 import { sha256File, writeJson, writeJsonl, readJson } from '../src/core/fs.mjs';
 import { searchRecallScorerAdapter } from '../src/adapters/scorers/search-recall.mjs';
+
+const gzipAsync = promisify(gzip);
 
 async function makeRun(repoRoot, root) {
   const runDir = path.join(root, 'run');
@@ -102,4 +106,52 @@ test('publishes and verifies result bundles, then detects edited summaries', asy
     () => verifyResultBundle({ repoRoot, bundleDir: outDir }),
     /result summary mismatch/
   );
+});
+
+test('aggregate result verification can ignore current input digests', async () => {
+  const repoRoot = process.cwd();
+  const root = await mkdtemp(path.join(os.tmpdir(), 'tf-benchmarks-artifacts-inputs-'));
+  const runDir = await makeRun(repoRoot, root);
+  const outDir = path.join(root, 'bundle');
+  await publishResultBundle({ repoRoot, runDir, outDir });
+
+  const manifestPath = path.join(outDir, 'manifest.json');
+  const manifest = await readJson(manifestPath);
+  manifest.verification_inputs.provider_config.sha256 = 'not-the-current-provider-config';
+  await writeJson(manifestPath, manifest);
+
+  await assert.rejects(
+    () => verifyResultBundle({ repoRoot, bundleDir: outDir }),
+    /provider config digest mismatch/
+  );
+  const verification = await verifyResultBundle({
+    repoRoot,
+    bundleDir: outDir,
+    verifyInputs: false
+  });
+  assert.equal(verification.ok, true);
+  assert.equal(verification.rows, 1);
+});
+
+test('verifies result bundles with gzip-compressed raw rows', async () => {
+  const repoRoot = process.cwd();
+  const root = await mkdtemp(path.join(os.tmpdir(), 'tf-benchmarks-artifacts-gz-'));
+  const runDir = await makeRun(repoRoot, root);
+  const outDir = path.join(root, 'bundle');
+  await publishResultBundle({ repoRoot, runDir, outDir });
+
+  const rawPath = path.join(outDir, 'raw.jsonl');
+  const gzPath = path.join(outDir, 'raw.jsonl.gz');
+  await writeFile(gzPath, await gzipAsync(await readFile(rawPath)));
+  await unlink(rawPath);
+
+  const manifestPath = path.join(outDir, 'manifest.json');
+  const manifest = await readJson(manifestPath);
+  manifest.artifacts.raw.path = 'raw.jsonl.gz';
+  manifest.artifacts.raw.sha256 = await sha256File(gzPath);
+  await writeJson(manifestPath, manifest);
+
+  const verification = await verifyResultBundle({ repoRoot, bundleDir: outDir });
+  assert.equal(verification.ok, true);
+  assert.equal(verification.rows, 1);
 });
