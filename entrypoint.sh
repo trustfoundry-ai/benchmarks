@@ -1,58 +1,90 @@
 #!/usr/bin/env bash
 #
-# Container entrypoint for the benchmarks harness.
+# Container entrypoint for the TrustFoundry Legal Search benchmark suite.
 #
 # Inputs (all via env):
 #   TF_API_KEY         required — TrustFoundry public-search API key
-#   MODEL_TYPES        optional — comma-separated subset of:
-#                                 case-questions,key-facts,laws,regs
-#                                 (default: all four)
-#   BENCHMARK_SIZE     optional — "200" or "5k" (default: 5k)
-#   RUN_LABEL          optional — short label baked into the run ID
-#                                 (default: manual)
+#   BENCHMARK_CONFIG   optional — a config name from configs/benchmarks/
+#                                 (filename without .json), or one of the
+#                                 convenience aliases below.
+#                                 (default: trustfoundry-legal-search-case-questions-5k)
+#                                 Aliases:
+#                                   all-200 — run every *-200 config in sequence
+#                                   all-5k  — run every *-5k config in sequence
+#   RUN_LABEL          optional — short label baked into the run ID (default: manual)
 #   OUTPUT_BUNDLE_URI  optional — destination prefix for verified bundles.
 #                                 Cloud-agnostic; dispatched by URI scheme:
-#                                   gs://...   → gcloud storage cp
-#                                   file:///   → local cp -r
-#                                   /abs/path  → local cp -r (treated as file://)
+#                                   gs://...  → gcloud storage cp
+#                                   file://  → local cp -r
+#                                   /abs/path → local cp -r (treated as file://)
 #                                 Each bundle lands under
 #                                   $OUTPUT_BUNDLE_URI/<benchmark-family>/<sha7>/<leaf>/
-#                                 If unset, bundles stay on local disk only.
+#                                 If unset, bundles stay on the container filesystem.
 #   HARNESS_COMMIT_SHA   set    — public benchmarks commit the image was
 #                                 built from; stamped into output paths.
 #
 # Behavior: runs `pnpm benchmark run` + `publish-result` + `verify-result`
-# once per model type in $MODEL_TYPES, sequentially.
+# once per resolved config, sequentially.
 
 set -euo pipefail
 
 : "${TF_API_KEY:?TF_API_KEY is required}"
-: "${MODEL_TYPES:=case-questions,key-facts,laws,regs}"
-: "${BENCHMARK_SIZE:=5k}"
+: "${BENCHMARK_CONFIG:=trustfoundry-legal-search-case-questions-5k}"
 : "${RUN_LABEL:=manual}"
 : "${OUTPUT_BUNDLE_URI:=}"
 : "${HARNESS_COMMIT_SHA:=unknown}"
 
-case "$BENCHMARK_SIZE" in
-  200|5k) ;;
-  *) echo "BENCHMARK_SIZE must be 200 or 5k (got: $BENCHMARK_SIZE)" >&2; exit 2 ;;
-esac
-
 PARALLEL_C=8
 SHA7=${HARNESS_COMMIT_SHA:0:7}
 DATE=$(date -u +%Y-%m-%d)
-RUN_ID="${DATE}-production-${RUN_LABEL}-c${PARALLEL_C}-${BENCHMARK_SIZE}"
 
-# Benchmark family name used at the top of the upload path. All four
-# model types belong to the same family; their bundles land as siblings
-# under <family>/<sha7>/. Hardcoded for now — when we add a second
-# benchmark family (e.g. trustfoundry-legal-judgment) we'll either
-# parameterize this or ship a second Dockerfile + entrypoint.
+# Benchmark family hardcoded for this suite. Future suites (legal-judgment,
+# etc.) ship as separate Dockerfiles + entrypoints with their own family.
 BENCHMARK_FAMILY=trustfoundry-legal-search
+PROVIDER_CFG=configs/providers/trustfoundry-public-search.json
+
+# Canonical list of configs this suite knows how to run. Drives validation
+# and the all-200 / all-5k aliases. Keep in sync with the GHA dropdown in
+# Trust-Foundry/benchmarks-lab/.github/workflows/tf-legal-search-run.yml.
+ALL_CONFIGS=(
+  trustfoundry-legal-search-case-questions-200
+  trustfoundry-legal-search-case-questions-5k
+  trustfoundry-legal-search-key-facts-200
+  trustfoundry-legal-search-key-facts-5k
+  trustfoundry-legal-search-laws-200
+  trustfoundry-legal-search-laws-5k
+  trustfoundry-legal-search-regs-200
+  trustfoundry-legal-search-regs-5k
+)
+
+declare -a CONFIGS_TO_RUN=()
+case "$BENCHMARK_CONFIG" in
+  all-200)
+    for cfg in "${ALL_CONFIGS[@]}"; do
+      [[ "$cfg" == *-200 ]] && CONFIGS_TO_RUN+=("$cfg")
+    done
+    ;;
+  all-5k)
+    for cfg in "${ALL_CONFIGS[@]}"; do
+      [[ "$cfg" == *-5k ]] && CONFIGS_TO_RUN+=("$cfg")
+    done
+    ;;
+  *)
+    found=0
+    for cfg in "${ALL_CONFIGS[@]}"; do
+      [[ "$cfg" == "$BENCHMARK_CONFIG" ]] && { found=1; break; }
+    done
+    if [ "$found" -ne 1 ]; then
+      echo "Unknown BENCHMARK_CONFIG: '$BENCHMARK_CONFIG'" >&2
+      echo "Valid: all-200, all-5k, ${ALL_CONFIGS[*]}" >&2
+      exit 2
+    fi
+    CONFIGS_TO_RUN+=("$BENCHMARK_CONFIG")
+    ;;
+esac
 
 # Dispatches an upload of a local directory's contents to a destination URI,
-# choosing the appropriate tool based on the URI scheme. Cloud-agnostic
-# interface; add more schemes here as needed.
+# choosing the appropriate tool based on the URI scheme.
 upload_bundle() {
   local src_dir="$1"
   local dest_uri="$2"
@@ -78,57 +110,41 @@ upload_bundle() {
   esac
 }
 
-# Map each public MODEL_TYPES value to the corresponding suite ID
-# (used in result paths) and provider config.
-declare -A SUITE_OF=(
-  [case-questions]=public-search-case-questions
-  [key-facts]=trustfoundry-legal-search-key-facts
-  [laws]=trustfoundry-legal-search-laws
-  [regs]=trustfoundry-legal-search-regs
-)
-declare -A PROVIDER_CFG_OF=(
-  [case-questions]=configs/providers/trustfoundry-public-search-case-question.json
-  [key-facts]=configs/providers/trustfoundry-public-search.json
-  [laws]=configs/providers/trustfoundry-public-search.json
-  [regs]=configs/providers/trustfoundry-public-search.json
-)
-# The case-questions benchmark configs use an older "public-search-..." prefix,
-# while the other three use "trustfoundry-legal-search-...". Map explicitly.
-declare -A BENCH_CFG_PREFIX_OF=(
-  [case-questions]=public-search-case-questions
-  [key-facts]=trustfoundry-legal-search-key-facts
-  [laws]=trustfoundry-legal-search-laws
-  [regs]=trustfoundry-legal-search-regs
-)
-
 echo "benchmarks entrypoint"
 echo "  HARNESS_COMMIT_SHA=${HARNESS_COMMIT_SHA}"
-echo "  MODEL_TYPES=${MODEL_TYPES}"
-echo "  BENCHMARK_SIZE=${BENCHMARK_SIZE}"
+echo "  BENCHMARK_CONFIG=${BENCHMARK_CONFIG}"
 echo "  RUN_LABEL=${RUN_LABEL}"
 echo "  OUTPUT_BUNDLE_URI=${OUTPUT_BUNDLE_URI:-(unset — local only)}"
-echo "  RUN_ID=${RUN_ID}"
+echo "  Resolved configs: ${CONFIGS_TO_RUN[*]}"
 
-IFS=',' read -ra REQUESTED_TYPES <<< "$MODEL_TYPES"
-for type in "${REQUESTED_TYPES[@]}"; do
-  type=$(echo "$type" | tr -d '[:space:]')
-  if [[ -z "${SUITE_OF[$type]:-}" ]]; then
-    echo "Unknown MODEL_TYPES entry: '$type' (valid: ${!SUITE_OF[*]})" >&2
+for cfg in "${CONFIGS_TO_RUN[@]}"; do
+  bench_cfg_path="configs/benchmarks/${cfg}.json"
+  if [ ! -f "$bench_cfg_path" ]; then
+    echo "Benchmark config not found: $bench_cfg_path" >&2
     exit 2
   fi
-  suite=${SUITE_OF[$type]}
-  prefix=${BENCH_CFG_PREFIX_OF[$type]}
-  bench_cfg="configs/benchmarks/${prefix}-${BENCHMARK_SIZE}.json"
-  provider_cfg=${PROVIDER_CFG_OF[$type]}
-  run_dir="runs/${prefix}-${BENCHMARK_SIZE}"
-  bundle_dir="results/${suite}/trustfoundry-public-search/${RUN_ID}"
+
+  # Pattern: trustfoundry-legal-search-<model-type>-<size>
+  # where size is "200" or "5k". Suite = config minus the size suffix.
+  if [[ "$cfg" =~ ^(trustfoundry-legal-search-(.+))-(200|5k)$ ]]; then
+    suite="${BASH_REMATCH[1]}"
+    model_type="${BASH_REMATCH[2]}"
+    size="${BASH_REMATCH[3]}"
+  else
+    echo "Cannot parse config name '$cfg' (expected trustfoundry-legal-search-<model-type>-<size>)" >&2
+    exit 2
+  fi
+
+  run_id="${DATE}-production-${RUN_LABEL}-c${PARALLEL_C}-${size}"
+  run_dir="runs/${cfg}"
+  bundle_dir="results/${suite}/trustfoundry-public-search/${run_id}"
 
   echo
-  echo "=== ${type} (${suite}) ==="
+  echo "=== ${cfg} ==="
 
   pnpm benchmark run \
-    --benchmark-config "$bench_cfg" \
-    --provider-config "$provider_cfg" \
+    --benchmark-config "$bench_cfg_path" \
+    --provider-config "$PROVIDER_CFG" \
     --out "$run_dir" \
     --parallel "$PARALLEL_C" \
     --force
@@ -141,10 +157,10 @@ for type in "${REQUESTED_TYPES[@]}"; do
   pnpm benchmark verify-result "$bundle_dir"
 
   if [ -n "$OUTPUT_BUNDLE_URI" ]; then
-    # Encode the model type into the leaf dir so all four sibling bundles
-    # from one run cluster under <benchmark-family>/<sha7>/ without
-    # colliding with each other.
-    leaf="${DATE}-production-${RUN_LABEL}-${type}-c${PARALLEL_C}-${BENCHMARK_SIZE}"
+    # Encode the model type into the leaf dir so multiple sibling bundles
+    # from one all-200/all-5k run cluster under <benchmark-family>/<sha7>/
+    # without colliding.
+    leaf="${DATE}-production-${RUN_LABEL}-${model_type}-c${PARALLEL_C}-${size}"
     dest="${OUTPUT_BUNDLE_URI%/}/${BENCHMARK_FAMILY}/${SHA7}/${leaf}/"
     echo "uploading ${bundle_dir}/ -> ${dest}"
     upload_bundle "$bundle_dir" "$dest"
