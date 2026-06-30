@@ -79,6 +79,38 @@ export TF_API_KEY=your_key_here
 
 See each suite README for run commands and suite-specific setup.
 
+## Running the harness in a container
+
+A `Dockerfile` and `entrypoint.sh` at the repository root package the harness for reproducible runs in any container runtime. The image contains Node 20, pnpm, the harness source, and the public datasets — no additional setup needed beyond providing a `TF_API_KEY`.
+
+Build the image:
+
+```bash
+docker build -t ttf-benchmarks .
+```
+
+Run a 200-row case-questions smoke locally (results stay inside the container; copy them out with `docker cp` if needed):
+
+```bash
+docker run --rm \
+  -e TF_API_KEY=$TF_API_KEY \
+  -e BENCHMARK_SIZE=200 \
+  -e MODEL_TYPES=case-questions \
+  ttf-benchmarks
+```
+
+Run all four model types at full 5k and upload each verified bundle to a GCS bucket:
+
+```bash
+docker run --rm \
+  -e TF_API_KEY=$TF_API_KEY \
+  -e OUTPUT_GCS_URI=gs://your-bucket/your-prefix \
+  -v $HOME/.config/gcloud:/root/.config/gcloud \
+  ttf-benchmarks
+```
+
+The entrypoint reads `MODEL_TYPES` (comma-separated subset of `case-questions,key-facts,laws,regs` — default all four), `BENCHMARK_SIZE` (`200` or `5k` — default `5k`), `RUN_LABEL` (short tag baked into the run ID — default `manual`), and `OUTPUT_GCS_URI` (if unset, bundles stay local). The image stamps the source commit it was built from into `$HARNESS_COMMIT_SHA`, and uploaded paths take the shape `${OUTPUT_GCS_URI}/<suite>/<sha7>/<run-id>/`.
+
 ## Repository Layout
 
 - `bin/` and `src/`: the benchmark CLI and harness framework.
@@ -87,6 +119,7 @@ See each suite README for run commands and suite-specific setup.
 - `suites/public-search/`: suite-specific documentation.
 - `results/`: generated result bundles.
 - `agent-skills/`: optional agent workflow instructions.
+- `Dockerfile`, `entrypoint.sh`: reproducible container image (see "Running the harness in a container" above).
 
 ## Extending
 
