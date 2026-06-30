@@ -28,8 +28,8 @@ These are the latest canonical benchmark runs in this repository. Dataset labels
       <td>0.3864</td>
       <td>0.7106</td>
       <td>0.4716</td>
-      <td>1050 ms</td>
-      <td>1665 ms</td>
+      <td>1020 ms</td>
+      <td>1573.1 ms</td>
     </tr>
     <tr>
       <td>2026-06-29</td>
@@ -66,7 +66,7 @@ These are the latest canonical benchmark runs in this repository. Dataset labels
 
 Latest full runs:
 
-- Case questions: `2026-06-29-production-5k-case-question`; 5,000 rows; c=8; provider failures 0; Recall@1 0.3864; Recall@10 0.638; Recall@25 0.7106; MRR 0.4716; latency p50 1050 ms, p95 1665 ms; [5k results](results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-5k-case-question/); [200-row companion](results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-200-case-question/).
+- Case questions: `2026-06-29-production-5k-case-question`; 5,000 rows; c=8; provider failures 0; Recall@1 0.3864; Recall@10 0.638; Recall@25 0.7106; MRR 0.4716; latency p50 1020 ms, p95 1573.1 ms; [5k results](results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-5k-case-question/); [200-row companion](results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-200-case-question/).
 - Key facts: `2026-06-29-production-5k-case-key-fact`; 5,000 rows; c=8; provider failures 0; Recall@1 0.8726; Recall@10 0.9688; Recall@25 0.9762; MRR 0.9124; latency p50 2064.5 ms, p95 3313.1 ms; [5k results](results/trustfoundry-legal-search-key-facts/trustfoundry-public-search/2026-06-29-production-5k-case-key-fact/); [200-row companion](results/trustfoundry-legal-search-key-facts/trustfoundry-public-search/2026-06-29-production-200-case-key-fact/).
 - Law questions: `2026-06-29-production-5k-law-question`; 5,000 rows; c=8; provider failures 0; Recall@1 0.6666; Recall@10 0.8816; Recall@25 0.9000; MRR 0.7483; latency p50 889 ms, p95 1436 ms; [5k results](results/trustfoundry-legal-search-laws/trustfoundry-public-search/2026-06-29-production-5k-law-question/); [200-row companion](results/trustfoundry-legal-search-laws/trustfoundry-public-search/2026-06-29-production-200-law-question/).
 - Regulation questions: `2026-06-29-production-5k-reg-question`; 5,000 rows; c=8; provider failures 0; Recall@1 0.5704; Recall@10 0.8744; Recall@25 0.8944; MRR 0.6851; latency p50 942 ms, p95 1553 ms; [5k results](results/trustfoundry-legal-search-regs/trustfoundry-public-search/2026-06-29-production-5k-reg-question/); [200-row companion](results/trustfoundry-legal-search-regs/trustfoundry-public-search/2026-06-29-production-200-reg-question/).

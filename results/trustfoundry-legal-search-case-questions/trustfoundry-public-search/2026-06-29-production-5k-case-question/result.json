@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-30T00:59:59.717Z",
+  "generated_at": "2026-06-30T02:31:59.621Z",
   "metadata": {
     "cutoffs": [
       1,
@@ -34,7 +34,7 @@
       "version": "trustfoundry-legal-search-v1"
     },
     "harness": {
-      "commit": "362abc63a0925a1d91cd4055a1eb75be416a41e2",
+      "commit": "81c8e68481703df61a005f2fe599102c569442cd",
       "name": "@trustfoundry-ai/benchmarks"
     },
     "provider": {
@@ -53,7 +53,7 @@
       "target": "https://api.trustfoundry.ai/public/v1/search",
       "version": "trustfoundry-public-search-provider-v1"
     },
-    "run_id": "public-search-20260630T004150Z",
+    "run_id": "public-search-20260630T022012Z",
     "scheduler": {
       "caseCount": 5000,
       "parallel": 8
@@ -854,7 +854,7 @@
         "target": "https://api.trustfoundry.ai/public/v1/search",
         "version": "trustfoundry-public-search-provider-v1"
       },
-      "runId": "public-search-20260630T004150Z",
+      "runId": "public-search-20260630T022012Z",
       "scheduler": {
         "caseCount": 5000,
         "parallel": 8
@@ -877,12 +877,12 @@
     "hitAt25": 0.7106,
     "hitAt5": 0.575,
     "latency_ms": {
-      "max": 17449,
-      "mean": 1133.2072,
-      "min": 459,
+      "max": 11426,
+      "mean": 1071.0582,
+      "min": 489,
       "n": 5000,
-      "p50": 1050,
-      "p95": 1665
+      "p50": 1020,
+      "p95": 1573.0500000000002
     },
     "meanResultCount": 25,
     "mrr": 0.4716,
