@@ -1,0 +1,11 @@
+{
+  "_comment": "First 200 deterministic case-question search rows from the public Legal Search 5k subset.",
+  "benchmarkId": "trustfoundry-legal-search",
+  "dataDir": "data/trustfoundry-legal-search-5k",
+  "files": ["case_questions.jsonl"],
+  "datasetSize": "trustfoundry-legal-search-case-questions-200",
+  "datasetNames": ["case_questions"],
+  "splits": ["test"],
+  "queryTransformId": "strip-synthetic-instruction-prefixes-v1",
+  "limit": 200
+}

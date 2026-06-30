@@ -9,8 +9,8 @@ import {
   validateScorerCutoffsMatchImplementation
 } from '../src/core/runner.mjs';
 
-test('benchmarkAdapterId defaults to the case-question adapter', () => {
-  assert.equal(benchmarkAdapterId({}), 'public-search-case-questions');
+test('benchmarkAdapterId defaults to the legal-search adapter', () => {
+  assert.equal(benchmarkAdapterId({}), 'trustfoundry-legal-search');
 });
 
 test('benchmarkAdapterId reads benchmarkId config aliases', () => {

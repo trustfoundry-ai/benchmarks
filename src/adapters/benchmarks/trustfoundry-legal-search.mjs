@@ -6,6 +6,7 @@ import { applyQueryTransform } from '../../core/query-transforms.mjs';
 
 const DEFAULT_DATA_DIR = 'data/trustfoundry-legal-search-5k';
 const DEFAULT_FILES = [
+  'case_questions.jsonl',
   'case_key_facts.jsonl',
   'laws.jsonl',
   'regs.jsonl'

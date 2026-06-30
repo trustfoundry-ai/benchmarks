@@ -18,7 +18,7 @@ Defaults:
   benchmark-config ${defaultPaths().benchmarkConfig}
   provider-config  ${defaultPaths().providerConfig}
   scorer-config    ${defaultPaths().scorerConfig}
-  out              runs/public-search-200
+  out              runs/trustfoundry-legal-search-case-questions-200
   parallel         4
 `);
 }
@@ -70,7 +70,7 @@ function printAdapters() {
 }
 
 async function runCommand(options) {
-  const out = options.out ?? 'runs/public-search-200';
+  const out = options.out ?? 'runs/trustfoundry-legal-search-case-questions-200';
   const result = await executeRun({
     repoRoot: repoRoot(),
     outDir: out,

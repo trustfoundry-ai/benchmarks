@@ -22,7 +22,7 @@ async function makeRun(repoRoot, root) {
   const cases = [
     {
       caseId: 'case-1',
-      benchmarkId: 'public-search-case-questions',
+      benchmarkId: 'trustfoundry-legal-search',
       split: 'test',
       prompt: 'query',
       metadata: {
@@ -62,18 +62,18 @@ async function makeRun(repoRoot, root) {
   const manifest = {
     run_id: 'artifact-test',
     benchmark: {
-      configPath: 'configs/benchmarks/public-search-case-questions-200.json',
-      configSha256: await sha256File(path.join(repoRoot, 'configs/benchmarks/public-search-case-questions-200.json')),
+      configPath: 'configs/benchmarks/trustfoundry-legal-search-case-questions-200.json',
+      configSha256: await sha256File(path.join(repoRoot, 'configs/benchmarks/trustfoundry-legal-search-case-questions-200.json')),
       sourceFiles: [
         {
-          path: 'data/public-search-case-questions-5k/case_questions.jsonl',
-          sha256: await sha256File(path.join(repoRoot, 'data/public-search-case-questions-5k/case_questions.jsonl'))
+          path: 'data/trustfoundry-legal-search-5k/case_questions.jsonl',
+          sha256: await sha256File(path.join(repoRoot, 'data/trustfoundry-legal-search-5k/case_questions.jsonl'))
         }
       ]
     },
     provider: {
-      configPath: 'configs/providers/trustfoundry-public-search-case-question.json',
-      configSha256: await sha256File(path.join(repoRoot, 'configs/providers/trustfoundry-public-search-case-question.json'))
+      configPath: 'configs/providers/trustfoundry-public-search.json',
+      configSha256: await sha256File(path.join(repoRoot, 'configs/providers/trustfoundry-public-search.json'))
     },
     scorer: {
       configPath: 'configs/scorers/search-recall.json',

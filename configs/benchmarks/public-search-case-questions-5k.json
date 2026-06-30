@@ -1,8 +1,0 @@
-{
-  "_comment": "Full public 5,000-row case-question search recall subset.",
-  "dataDir": "data/public-search-case-questions-5k",
-  "datasetSize": "public-case-questions-5k",
-  "datasetNames": ["case_questions"],
-  "splits": ["test"],
-  "queryTransformId": "strip-synthetic-instruction-prefixes-v1"
-}

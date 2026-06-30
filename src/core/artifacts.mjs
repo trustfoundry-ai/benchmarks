@@ -134,7 +134,7 @@ export function buildRawRows({ cases, providerResults, caseScores }) {
 export function reconstructFromRawRows(rawRows) {
   const cases = rawRows.map((row) => ({
     caseId: row.case_id,
-    benchmarkId: row.benchmark_id ?? 'public-search-case-questions',
+    benchmarkId: row.benchmark_id ?? 'trustfoundry-legal-search',
     split: row.split,
     prompt: row.prompt,
     metadata: {
