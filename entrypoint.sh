@@ -39,6 +39,13 @@ SHA7=${HARNESS_COMMIT_SHA:0:7}
 DATE=$(date -u +%Y-%m-%d)
 RUN_ID="${DATE}-production-${RUN_LABEL}-c${PARALLEL_C}-${BENCHMARK_SIZE}"
 
+# Benchmark family name used at the top of the GCS upload path. All four
+# model types belong to the same family; their bundles land as siblings
+# under <family>/<sha7>/. Hardcoded for now — when we add a second
+# benchmark family (e.g. trustfoundry-legal-judgment) we'll either
+# parameterize this or ship a second Dockerfile + entrypoint.
+GCS_BENCHMARK_FAMILY=trustfoundry-legal-search
+
 # Map each public MODEL_TYPES value to the corresponding suite ID
 # (used in result paths) and provider config.
 declare -A SUITE_OF=(
@@ -102,9 +109,15 @@ for type in "${REQUESTED_TYPES[@]}"; do
   pnpm benchmark verify-result "$bundle_dir"
 
   if [ -n "$OUTPUT_GCS_URI" ]; then
-    dest="${OUTPUT_GCS_URI%/}/${suite}/${SHA7}/${RUN_ID}/"
-    echo "uploading ${bundle_dir} -> ${dest}"
-    gcloud storage cp -r "$bundle_dir" "$dest"
+    # Encode the model type into the leaf dir so all four sibling bundles
+    # from one run cluster under <benchmark-family>/<sha7>/ without
+    # colliding with each other.
+    gcs_leaf="${DATE}-production-${RUN_LABEL}-${type}-c${PARALLEL_C}-${BENCHMARK_SIZE}"
+    dest="${OUTPUT_GCS_URI%/}/${GCS_BENCHMARK_FAMILY}/${SHA7}/${gcs_leaf}/"
+    echo "uploading ${bundle_dir}/ -> ${dest}"
+    # Copy the *contents* of the bundle into the destination, not the dir
+    # itself — otherwise gcloud nests bundle_dir inside dest.
+    gcloud storage cp -r "${bundle_dir}"/* "$dest"
   fi
 done
 
