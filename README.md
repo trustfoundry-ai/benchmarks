@@ -99,17 +99,27 @@ docker run --rm \
   ttf-benchmarks
 ```
 
-Run all four model types at full 5k and upload each verified bundle to a GCS bucket:
+Run all four model types at full 5k and upload each verified bundle (cloud-agnostic destination — dispatched by URI scheme):
 
 ```bash
+# Google Cloud Storage
 docker run --rm \
   -e TF_API_KEY=$TF_API_KEY \
-  -e OUTPUT_GCS_URI=gs://your-bucket/your-prefix \
+  -e OUTPUT_BUNDLE_URI=gs://your-bucket/your-prefix \
   -v $HOME/.config/gcloud:/root/.config/gcloud \
+  ttf-benchmarks
+
+# Local filesystem (bind-mount the destination)
+docker run --rm \
+  -e TF_API_KEY=$TF_API_KEY \
+  -e OUTPUT_BUNDLE_URI=file:///out \
+  -v $PWD/out:/out \
   ttf-benchmarks
 ```
 
-The entrypoint reads `MODEL_TYPES` (comma-separated subset of `case-questions,key-facts,laws,regs` — default all four), `BENCHMARK_SIZE` (`200` or `5k` — default `5k`), `RUN_LABEL` (short tag baked into the run ID — default `manual`), and `OUTPUT_GCS_URI` (if unset, bundles stay local). The image stamps the source commit it was built from into `$HARNESS_COMMIT_SHA`, and uploaded paths take the shape `${OUTPUT_GCS_URI}/<suite>/<sha7>/<run-id>/`.
+The entrypoint reads `MODEL_TYPES` (comma-separated subset of `case-questions,key-facts,laws,regs` — default all four), `BENCHMARK_SIZE` (`200` or `5k` — default `5k`), `RUN_LABEL` (short tag baked into the run ID — default `manual`), and `OUTPUT_BUNDLE_URI` (if unset, bundles stay on the container filesystem only). Supported `OUTPUT_BUNDLE_URI` schemes: `gs://` (via the bundled `gcloud` SDK), `file://` or an absolute path (local `cp`). To add another cloud, extend the `upload_bundle` dispatch in `entrypoint.sh`.
+
+The image stamps the source commit it was built from into `$HARNESS_COMMIT_SHA`, and uploaded paths take the shape `${OUTPUT_BUNDLE_URI}/<benchmark-family>/<sha7>/<run-leaf>/`.
 
 ## Repository Layout
 
