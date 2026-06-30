@@ -1,6 +1,16 @@
 import path from 'node:path';
 
-import { exists, readJson, relativePath, sha256File, writeJson, writeJsonl } from './fs.mjs';
+import {
+  createJsonlWriter,
+  exists,
+  readJson,
+  readJsonl,
+  readJsonlStream,
+  relativePath,
+  sha256File,
+  writeJson,
+  writeJsonl
+} from './fs.mjs';
 import { getAdapter } from './registry.mjs';
 import {
   SUPPORTED_CUTOFFS,
@@ -215,19 +225,36 @@ async function createManifest({
   };
 }
 
-async function runParallel(items, parallel, worker, onProgress) {
-  const results = new Array(items.length);
+// Runs `worker` for each item with bounded concurrency, streaming each
+// result to disk as it completes (rather than buffering all results in
+// memory). JSONL output is in completion order; downstream consumers look
+// up cases by caseId so order does not matter. Returns counts only.
+async function runParallelToDisk({ items, parallel, worker, onProgress, outputPath }) {
+  const writer = await createJsonlWriter(outputPath);
+  // Serialize writes via a chained promise — Node's writeStream is atomic
+  // per call, but chaining gives clean backpressure across workers without
+  // any explicit mutex bookkeeping.
+  let writeChain = Promise.resolve();
+  function writeRow(row) {
+    const next = writeChain.then(() => writer.write(row));
+    writeChain = next.catch(() => {});
+    return next;
+  }
+
   let next = 0;
   let completed = 0;
+  let providerFailures = 0;
+
   async function loop() {
     for (;;) {
       const index = next;
       next += 1;
       if (index >= items.length) return;
+      let result;
       try {
-        results[index] = await worker(items[index], index);
+        result = await worker(items[index], index);
       } catch (error) {
-        results[index] = {
+        result = {
           caseId: items[index].caseId,
           status: 'provider_failure',
           rawOutput: { error: { kind: 'unhandled_error', message: error.message } },
@@ -240,12 +267,16 @@ async function runParallel(items, parallel, worker, onProgress) {
           error: { kind: 'unhandled_error', message: error.message }
         };
       }
+      if (result.status !== 'completed') providerFailures += 1;
+      await writeRow(result);
       completed += 1;
       onProgress?.({ completed, total: items.length });
     }
   }
+
   await Promise.all(Array.from({ length: Math.min(parallel, items.length) }, loop));
-  return results;
+  await writer.close();
+  return { completed, providerFailures };
 }
 
 export async function executeRun({
@@ -295,34 +326,35 @@ export async function executeRun({
   await writeJson(path.join(resolvedOut, 'inventory.json'), loaded.inventory);
   await writeJsonl(path.join(resolvedOut, 'cases.jsonl'), loaded.cases);
 
+  const providerResultsPath = path.join(resolvedOut, 'provider-results.jsonl');
   let lastProgressAt = Date.now();
-  const providerResults = await runParallel(
-    loaded.cases,
-    schedulerParallel,
-    (benchmarkCase) => providerAdapter.executeCase({
-      benchmarkCase,
-      config: inputs.providerConfig
-    }),
-    ({ completed, total }) => {
+  const { providerFailures } = await runParallelToDisk({
+    items: loaded.cases,
+    parallel: schedulerParallel,
+    worker: (benchmarkCase) =>
+      providerAdapter.executeCase({ benchmarkCase, config: inputs.providerConfig }),
+    onProgress: ({ completed, total }) => {
       if (!progress) return;
       const now = Date.now();
       if (completed === total || now - lastProgressAt >= 10000) {
         lastProgressAt = now;
         console.error(`progress ${completed}/${total}`);
       }
-    }
-  );
-  await writeJsonl(path.join(resolvedOut, 'provider-results.jsonl'), providerResults);
+    },
+    outputPath: providerResultsPath
+  });
 
   manifest.completedAt = new Date().toISOString();
-  manifest.providerFailures = providerResults.filter((item) => item.status !== 'completed').length;
+  manifest.providerFailures = providerFailures;
   await writeJson(path.join(resolvedOut, 'manifest.json'), manifest);
 
-  const scores = await scorerAdapter.score({
+  // Stream-score from the just-written provider-results.jsonl. Cases stay in
+  // memory (loaded.cases) — they're small (no big response payloads).
+  const scores = await scoreFromDisk({
+    scorerAdapter,
     manifest,
     cases: loaded.cases,
-    providerResults,
-    config: inputs.scorerConfig
+    providerResultsPath
   });
   await writeJson(path.join(resolvedOut, 'scores.json'), scores);
 
@@ -334,13 +366,33 @@ export async function executeRun({
   };
 }
 
+// Streams provider-results.jsonl through the scorer, looking up each row's
+// case in the pre-loaded cases map. Used by both executeRun and scoreRun.
+async function scoreFromDisk({ scorerAdapter, manifest, cases, providerResultsPath }) {
+  const casesById = new Map(cases.map((benchmarkCase) => [benchmarkCase.caseId, benchmarkCase]));
+  async function* pairs() {
+    for await (const providerResult of readJsonlStream(providerResultsPath)) {
+      const benchmarkCase = casesById.get(providerResult.caseId);
+      if (!benchmarkCase) {
+        throw new Error(`Provider result references unknown case: ${providerResult.caseId}`);
+      }
+      yield { benchmarkCase, providerResult };
+    }
+  }
+  return scorerAdapter.scoreStream({ manifest, pairs: pairs() });
+}
+
 export async function scoreRun({ repoRoot, runDir }) {
   const resolvedRun = path.resolve(repoRoot, runDir);
   const manifest = await readJson(path.join(resolvedRun, 'manifest.json'));
-  const cases = await import('./fs.mjs').then((mod) => mod.readJsonl(path.join(resolvedRun, 'cases.jsonl')));
-  const providerResults = await import('./fs.mjs').then((mod) => mod.readJsonl(path.join(resolvedRun, 'provider-results.jsonl')));
+  const cases = await readJsonl(path.join(resolvedRun, 'cases.jsonl'));
   const scorerAdapter = getAdapter('scorers', 'search-recall');
-  const scores = await scorerAdapter.score({ manifest, cases, providerResults });
+  const scores = await scoreFromDisk({
+    scorerAdapter,
+    manifest,
+    cases,
+    providerResultsPath: path.join(resolvedRun, 'provider-results.jsonl')
+  });
   await writeJson(path.join(resolvedRun, 'scores.json'), scores);
   return scores;
 }

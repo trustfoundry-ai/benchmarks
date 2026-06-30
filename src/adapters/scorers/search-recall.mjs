@@ -319,20 +319,44 @@ export const searchRecallScorerAdapter = {
     const caseScores = cases.map((benchmarkCase) =>
       scoreCase({ benchmarkCase, providerResult: byCaseId.get(benchmarkCase.caseId) })
     );
-    return {
-      scorerId: this.id,
-      status: 'completed',
-      caseScores,
-      summary: buildSummary(caseScores, { manifest }),
-      metadata: {
-        scorer: this.id,
-        version: this.version,
-        cutoffs: CUTOFFS,
-        mrrDecimalPlaces: MRR_DECIMAL_PLACES
+    return finalize({ manifest, caseScores, scorerId: this.id, version: this.version });
+  },
+
+  // Streaming variant. `pairs` is an async iterable yielding either
+  // `{ benchmarkCase, providerResult }` objects or `[benchmarkCase, providerResult]`
+  // tuples. Each pair is scored as it arrives; only the per-case score (small,
+  // bounded) is retained. The optional `onCaseScored({ benchmarkCase, providerResult, caseScore })`
+  // hook lets the caller pipe each scored case to disk (e.g. into a raw.jsonl
+  // writer) without a second pass over the inputs.
+  async scoreStream({ manifest, pairs, onCaseScored }) {
+    const caseScores = [];
+    for await (const pair of pairs) {
+      const benchmarkCase = pair.benchmarkCase ?? pair[0];
+      const providerResult = pair.providerResult ?? pair[1];
+      const caseScore = scoreCase({ benchmarkCase, providerResult });
+      caseScores.push(caseScore);
+      if (onCaseScored) {
+        await onCaseScored({ benchmarkCase, providerResult, caseScore });
       }
-    };
+    }
+    return finalize({ manifest, caseScores, scorerId: this.id, version: this.version });
   }
 };
+
+function finalize({ manifest, caseScores, scorerId, version }) {
+  return {
+    scorerId,
+    status: 'completed',
+    caseScores,
+    summary: buildSummary(caseScores, { manifest }),
+    metadata: {
+      scorer: scorerId,
+      version,
+      cutoffs: CUTOFFS,
+      mrrDecimalPlaces: MRR_DECIMAL_PLACES
+    }
+  };
+}
 
 // Exposed for runner-side config validation. If you change CUTOFFS or
 // HEADLINE_CUTOFF above, update configs/scorers/search-recall.json to match -

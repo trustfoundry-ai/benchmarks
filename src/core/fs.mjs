@@ -1,6 +1,8 @@
 import { createHash } from 'node:crypto';
+import { createReadStream, createWriteStream } from 'node:fs';
 import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { createInterface } from 'node:readline';
 
 export async function readJson(file) {
   return JSON.parse(await readFile(file, 'utf8'));
@@ -27,6 +29,48 @@ export async function writeJsonl(file, rows) {
     `${rows.map((row) => JSON.stringify(row)).join('\n')}\n`,
     'utf8'
   );
+}
+
+// Streams JSON objects from a JSONL file one at a time. Use this instead of
+// readJsonl when row count is large enough that the full array would press on
+// the JS heap (5k+ rows with rich provider responses). Throws with file:line
+// context on malformed JSON.
+export async function* readJsonlStream(file) {
+  const rl = createInterface({
+    input: createReadStream(file, { encoding: 'utf8' }),
+    crlfDelay: Infinity
+  });
+  let lineNumber = 0;
+  for await (const line of rl) {
+    lineNumber += 1;
+    if (!line.trim()) continue;
+    try {
+      yield JSON.parse(line);
+    } catch (error) {
+      throw new Error(`Invalid JSONL at ${file}:${lineNumber}: ${error.message}`);
+    }
+  }
+}
+
+// Opens a JSONL writer that streams rows to disk one at a time. Use this
+// instead of writeJsonl when the rows are produced incrementally (so the full
+// array never lives in memory). Caller MUST await close() to flush.
+export async function createJsonlWriter(file) {
+  await ensureDir(path.dirname(file));
+  const stream = createWriteStream(file, { encoding: 'utf8' });
+  return {
+    async write(row) {
+      const line = `${JSON.stringify(row)}\n`;
+      if (!stream.write(line)) {
+        await new Promise((resolve) => stream.once('drain', resolve));
+      }
+    },
+    async close() {
+      await new Promise((resolve, reject) => {
+        stream.end((error) => (error ? reject(error) : resolve()));
+      });
+    }
+  };
 }
 
 export async function writeText(file, text) {
