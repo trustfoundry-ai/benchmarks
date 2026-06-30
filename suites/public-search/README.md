@@ -35,6 +35,19 @@ Each file contains 5,000 rows. Smoke configs and full configs reference the same
 
 The key-fact file is selected from the existing deterministic 10k source after excluding rows whose normalized query is empty. Law and regulation files are the first 5,000 rows from their deterministic 10k source files.
 
+### Benchmark Matrix
+
+TrustFoundry Legal Search is reported as four related model types over the same public search endpoint and scorer:
+
+| Model type | Dataset | 200 config | 5k config | Published results |
+| --- | --- | --- | --- | --- |
+| `case_question` | Case questions | [`public-search-case-questions-200.json`](../../configs/benchmarks/public-search-case-questions-200.json) | [`public-search-case-questions-5k.json`](../../configs/benchmarks/public-search-case-questions-5k.json) | [200](../../results/public-search-case-questions/trustfoundry-public-search/2026-06-28-production-default-c8-200/), [5k](../../results/public-search-case-questions/trustfoundry-public-search/2026-06-28-production-default-c8-5k/) |
+| `case_key_fact` | Case key facts | [`trustfoundry-legal-search-key-facts-200.json`](../../configs/benchmarks/trustfoundry-legal-search-key-facts-200.json) | [`trustfoundry-legal-search-key-facts-5k.json`](../../configs/benchmarks/trustfoundry-legal-search-key-facts-5k.json) | [200](../../results/trustfoundry-legal-search-key-facts/trustfoundry-public-search/2026-06-29-production-200-case-key-fact/), [5k](../../results/trustfoundry-legal-search-key-facts/trustfoundry-public-search/2026-06-29-production-5k-case-key-fact/) |
+| `law_question` | Law questions | [`trustfoundry-legal-search-laws-200.json`](../../configs/benchmarks/trustfoundry-legal-search-laws-200.json) | [`trustfoundry-legal-search-laws-5k.json`](../../configs/benchmarks/trustfoundry-legal-search-laws-5k.json) | [200](../../results/trustfoundry-legal-search-laws/trustfoundry-public-search/2026-06-29-production-200-law-question/), [5k](../../results/trustfoundry-legal-search-laws/trustfoundry-public-search/2026-06-29-production-5k-law-question/) |
+| `reg_question` | Regulation questions | [`trustfoundry-legal-search-regs-200.json`](../../configs/benchmarks/trustfoundry-legal-search-regs-200.json) | [`trustfoundry-legal-search-regs-5k.json`](../../configs/benchmarks/trustfoundry-legal-search-regs-5k.json) | [200](../../results/trustfoundry-legal-search-regs/trustfoundry-public-search/2026-06-29-production-200-reg-question/), [5k](../../results/trustfoundry-legal-search-regs/trustfoundry-public-search/2026-06-29-production-5k-reg-question/) |
+
+The generic provider config [`trustfoundry-public-search.json`](../../configs/providers/trustfoundry-public-search.json) omits `model_type` and sends each row's `model_type`, which is how the key-fact, law, and regulation runs use one provider config. The older case-question result bundles were generated with [`trustfoundry-public-search-case-question.json`](../../configs/providers/trustfoundry-public-search-case-question.json), which pins `model_type: "case_question"`; keep that config for reproducing those published bundles.
+
 ### Test Data Schema
 
 Each line in `case_questions.jsonl` is one JSON object. The main fields are:
@@ -100,7 +113,7 @@ pnpm benchmark run \
   --force
 ```
 
-Use the matching config names for other targets: `trustfoundry-legal-search-key-facts-*` or `trustfoundry-legal-search-regs-*`. The case-question provider config pins `model_type: "case_question"`; the generic provider config omits `model_type` and sends each row's `model_type`.
+Use the matching config names for other targets: `trustfoundry-legal-search-key-facts-*` or `trustfoundry-legal-search-regs-*`. The benchmark matrix above lists the provider config convention used by each model type.
 
 The TrustFoundry public-search provider makes one retry for transient provider failures: fetch errors, streamed provider error events, missing result events, or HTTP 5xx responses. It does not retry validation errors or HTTP 4xx responses. If the retry succeeds, the row is scored from the successful response and latency includes the full elapsed time across both attempts; if it still fails, it is reported as a provider failure.
 
