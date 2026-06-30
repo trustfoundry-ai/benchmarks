@@ -1,0 +1,10 @@
+{
+  "_comment": "Full public 5,000-row regulation-question search recall subset.",
+  "benchmarkId": "trustfoundry-legal-search",
+  "dataDir": "data/trustfoundry-legal-search-5k",
+  "files": ["regs.jsonl"],
+  "datasetSize": "trustfoundry-legal-search-regs-5k",
+  "datasetNames": ["regs"],
+  "splits": ["test"],
+  "queryTransformId": "strip-synthetic-instruction-prefixes-v1"
+}

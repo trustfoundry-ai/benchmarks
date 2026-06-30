@@ -1,0 +1,10 @@
+{
+  "_comment": "Full public 5,000-row key-fact search recall subset.",
+  "benchmarkId": "trustfoundry-legal-search",
+  "dataDir": "data/trustfoundry-legal-search-5k",
+  "files": ["case_key_facts.jsonl"],
+  "datasetSize": "trustfoundry-legal-search-key-facts-5k",
+  "datasetNames": ["case_key_facts"],
+  "splits": ["test"],
+  "queryTransformId": "strip-synthetic-instruction-prefixes-v1"
+}

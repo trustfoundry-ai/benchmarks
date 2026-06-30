@@ -1,6 +1,8 @@
 const DEFAULT_ENDPOINT = 'https://api.trustfoundry.ai/public/v1/search';
 const DEFAULT_TIMEOUT_MS = 60000;
 const DEFAULT_API_KEY_ENV = 'TF_API_KEY';
+const MAX_ATTEMPTS = 2;
+const PROVIDER_ID = 'trustfoundry-public-search';
 
 function positiveInteger(value) {
   const parsed = Number.parseInt(String(value ?? ''), 10);
@@ -13,12 +15,23 @@ function configuredBool(config, snakeKey, camelKey, fallback = false) {
   return Boolean(value);
 }
 
-function configuredModelType(config = {}) {
-  const modelType = config.model_type ?? config.modelType;
+function configuredModelType(config = {}, benchmarkCase = null) {
+  const modelType =
+    config.model_type ??
+    config.modelType ??
+    benchmarkCase?.metadata?.model_type ??
+    benchmarkCase?.metadata?.modelType;
   if (typeof modelType !== 'string' || !modelType.trim()) {
-    throw new Error('trustfoundry-public-search requires explicit provider config model_type');
+    throw new Error(
+      'trustfoundry-public-search requires provider config model_type or row metadata.model_type'
+    );
   }
   return modelType.trim();
+}
+
+function configuredSubject(config = {}) {
+  const modelType = config.model_type ?? config.modelType;
+  return typeof modelType === 'string' && modelType.trim() ? modelType.trim() : 'per-row';
 }
 
 function normalizeState(value) {
@@ -50,7 +63,7 @@ function requestLimitForConfig(config = {}) {
 function buildRequestBody(benchmarkCase, config = {}) {
   const body = {
     query: benchmarkCase.prompt ?? '',
-    model_type: configuredModelType(config)
+    model_type: configuredModelType(config, benchmarkCase)
   };
   const stateFilterEnabled = configuredBool(
     config,
@@ -230,7 +243,7 @@ function makeFailure(benchmarkCase, kind, message, { request = null, endpoint = 
     finalOutputText: JSON.stringify({ query: benchmarkCase.prompt ?? '', results: [], result_count: 0 }),
     artifacts: [],
     providerMetadata: {
-      provider: 'trustfoundry-public-search',
+      provider: PROVIDER_ID,
       endpoint,
       error: kind,
       resultCount: 0
@@ -254,12 +267,179 @@ function failureMessage({ httpStatus, httpOk, fetchError, errorEvent, rawText, s
   return null;
 }
 
+function errorKind({ fetchError, errorEvent, httpOk }) {
+  if (fetchError) return 'fetch_error';
+  if (errorEvent) return 'stream_error';
+  return httpOk ? 'missing_results' : 'http_error';
+}
+
+function isRetryableProviderFailure(result) {
+  if (result?.status !== 'provider_failure') return false;
+  const kind = result.error?.kind;
+  const status = result.error?.status ?? result.providerMetadata?.httpStatus ?? null;
+  if (kind === 'fetch_error' || kind === 'stream_error' || kind === 'missing_results') {
+    return true;
+  }
+  return kind === 'http_error' && Number.isInteger(status) && status >= 500 && status <= 599;
+}
+
+function attemptSummary(result, attempt) {
+  return {
+    attempt,
+    status: result.status,
+    error: result.error ?? null,
+    httpStatus: result.providerMetadata?.httpStatus ?? result.rawOutput?.httpStatus ?? null,
+    durationMs: result.timing?.durationMs ?? null,
+    startedAt: result.timing?.startedAt ?? null,
+    completedAt: result.timing?.completedAt ?? null
+  };
+}
+
+function withRetryMetadata(result, attempts) {
+  if (attempts.length <= 1) return result;
+  const startedAt = attempts[0].startedAt ?? result.timing?.startedAt ?? null;
+  const completedAt = result.timing?.completedAt ?? null;
+  const durationMs =
+    startedAt && completedAt
+      ? Date.parse(completedAt) - Date.parse(startedAt)
+      : result.timing?.durationMs ?? null;
+  return {
+    ...result,
+    providerMetadata: {
+      ...result.providerMetadata,
+      attempts: attempts.length,
+      retryCount: attempts.length - 1
+    },
+    timing: {
+      ...result.timing,
+      startedAt,
+      durationMs,
+      resultsReadyDurationMs: durationMs,
+      firstAttemptStartedAt: startedAt,
+      finalAttemptStartedAt: result.timing?.startedAt ?? null
+    },
+    retryMetadata: {
+      maxAttempts: MAX_ATTEMPTS,
+      attempts,
+      retryCount: attempts.length - 1
+    }
+  };
+}
+
+async function executeAttempt({ benchmarkCase, endpoint, request, apiKey, requestTimeoutMs, maxResults }) {
+  const startedAtMs = Date.now();
+  let httpStatus = null;
+  let httpOk = false;
+  let stream = {
+    events: [],
+    rawText: '',
+    firstByteAtMs: null,
+    citationsReadyAtMs: null,
+    streamCompletedAtMs: null
+  };
+  let fetchError = null;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'X-API-Key': apiKey,
+        'Content-Type': 'application/json',
+        Accept: 'application/x-ndjson'
+      },
+      body: JSON.stringify(request),
+      signal: AbortSignal.timeout(requestTimeoutMs)
+    });
+    httpStatus = response.status;
+    httpOk = response.ok;
+    stream = await readNdjsonResponse(response);
+  } catch (caught) {
+    fetchError = caught instanceof Error ? caught.message : String(caught);
+  }
+
+  const streamCompletedAtMs = stream.streamCompletedAtMs ?? Date.now();
+  const resultsReadyAtMs = stream.citationsReadyAtMs ?? streamCompletedAtMs;
+  const ttfbMs = stream.firstByteAtMs === null ? null : stream.firstByteAtMs - startedAtMs;
+  const resultsReadyDurationMs = resultsReadyAtMs - startedAtMs;
+  const streamDurationMs = streamCompletedAtMs - startedAtMs;
+  const searchSet = extractSearchSet(stream.events);
+  const errorEvent = findErrorEvent(stream.events);
+  const envelope = normalizeEnvelope(request.query, searchSet, { maxResults });
+  const message = failureMessage({
+    httpStatus,
+    httpOk,
+    fetchError,
+    errorEvent,
+    rawText: stream.rawText,
+    searchSet
+  });
+  const status = message ? 'provider_failure' : 'completed';
+  const kind = message ? errorKind({ fetchError, errorEvent, httpOk }) : null;
+
+  return {
+    caseId: benchmarkCase.caseId,
+    status,
+    rawOutput: {
+      endpoint,
+      request,
+      httpStatus,
+      httpOk,
+      eventCount: stream.events.length,
+      events: stream.events,
+      searchSet,
+      normalizedResults: envelope.results,
+      ttfbMs,
+      resultsReadyDurationMs,
+      streamDurationMs
+    },
+    finalOutputText: JSON.stringify(envelope),
+    artifacts: [],
+    providerMetadata: {
+      provider: PROVIDER_ID,
+      endpoint,
+      httpStatus,
+      modelType: request.model_type,
+      stateFilterEnabled: Object.hasOwn(request, 'state'),
+      state: request.state ?? null,
+      eventCount: stream.events.length,
+      maxResults,
+      requestLimit: request.limit ?? null,
+      resultCount: envelope.result_count,
+      totalAvailable: envelope.total_available,
+      ttfbMs,
+      resultsReadyDurationMs,
+      streamDurationMs,
+      citationsReadyObserved: stream.citationsReadyAtMs !== null
+    },
+    timing: {
+      startedAt: new Date(startedAtMs).toISOString(),
+      completedAt: new Date(resultsReadyAtMs).toISOString(),
+      durationMs: resultsReadyDurationMs,
+      resultsReadyAt: new Date(resultsReadyAtMs).toISOString(),
+      resultsReadyDurationMs,
+      streamCompletedAt: new Date(streamCompletedAtMs).toISOString(),
+      streamDurationMs,
+      firstByteAt: stream.firstByteAtMs === null ? null : new Date(stream.firstByteAtMs).toISOString(),
+      ttfbMs
+    },
+    tokenUsage: null,
+    retryMetadata: null,
+    error: message
+      ? {
+          kind,
+          message,
+          status: httpStatus
+        }
+      : null
+  };
+}
+
 export const trustfoundryPublicSearchProviderAdapter = {
   id: 'trustfoundry-public-search',
   version: 'trustfoundry-public-search-provider-v1',
 
   async describe({ config = {} }) {
-    const modelType = configuredModelType(config);
+    const modelType = configuredSubject(config);
     return {
       id: this.id,
       version: this.version,
@@ -296,116 +476,21 @@ export const trustfoundryPublicSearchProviderAdapter = {
 
     const requestTimeoutMs = config.request_timeout_ms ?? DEFAULT_TIMEOUT_MS;
     const maxResults = maxResultsForConfig(config);
-    const startedAtMs = Date.now();
-    let httpStatus = null;
-    let httpOk = false;
-    let stream = {
-      events: [],
-      rawText: '',
-      firstByteAtMs: null,
-      citationsReadyAtMs: null,
-      streamCompletedAtMs: null
-    };
-    let fetchError = null;
-
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'X-API-Key': apiKey,
-          'Content-Type': 'application/json',
-          Accept: 'application/x-ndjson'
-        },
-        body: JSON.stringify(request),
-        signal: AbortSignal.timeout(requestTimeoutMs)
-      });
-      httpStatus = response.status;
-      httpOk = response.ok;
-      stream = await readNdjsonResponse(response);
-    } catch (caught) {
-      fetchError = caught instanceof Error ? caught.message : String(caught);
-    }
-
-    const streamCompletedAtMs = stream.streamCompletedAtMs ?? Date.now();
-    const resultsReadyAtMs = stream.citationsReadyAtMs ?? streamCompletedAtMs;
-    const ttfbMs = stream.firstByteAtMs === null ? null : stream.firstByteAtMs - startedAtMs;
-    const resultsReadyDurationMs = resultsReadyAtMs - startedAtMs;
-    const streamDurationMs = streamCompletedAtMs - startedAtMs;
-    const searchSet = extractSearchSet(stream.events);
-    const errorEvent = findErrorEvent(stream.events);
-    const envelope = normalizeEnvelope(request.query, searchSet, { maxResults });
-    const message = failureMessage({
-      httpStatus,
-      httpOk,
-      fetchError,
-      errorEvent,
-      rawText: stream.rawText,
-      searchSet
-    });
-    const status = message ? 'provider_failure' : 'completed';
-
-    return {
-      caseId: benchmarkCase.caseId,
-      status,
-      rawOutput: {
+    const attempts = [];
+    let result = null;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+      result = await executeAttempt({
+        benchmarkCase,
         endpoint,
         request,
-        httpStatus,
-        httpOk,
-        eventCount: stream.events.length,
-        events: stream.events,
-        searchSet,
-        normalizedResults: envelope.results,
-        ttfbMs,
-        resultsReadyDurationMs,
-        streamDurationMs
-      },
-      finalOutputText: JSON.stringify(envelope),
-      artifacts: [],
-      providerMetadata: {
-        provider: this.id,
-        endpoint,
-        httpStatus,
-        modelType: request.model_type,
-        stateFilterEnabled: Object.hasOwn(request, 'state'),
-        state: request.state ?? null,
-        eventCount: stream.events.length,
-        maxResults,
-        requestLimit: request.limit ?? null,
-        resultCount: envelope.result_count,
-        totalAvailable: envelope.total_available,
-        ttfbMs,
-        resultsReadyDurationMs,
-        streamDurationMs,
-        citationsReadyObserved: stream.citationsReadyAtMs !== null
-      },
-      timing: {
-        startedAt: new Date(startedAtMs).toISOString(),
-        completedAt: new Date(resultsReadyAtMs).toISOString(),
-        durationMs: resultsReadyDurationMs,
-        resultsReadyAt: new Date(resultsReadyAtMs).toISOString(),
-        resultsReadyDurationMs,
-        streamCompletedAt: new Date(streamCompletedAtMs).toISOString(),
-        streamDurationMs,
-        firstByteAt: stream.firstByteAtMs === null ? null : new Date(stream.firstByteAtMs).toISOString(),
-        ttfbMs
-      },
-      tokenUsage: null,
-      retryMetadata: null,
-      error: message
-        ? {
-            kind: fetchError
-              ? 'fetch_error'
-              : errorEvent
-                ? 'stream_error'
-                : httpOk
-                  ? 'missing_results'
-                  : 'http_error',
-            message,
-            status: httpStatus
-          }
-        : null
-    };
+        apiKey,
+        requestTimeoutMs,
+        maxResults
+      });
+      attempts.push(attemptSummary(result, attempt));
+      if (!isRetryableProviderFailure(result)) break;
+    }
+    return withRetryMetadata(result, attempts);
   }
 };
 
@@ -417,5 +502,6 @@ export const _internals = {
   normalizeState,
   readNdjsonResponse,
   requestLimitForConfig,
+  isRetryableProviderFailure,
   stateForCase
 };

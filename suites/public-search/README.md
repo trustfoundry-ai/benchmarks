@@ -1,6 +1,6 @@
 # TrustFoundry Legal Search
 
-This suite evaluates whether a search API returns the expected case-law document or citation for a legal question. Each row contains a generated question, an expected TrustFoundry document UUID, accepted citation metadata, and jurisdiction metadata. The TrustFoundry provider calls:
+This suite evaluates whether a search API returns the expected legal document or citation for a generated legal search prompt. Public datasets cover case questions, case key facts, law questions, and regulation questions. Each row contains a generated query, an expected TrustFoundry document UUID, accepted citation metadata, and jurisdiction metadata. The TrustFoundry provider calls:
 
 ```text
 POST https://api.trustfoundry.ai/public/v1/search
@@ -22,28 +22,47 @@ pnpm install
 
 ## Run
 
-The repository includes one public data file for this suite:
+TrustFoundry Legal Search is one benchmark family with four targets. Each target has a deterministic 5,000-row JSONL dataset and a 200-row smoke config that reads the first 200 rows from the same file by setting `limit: 200`.
 
-```text
-data/public-search-case-questions-5k/case_questions.jsonl
-```
+The key-fact file is selected from the existing deterministic 10k source after excluding rows whose normalized query is empty. Law and regulation files are the first 5,000 rows from their deterministic 10k source files.
 
-That file contains 5,000 rows. The smoke config and full config both reference the same file. The smoke config stops after the first deterministic 200 rows by setting `limit: 200`; there is no separate 200-row dataset to keep in sync.
+### Targets
+
+All targets use the same public search endpoint and `search-recall` scorer.
+
+- `case_question` - Case questions
+  - Data: [`case_questions.jsonl`](../../data/trustfoundry-legal-search-5k/case_questions.jsonl)
+  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search-case-questions-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search-case-questions-5k.json)
+  - Published bundles: [`200`](../../results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-200-case-question/), [`5k`](../../results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-5k-case-question/)
+- `case_key_fact` - Case key facts
+  - Data: [`case_key_facts.jsonl`](../../data/trustfoundry-legal-search-5k/case_key_facts.jsonl)
+  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search-key-facts-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search-key-facts-5k.json)
+  - Published bundles: [`200`](../../results/trustfoundry-legal-search-key-facts/trustfoundry-public-search/2026-06-29-production-200-case-key-fact/), [`5k`](../../results/trustfoundry-legal-search-key-facts/trustfoundry-public-search/2026-06-29-production-5k-case-key-fact/)
+- `law_question` - Law questions
+  - Data: [`laws.jsonl`](../../data/trustfoundry-legal-search-5k/laws.jsonl)
+  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search-laws-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search-laws-5k.json)
+  - Published bundles: [`200`](../../results/trustfoundry-legal-search-laws/trustfoundry-public-search/2026-06-29-production-200-law-question/), [`5k`](../../results/trustfoundry-legal-search-laws/trustfoundry-public-search/2026-06-29-production-5k-law-question/)
+- `reg_question` - Regulation questions
+  - Data: [`regs.jsonl`](../../data/trustfoundry-legal-search-5k/regs.jsonl)
+  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search-regs-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search-regs-5k.json)
+  - Published bundles: [`200`](../../results/trustfoundry-legal-search-regs/trustfoundry-public-search/2026-06-29-production-200-reg-question/), [`5k`](../../results/trustfoundry-legal-search-regs/trustfoundry-public-search/2026-06-29-production-5k-reg-question/)
+
+The generic provider config [`trustfoundry-public-search.json`](../../configs/providers/trustfoundry-public-search.json) omits `model_type` and sends each row's `model_type`, so the same provider config works for all four targets.
 
 ### Test Data Schema
 
-Each line in `case_questions.jsonl` is one JSON object. The main fields are:
+Each line in a dataset JSONL file is one JSON object. The main fields are:
 
 | Field | Description |
 | --- | --- |
-| `query_text` | The legal question sent to the search API after the suite's query normalization step. |
-| `document_uuid` | TrustFoundry document UUID for the expected case. TrustFoundry runs can score against this because the public search API returns document UUIDs in results. |
-| `expected.canonical_citation` | Primary citation for the expected case. |
-| `expected.alternates` | Additional accepted citations for the expected case. |
+| `query_text` | The legal query sent to the search API after the suite's query normalization step. |
+| `document_uuid` | TrustFoundry document UUID for the expected document. TrustFoundry runs can score against this because the public search API returns document UUIDs in results. |
+| `expected.canonical_citation` | Primary citation for the expected document. |
+| `expected.alternates` | Additional accepted citations for the expected document. |
 | `geo_level_1_identifier` | Row-level state or `FED` jurisdiction value. The TrustFoundry provider sends this as the state filter when state filtering is enabled. |
-| `model_type` | Expected model type for the row, currently `case_question`. Provider configs must still declare the model type explicitly. |
+| `model_type` | Expected model type for the row: `case_question`, `case_key_fact`, `law_question`, or `reg_question`. The generic TrustFoundry provider config uses this row-level value. |
 | `doc_type` / `document_type` | Source document category metadata. |
-| `field` | Source field used to generate the query, currently `questions`. |
+| `field` | Source field used to generate the query, such as `questions` or `key_facts`. |
 | `split` | Dataset split, currently `test` for public rows. |
 | `source_dataset` / `source_index` | Provenance fields for tracing the row back to the source generation set. |
 
@@ -55,10 +74,10 @@ Smoke run, first deterministic 200 rows:
 
 ```bash
 pnpm benchmark run \
-  --benchmark-config configs/benchmarks/public-search-case-questions-200.json \
-  --provider-config configs/providers/trustfoundry-public-search-case-question.json \
-  --out runs/public-search-200 \
-  --parallel 4 \
+  --benchmark-config configs/benchmarks/trustfoundry-legal-search-case-questions-200.json \
+  --provider-config configs/providers/trustfoundry-public-search.json \
+  --out runs/trustfoundry-legal-search-case-questions-200 \
+  --parallel 8 \
   --force
 ```
 
@@ -66,14 +85,16 @@ Full public 5k run:
 
 ```bash
 pnpm benchmark run \
-  --benchmark-config configs/benchmarks/public-search-case-questions-5k.json \
-  --provider-config configs/providers/trustfoundry-public-search-case-question.json \
-  --out runs/public-search-5k \
-  --parallel 4 \
+  --benchmark-config configs/benchmarks/trustfoundry-legal-search-case-questions-5k.json \
+  --provider-config configs/providers/trustfoundry-public-search.json \
+  --out runs/trustfoundry-legal-search-case-questions-5k \
+  --parallel 8 \
   --force
 ```
 
-The provider config requires `model_type: "case_question"` and sends the row-level state filter by default.
+Use the matching config and run directory names for other targets: `trustfoundry-legal-search-key-facts-*`, `trustfoundry-legal-search-laws-*`, or `trustfoundry-legal-search-regs-*`.
+
+The TrustFoundry public-search provider makes one retry for transient provider failures: fetch errors, streamed provider error events, missing result events, or HTTP 5xx responses. It does not retry validation errors or HTTP 4xx responses. If the retry succeeds, the row is scored from the successful response and latency includes the full elapsed time across both attempts; if it still fails, it is reported as a provider failure.
 
 ### Request limit and scorer cutoffs
 
@@ -99,8 +120,11 @@ Individual provider configs can still pin an explicit `limit` if an adapter need
 Create a shareable result bundle from a run:
 
 ```bash
-pnpm benchmark publish-result --run runs/public-search-200 --out results/public-search-200 --force
-pnpm benchmark verify-result results/public-search-200
+pnpm benchmark publish-result \
+  --run runs/trustfoundry-legal-search-case-questions-200 \
+  --out results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-200-case-question \
+  --force
+pnpm benchmark verify-result results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-200-case-question
 ```
 
 ## Metrics
@@ -117,6 +141,8 @@ The scorer can match either an expected document UUID or an accepted citation. T
 
 Each run writes raw provider outputs and row-level scores so aggregate metrics can be recomputed from the evidence.
 
+Top-level `hit@k` and `MRR` are computed over successfully scored rows and report provider failures separately. Use `strict_overall` when provider failures should count as misses.
+
 ## Example Test Results
 
-For example output, inspect the scored summary at [`result.json`](../../results/public-search-case-questions/trustfoundry-public-search/2026-06-28-production-default-c8-5k/result.json). The full checked-in bundle also includes the raw row evidence, manifest, and checksums.
+For example output, inspect the scored summary at [`result.json`](../../results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-5k-case-question/result.json). The full checked-in bundle also includes the raw row evidence, manifest, and checksums.

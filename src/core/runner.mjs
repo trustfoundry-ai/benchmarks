@@ -7,9 +7,10 @@ import {
   SUPPORTED_HEADLINE_CUTOFF
 } from '../adapters/scorers/search-recall.mjs';
 
-const DEFAULT_BENCHMARK_CONFIG = 'configs/benchmarks/public-search-case-questions-200.json';
-const DEFAULT_PROVIDER_CONFIG = 'configs/providers/trustfoundry-public-search-case-question.json';
+const DEFAULT_BENCHMARK_CONFIG = 'configs/benchmarks/trustfoundry-legal-search-case-questions-200.json';
+const DEFAULT_PROVIDER_CONFIG = 'configs/providers/trustfoundry-public-search.json';
 const DEFAULT_SCORER_CONFIG = 'configs/scorers/search-recall.json';
+const DEFAULT_BENCHMARK_ADAPTER = 'trustfoundry-legal-search';
 
 function nowCompact() {
   return new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
@@ -108,6 +109,16 @@ export function defaultPaths() {
     providerConfig: DEFAULT_PROVIDER_CONFIG,
     scorerConfig: DEFAULT_SCORER_CONFIG
   };
+}
+
+export function benchmarkAdapterId(config = {}) {
+  return (
+    config.benchmark_adapter ??
+    config.benchmarkAdapter ??
+    config.benchmark_id ??
+    config.benchmarkId ??
+    DEFAULT_BENCHMARK_ADAPTER
+  );
 }
 
 export async function loadRunInputs({
@@ -260,7 +271,7 @@ export async function executeRun({
     scorerConfigPath,
     limit
   });
-  const benchmarkAdapter = getAdapter('benchmarks', 'public-search-case-questions');
+  const benchmarkAdapter = getAdapter('benchmarks', benchmarkAdapterId(inputs.benchmarkConfig));
   const providerAdapter = getAdapter('providers', 'trustfoundry-public-search');
   const scorerAdapter = getAdapter('scorers', 'search-recall');
   const loaded = await benchmarkAdapter.loadCases({

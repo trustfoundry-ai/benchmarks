@@ -2,11 +2,27 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  benchmarkAdapterId,
   maxScorerCutoff,
   readApiRequestLimit,
   validateApiRequestLimitAgainstCutoffs,
   validateScorerCutoffsMatchImplementation
 } from '../src/core/runner.mjs';
+
+test('benchmarkAdapterId defaults to the legal-search adapter', () => {
+  assert.equal(benchmarkAdapterId({}), 'trustfoundry-legal-search');
+});
+
+test('benchmarkAdapterId reads benchmarkId config aliases', () => {
+  assert.equal(
+    benchmarkAdapterId({ benchmarkId: 'trustfoundry-legal-search' }),
+    'trustfoundry-legal-search'
+  );
+  assert.equal(
+    benchmarkAdapterId({ benchmark_adapter: 'trustfoundry-legal-search' }),
+    'trustfoundry-legal-search'
+  );
+});
 
 test('maxScorerCutoff returns max of cutoffs and headline_cutoff', () => {
   assert.equal(

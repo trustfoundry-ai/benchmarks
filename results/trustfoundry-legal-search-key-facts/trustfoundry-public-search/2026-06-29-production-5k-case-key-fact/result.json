@@ -1,0 +1,1969 @@
+{
+  "generated_at": "2026-06-30T00:28:21.341Z",
+  "metadata": {
+    "cutoffs": [
+      1,
+      5,
+      10,
+      25
+    ],
+    "mrrDecimalPlaces": 4,
+    "scorer": "search-recall",
+    "version": "search-recall-v1"
+  },
+  "run": {
+    "benchmark": {
+      "configPath": "configs/benchmarks/trustfoundry-legal-search-key-facts-5k.json",
+      "configSha256": "33d75f8c7ca30e18eae00b84ae4b3907d62d0c98bf062b8bcc968084d1281f6e",
+      "datasetNames": [
+        "case_key_facts"
+      ],
+      "datasetSize": "trustfoundry-legal-search-key-facts-5k",
+      "id": "trustfoundry-legal-search",
+      "queryTransformId": "strip-synthetic-instruction-prefixes-v1",
+      "sourceFiles": [
+        {
+          "path": "data/trustfoundry-legal-search-5k/case_key_facts.jsonl",
+          "sha256": "2fcdf90c43224d2b450bb91293de1a687eacd26f0988cfb0a2881ef9eae7fbbb"
+        }
+      ],
+      "sourceRoot": "data/trustfoundry-legal-search-5k",
+      "splits": [
+        "test"
+      ],
+      "version": "trustfoundry-legal-search-v1"
+    },
+    "harness": {
+      "commit": "26dff0212922c8c16ef7ab5eb652fcafb5f9b30f",
+      "name": "@trustfoundry-ai/benchmarks"
+    },
+    "provider": {
+      "apiKeyEnv": "TF_API_KEY",
+      "configPath": "configs/providers/trustfoundry-public-search.json",
+      "configSha256": "e466925546b44be0bc0a2c085d08dee2434df3b881b7b4ee61313dc94651b304",
+      "id": "trustfoundry-public-search",
+      "settings": {
+        "limit": 25,
+        "maxResults": null,
+        "modelType": "per-row",
+        "requestTimeoutMs": 60000,
+        "stateFilterEnabled": true
+      },
+      "subject": "per-row",
+      "target": "https://api.trustfoundry.ai/public/v1/search",
+      "version": "trustfoundry-public-search-provider-v1"
+    },
+    "run_id": "trustfoundry-legal-search-key-facts-5k-c8-r2",
+    "scheduler": {
+      "caseCount": 5000,
+      "parallel": 8
+    }
+  },
+  "schema_version": "trustfoundry.benchmarks.result.v1",
+  "status": "self-reported",
+  "summary": {
+    "byDataset": {
+      "case_key_facts": {
+        "hitAt1": 0.8726,
+        "hitAt10": 0.9688,
+        "hitAt25": 0.9762,
+        "hitAt5": 0.961,
+        "meanResultCount": 24.9268,
+        "mrr": 0.9124,
+        "overallScore": 0.9762,
+        "providerFailures": 0,
+        "scored": 5000,
+        "supportedScore": 0.9762,
+        "total": 5000
+      }
+    },
+    "byDocType": {
+      "case": {
+        "hitAt1": 0.8726,
+        "hitAt10": 0.9688,
+        "hitAt25": 0.9762,
+        "hitAt5": 0.961,
+        "meanResultCount": 24.9268,
+        "mrr": 0.9124,
+        "overallScore": 0.9762,
+        "providerFailures": 0,
+        "scored": 5000,
+        "supportedScore": 0.9762,
+        "total": 5000
+      }
+    },
+    "byField": {
+      "key_facts": {
+        "hitAt1": 0.8726,
+        "hitAt10": 0.9688,
+        "hitAt25": 0.9762,
+        "hitAt5": 0.961,
+        "meanResultCount": 24.9268,
+        "mrr": 0.9124,
+        "overallScore": 0.9762,
+        "providerFailures": 0,
+        "scored": 5000,
+        "supportedScore": 0.9762,
+        "total": 5000
+      }
+    },
+    "byModelType": {
+      "case_key_fact": {
+        "hitAt1": 0.8726,
+        "hitAt10": 0.9688,
+        "hitAt25": 0.9762,
+        "hitAt5": 0.961,
+        "meanResultCount": 24.9268,
+        "mrr": 0.9124,
+        "overallScore": 0.9762,
+        "providerFailures": 0,
+        "scored": 5000,
+        "supportedScore": 0.9762,
+        "total": 5000
+      }
+    },
+    "bySplit": {
+      "test": {
+        "hitAt1": 0.8726,
+        "hitAt10": 0.9688,
+        "hitAt25": 0.9762,
+        "hitAt5": 0.961,
+        "meanResultCount": 24.9268,
+        "mrr": 0.9124,
+        "overallScore": 0.9762,
+        "providerFailures": 0,
+        "scored": 5000,
+        "supportedScore": 0.9762,
+        "total": 5000
+      }
+    },
+    "byState": {
+      "AK": {
+        "hitAt1": 1,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 22.333333333333332,
+        "mrr": 1,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 12,
+        "supportedScore": 1,
+        "total": 12
+      },
+      "AL": {
+        "hitAt1": 0.8928571428571429,
+        "hitAt10": 0.9880952380952381,
+        "hitAt25": 1,
+        "hitAt5": 0.9880952380952381,
+        "meanResultCount": 25,
+        "mrr": 0.935,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 84,
+        "supportedScore": 1,
+        "total": 84
+      },
+      "AR": {
+        "hitAt1": 0.9361702127659575,
+        "hitAt10": 0.9787234042553191,
+        "hitAt25": 1,
+        "hitAt5": 0.9787234042553191,
+        "meanResultCount": 25,
+        "mrr": 0.9551,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 47,
+        "supportedScore": 1,
+        "total": 47
+      },
+      "AZ": {
+        "hitAt1": 0.9545454545454546,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 24.681818181818183,
+        "mrr": 0.9772,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 22,
+        "supportedScore": 1,
+        "total": 22
+      },
+      "CA": {
+        "hitAt1": 0.9111111111111111,
+        "hitAt10": 0.9777777777777777,
+        "hitAt25": 0.9777777777777777,
+        "hitAt5": 0.9777777777777777,
+        "meanResultCount": 24.822222222222223,
+        "mrr": 0.9345,
+        "overallScore": 0.9777777777777777,
+        "providerFailures": 0,
+        "scored": 135,
+        "supportedScore": 0.9777777777777777,
+        "total": 135
+      },
+      "CO": {
+        "hitAt1": 0.9,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 0.975,
+        "meanResultCount": 25,
+        "mrr": 0.9289,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 40,
+        "supportedScore": 1,
+        "total": 40
+      },
+      "CT": {
+        "hitAt1": 0.8452380952380952,
+        "hitAt10": 0.9880952380952381,
+        "hitAt25": 0.9880952380952381,
+        "hitAt5": 0.9642857142857143,
+        "meanResultCount": 24.738095238095237,
+        "mrr": 0.8945,
+        "overallScore": 0.9880952380952381,
+        "providerFailures": 0,
+        "scored": 84,
+        "supportedScore": 0.9880952380952381,
+        "total": 84
+      },
+      "DC": {
+        "hitAt1": 0.75,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 25,
+        "mrr": 0.8645,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 16,
+        "supportedScore": 1,
+        "total": 16
+      },
+      "DE": {
+        "hitAt1": 1,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 25,
+        "mrr": 1,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 12,
+        "supportedScore": 1,
+        "total": 12
+      },
+      "FED": {
+        "hitAt1": 0.7973856209150327,
+        "hitAt10": 0.9455337690631809,
+        "hitAt25": 0.9527959331880901,
+        "hitAt5": 0.9317356572258533,
+        "meanResultCount": 24.931009440813362,
+        "mrr": 0.8583,
+        "overallScore": 0.9527959331880901,
+        "providerFailures": 0,
+        "scored": 1377,
+        "supportedScore": 0.9527959331880901,
+        "total": 1377
+      },
+      "FL": {
+        "hitAt1": 0.864516129032258,
+        "hitAt10": 0.967741935483871,
+        "hitAt25": 0.9741935483870968,
+        "hitAt5": 0.9548387096774194,
+        "meanResultCount": 24.980645161290322,
+        "mrr": 0.9054,
+        "overallScore": 0.9741935483870968,
+        "providerFailures": 0,
+        "scored": 155,
+        "supportedScore": 0.9741935483870968,
+        "total": 155
+      },
+      "GA": {
+        "hitAt1": 0.9390243902439024,
+        "hitAt10": 0.9878048780487805,
+        "hitAt25": 0.9878048780487805,
+        "hitAt5": 0.9817073170731707,
+        "meanResultCount": 24.96951219512195,
+        "mrr": 0.9613,
+        "overallScore": 0.9878048780487805,
+        "providerFailures": 0,
+        "scored": 164,
+        "supportedScore": 0.9878048780487805,
+        "total": 164
+      },
+      "HI": {
+        "hitAt1": 0.875,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 24.75,
+        "mrr": 0.9375,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 8,
+        "supportedScore": 1,
+        "total": 8
+      },
+      "IA": {
+        "hitAt1": 0.9056603773584906,
+        "hitAt10": 0.9622641509433962,
+        "hitAt25": 0.9811320754716981,
+        "hitAt5": 0.9622641509433962,
+        "meanResultCount": 24.81132075471698,
+        "mrr": 0.9321,
+        "overallScore": 0.9811320754716981,
+        "providerFailures": 0,
+        "scored": 53,
+        "supportedScore": 0.9811320754716981,
+        "total": 53
+      },
+      "ID": {
+        "hitAt1": 1,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 24.818181818181817,
+        "mrr": 1,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 22,
+        "supportedScore": 1,
+        "total": 22
+      },
+      "IL": {
+        "hitAt1": 0.850828729281768,
+        "hitAt10": 0.9834254143646409,
+        "hitAt25": 0.994475138121547,
+        "hitAt5": 0.9834254143646409,
+        "meanResultCount": 24.96132596685083,
+        "mrr": 0.9129,
+        "overallScore": 0.994475138121547,
+        "providerFailures": 0,
+        "scored": 181,
+        "supportedScore": 0.994475138121547,
+        "total": 181
+      },
+      "IN": {
+        "hitAt1": 0.875,
+        "hitAt10": 0.984375,
+        "hitAt25": 1,
+        "hitAt5": 0.984375,
+        "meanResultCount": 25,
+        "mrr": 0.9278,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 64,
+        "supportedScore": 1,
+        "total": 64
+      },
+      "KS": {
+        "hitAt1": 0.925,
+        "hitAt10": 0.975,
+        "hitAt25": 0.975,
+        "hitAt5": 0.975,
+        "meanResultCount": 24.9,
+        "mrr": 0.95,
+        "overallScore": 0.975,
+        "providerFailures": 0,
+        "scored": 40,
+        "supportedScore": 0.975,
+        "total": 40
+      },
+      "KY": {
+        "hitAt1": 0.958904109589041,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 24.82191780821918,
+        "mrr": 0.9753,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 73,
+        "supportedScore": 1,
+        "total": 73
+      },
+      "LA": {
+        "hitAt1": 0.916083916083916,
+        "hitAt10": 0.9790209790209791,
+        "hitAt25": 0.986013986013986,
+        "hitAt5": 0.972027972027972,
+        "meanResultCount": 24.986013986013987,
+        "mrr": 0.941,
+        "overallScore": 0.986013986013986,
+        "providerFailures": 0,
+        "scored": 143,
+        "supportedScore": 0.986013986013986,
+        "total": 143
+      },
+      "MA": {
+        "hitAt1": 0.9425287356321839,
+        "hitAt10": 0.9655172413793104,
+        "hitAt25": 0.9885057471264368,
+        "hitAt5": 0.9655172413793104,
+        "meanResultCount": 24.977011494252874,
+        "mrr": 0.9522,
+        "overallScore": 0.9885057471264368,
+        "providerFailures": 0,
+        "scored": 87,
+        "supportedScore": 0.9885057471264368,
+        "total": 87
+      },
+      "MD": {
+        "hitAt1": 0.8695652173913043,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 0.9782608695652174,
+        "meanResultCount": 24.82608695652174,
+        "mrr": 0.923,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 46,
+        "supportedScore": 1,
+        "total": 46
+      },
+      "ME": {
+        "hitAt1": 0.9285714285714286,
+        "hitAt10": 0.9642857142857143,
+        "hitAt25": 1,
+        "hitAt5": 0.9642857142857143,
+        "meanResultCount": 24.571428571428573,
+        "mrr": 0.9423,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 28,
+        "supportedScore": 1,
+        "total": 28
+      },
+      "MI": {
+        "hitAt1": 0.8787878787878788,
+        "hitAt10": 0.9848484848484849,
+        "hitAt25": 0.9848484848484849,
+        "hitAt5": 0.9848484848484849,
+        "meanResultCount": 25,
+        "mrr": 0.9146,
+        "overallScore": 0.9848484848484849,
+        "providerFailures": 0,
+        "scored": 66,
+        "supportedScore": 0.9848484848484849,
+        "total": 66
+      },
+      "MN": {
+        "hitAt1": 0.9803921568627451,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 25,
+        "mrr": 0.9852,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 51,
+        "supportedScore": 1,
+        "total": 51
+      },
+      "MO": {
+        "hitAt1": 0.9215686274509803,
+        "hitAt10": 0.9803921568627451,
+        "hitAt25": 0.9901960784313726,
+        "hitAt5": 0.9509803921568627,
+        "meanResultCount": 25,
+        "mrr": 0.9418,
+        "overallScore": 0.9901960784313726,
+        "providerFailures": 0,
+        "scored": 102,
+        "supportedScore": 0.9901960784313726,
+        "total": 102
+      },
+      "MS": {
+        "hitAt1": 0.9615384615384616,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 25,
+        "mrr": 0.9807,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 52,
+        "supportedScore": 1,
+        "total": 52
+      },
+      "MT": {
+        "hitAt1": 0.85,
+        "hitAt10": 0.9,
+        "hitAt25": 0.9,
+        "hitAt5": 0.9,
+        "meanResultCount": 25,
+        "mrr": 0.875,
+        "overallScore": 0.9,
+        "providerFailures": 0,
+        "scored": 20,
+        "supportedScore": 0.9,
+        "total": 20
+      },
+      "NC": {
+        "hitAt1": 0.8888888888888888,
+        "hitAt10": 0.9722222222222222,
+        "hitAt25": 0.9722222222222222,
+        "hitAt5": 0.9444444444444444,
+        "meanResultCount": 25,
+        "mrr": 0.9125,
+        "overallScore": 0.9722222222222222,
+        "providerFailures": 0,
+        "scored": 72,
+        "supportedScore": 0.9722222222222222,
+        "total": 72
+      },
+      "ND": {
+        "hitAt1": 0.9047619047619048,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 0.9523809523809523,
+        "meanResultCount": 25,
+        "mrr": 0.9365,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 21,
+        "supportedScore": 1,
+        "total": 21
+      },
+      "NE": {
+        "hitAt1": 0.9047619047619048,
+        "hitAt10": 0.9761904761904762,
+        "hitAt25": 0.9761904761904762,
+        "hitAt5": 0.9761904761904762,
+        "meanResultCount": 24.785714285714285,
+        "mrr": 0.9293,
+        "overallScore": 0.9761904761904762,
+        "providerFailures": 0,
+        "scored": 42,
+        "supportedScore": 0.9761904761904762,
+        "total": 42
+      },
+      "NH": {
+        "hitAt1": 0.9333333333333333,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 24.6,
+        "mrr": 0.9666,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 15,
+        "supportedScore": 1,
+        "total": 15
+      },
+      "NJ": {
+        "hitAt1": 0.9038461538461539,
+        "hitAt10": 0.9615384615384616,
+        "hitAt25": 0.9807692307692307,
+        "hitAt5": 0.9615384615384616,
+        "meanResultCount": 24.865384615384617,
+        "mrr": 0.9335,
+        "overallScore": 0.9807692307692307,
+        "providerFailures": 0,
+        "scored": 52,
+        "supportedScore": 0.9807692307692307,
+        "total": 52
+      },
+      "NM": {
+        "hitAt1": 0.7727272727272727,
+        "hitAt10": 0.9545454545454546,
+        "hitAt25": 1,
+        "hitAt5": 0.9545454545454546,
+        "meanResultCount": 24.545454545454547,
+        "mrr": 0.8677,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 22,
+        "supportedScore": 1,
+        "total": 22
+      },
+      "NV": {
+        "hitAt1": 1,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 24.5,
+        "mrr": 1,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 10,
+        "supportedScore": 1,
+        "total": 10
+      },
+      "NY": {
+        "hitAt1": 0.8864406779661017,
+        "hitAt10": 0.9610169491525423,
+        "hitAt25": 0.976271186440678,
+        "hitAt5": 0.9525423728813559,
+        "meanResultCount": 25,
+        "mrr": 0.9157,
+        "overallScore": 0.976271186440678,
+        "providerFailures": 0,
+        "scored": 590,
+        "supportedScore": 0.976271186440678,
+        "total": 590
+      },
+      "OH": {
+        "hitAt1": 0.863905325443787,
+        "hitAt10": 0.9585798816568047,
+        "hitAt25": 0.9585798816568047,
+        "hitAt5": 0.9526627218934911,
+        "meanResultCount": 24.952662721893493,
+        "mrr": 0.9043,
+        "overallScore": 0.9585798816568047,
+        "providerFailures": 0,
+        "scored": 169,
+        "supportedScore": 0.9585798816568047,
+        "total": 169
+      },
+      "OK": {
+        "hitAt1": 0.8275862068965517,
+        "hitAt10": 0.9655172413793104,
+        "hitAt25": 0.9655172413793104,
+        "hitAt5": 0.9655172413793104,
+        "meanResultCount": 24.862068965517242,
+        "mrr": 0.8879,
+        "overallScore": 0.9655172413793104,
+        "providerFailures": 0,
+        "scored": 58,
+        "supportedScore": 0.9655172413793104,
+        "total": 58
+      },
+      "OR": {
+        "hitAt1": 0.9354838709677419,
+        "hitAt10": 0.9838709677419355,
+        "hitAt25": 0.9838709677419355,
+        "hitAt5": 0.9838709677419355,
+        "meanResultCount": 24.693548387096776,
+        "mrr": 0.9569,
+        "overallScore": 0.9838709677419355,
+        "providerFailures": 0,
+        "scored": 62,
+        "supportedScore": 0.9838709677419355,
+        "total": 62
+      },
+      "PA": {
+        "hitAt1": 0.8819875776397516,
+        "hitAt10": 0.9751552795031055,
+        "hitAt25": 0.9751552795031055,
+        "hitAt5": 0.9751552795031055,
+        "meanResultCount": 25,
+        "mrr": 0.9217,
+        "overallScore": 0.9751552795031055,
+        "providerFailures": 0,
+        "scored": 161,
+        "supportedScore": 0.9751552795031055,
+        "total": 161
+      },
+      "RI": {
+        "hitAt1": 0.9310344827586207,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 24.896551724137932,
+        "mrr": 0.9568,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 29,
+        "supportedScore": 1,
+        "total": 29
+      },
+      "SC": {
+        "hitAt1": 0.8666666666666667,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 25,
+        "mrr": 0.9333,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 45,
+        "supportedScore": 1,
+        "total": 45
+      },
+      "SD": {
+        "hitAt1": 0.9375,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 24.3125,
+        "mrr": 0.9687,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 16,
+        "supportedScore": 1,
+        "total": 16
+      },
+      "TN": {
+        "hitAt1": 0.9791666666666666,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 24.9375,
+        "mrr": 0.9895,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 48,
+        "supportedScore": 1,
+        "total": 48
+      },
+      "TX": {
+        "hitAt1": 0.9171597633136095,
+        "hitAt10": 0.9763313609467456,
+        "hitAt25": 0.9940828402366864,
+        "hitAt5": 0.9763313609467456,
+        "meanResultCount": 25,
+        "mrr": 0.9433,
+        "overallScore": 0.9940828402366864,
+        "providerFailures": 0,
+        "scored": 169,
+        "supportedScore": 0.9940828402366864,
+        "total": 169
+      },
+      "UT": {
+        "hitAt1": 0.9,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 24.65,
+        "mrr": 0.95,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 20,
+        "supportedScore": 1,
+        "total": 20
+      },
+      "VA": {
+        "hitAt1": 0.9302325581395349,
+        "hitAt10": 0.9767441860465116,
+        "hitAt25": 0.9767441860465116,
+        "hitAt5": 0.9767441860465116,
+        "meanResultCount": 24.86046511627907,
+        "mrr": 0.9465,
+        "overallScore": 0.9767441860465116,
+        "providerFailures": 0,
+        "scored": 43,
+        "supportedScore": 0.9767441860465116,
+        "total": 43
+      },
+      "VT": {
+        "hitAt1": 0.9565217391304348,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 25,
+        "mrr": 0.971,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 23,
+        "supportedScore": 1,
+        "total": 23
+      },
+      "WA": {
+        "hitAt1": 0.921875,
+        "hitAt10": 0.984375,
+        "hitAt25": 1,
+        "hitAt5": 0.984375,
+        "meanResultCount": 25,
+        "mrr": 0.9498,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 64,
+        "supportedScore": 1,
+        "total": 64
+      },
+      "WI": {
+        "hitAt1": 0.9473684210526315,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 25,
+        "mrr": 0.9671,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 38,
+        "supportedScore": 1,
+        "total": 38
+      },
+      "WV": {
+        "hitAt1": 0.9459459459459459,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 24.7027027027027,
+        "mrr": 0.9729,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 37,
+        "supportedScore": 1,
+        "total": 37
+      },
+      "WY": {
+        "hitAt1": 1,
+        "hitAt10": 1,
+        "hitAt25": 1,
+        "hitAt5": 1,
+        "meanResultCount": 24.9,
+        "mrr": 1,
+        "overallScore": 1,
+        "providerFailures": 0,
+        "scored": 10,
+        "supportedScore": 1,
+        "total": 10
+      }
+    },
+    "execution": {
+      "benchmark": {
+        "configPath": "configs/benchmarks/trustfoundry-legal-search-key-facts-5k.json",
+        "configSha256": "33d75f8c7ca30e18eae00b84ae4b3907d62d0c98bf062b8bcc968084d1281f6e",
+        "datasetNames": [
+          "case_key_facts"
+        ],
+        "datasetSize": "trustfoundry-legal-search-key-facts-5k",
+        "id": "trustfoundry-legal-search",
+        "queryTransformId": "strip-synthetic-instruction-prefixes-v1",
+        "sourceFiles": [
+          {
+            "path": "data/trustfoundry-legal-search-5k/case_key_facts.jsonl",
+            "sha256": "2fcdf90c43224d2b450bb91293de1a687eacd26f0988cfb0a2881ef9eae7fbbb"
+          }
+        ],
+        "sourceRoot": "data/trustfoundry-legal-search-5k",
+        "splits": [
+          "test"
+        ],
+        "version": "trustfoundry-legal-search-v1"
+      },
+      "caseCount": 5000,
+      "provider": {
+        "apiKeyEnv": "TF_API_KEY",
+        "configPath": "configs/providers/trustfoundry-public-search.json",
+        "configSha256": "e466925546b44be0bc0a2c085d08dee2434df3b881b7b4ee61313dc94651b304",
+        "id": "trustfoundry-public-search",
+        "settings": {
+          "limit": 25,
+          "maxResults": null,
+          "modelType": "per-row",
+          "requestTimeoutMs": 60000,
+          "stateFilterEnabled": true
+        },
+        "subject": "per-row",
+        "target": "https://api.trustfoundry.ai/public/v1/search",
+        "version": "trustfoundry-public-search-provider-v1"
+      },
+      "runId": "trustfoundry-legal-search-key-facts-5k-c8-r2",
+      "scheduler": {
+        "caseCount": 5000,
+        "parallel": 8
+      },
+      "scorer": {
+        "cutoffs": [
+          1,
+          5,
+          10,
+          25
+        ],
+        "headlineCutoff": 25,
+        "id": "search-recall",
+        "mrrDecimalPlaces": 4,
+        "version": "search-recall-v1"
+      }
+    },
+    "hitAt1": 0.8726,
+    "hitAt10": 0.9688,
+    "hitAt25": 0.9762,
+    "hitAt5": 0.961,
+    "latency_ms": {
+      "max": 12917,
+      "mean": 2122.6506,
+      "min": 640,
+      "n": 5000,
+      "p50": 2064.5,
+      "p95": 3313.05
+    },
+    "meanResultCount": 24.9268,
+    "mrr": 0.9124,
+    "overall": {
+      "hit_at": {
+        "hit@1": 0.8726,
+        "hit@10": 0.9688,
+        "hit@25": 0.9762,
+        "hit@5": 0.961
+      },
+      "mrr": 0.9124,
+      "n": 5000
+    },
+    "overallScore": 0.9762,
+    "per_state": {
+      "AK": {
+        "hit_at": {
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 12
+      },
+      "AL": {
+        "hit_at": {
+          "hit@1": 0.8928571428571429,
+          "hit@10": 0.9880952380952381,
+          "hit@25": 1,
+          "hit@5": 0.9880952380952381
+        },
+        "mrr": 0.935,
+        "n": 84
+      },
+      "AR": {
+        "hit_at": {
+          "hit@1": 0.9361702127659575,
+          "hit@10": 0.9787234042553191,
+          "hit@25": 1,
+          "hit@5": 0.9787234042553191
+        },
+        "mrr": 0.9551,
+        "n": 47
+      },
+      "AZ": {
+        "hit_at": {
+          "hit@1": 0.9545454545454546,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9772,
+        "n": 22
+      },
+      "CA": {
+        "hit_at": {
+          "hit@1": 0.9111111111111111,
+          "hit@10": 0.9777777777777777,
+          "hit@25": 0.9777777777777777,
+          "hit@5": 0.9777777777777777
+        },
+        "mrr": 0.9345,
+        "n": 135
+      },
+      "CO": {
+        "hit_at": {
+          "hit@1": 0.9,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 0.975
+        },
+        "mrr": 0.9289,
+        "n": 40
+      },
+      "CT": {
+        "hit_at": {
+          "hit@1": 0.8452380952380952,
+          "hit@10": 0.9880952380952381,
+          "hit@25": 0.9880952380952381,
+          "hit@5": 0.9642857142857143
+        },
+        "mrr": 0.8945,
+        "n": 84
+      },
+      "DC": {
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.8645,
+        "n": 16
+      },
+      "DE": {
+        "hit_at": {
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 12
+      },
+      "FED": {
+        "hit_at": {
+          "hit@1": 0.7973856209150327,
+          "hit@10": 0.9455337690631809,
+          "hit@25": 0.9527959331880901,
+          "hit@5": 0.9317356572258533
+        },
+        "mrr": 0.8583,
+        "n": 1377
+      },
+      "FL": {
+        "hit_at": {
+          "hit@1": 0.864516129032258,
+          "hit@10": 0.967741935483871,
+          "hit@25": 0.9741935483870968,
+          "hit@5": 0.9548387096774194
+        },
+        "mrr": 0.9054,
+        "n": 155
+      },
+      "GA": {
+        "hit_at": {
+          "hit@1": 0.9390243902439024,
+          "hit@10": 0.9878048780487805,
+          "hit@25": 0.9878048780487805,
+          "hit@5": 0.9817073170731707
+        },
+        "mrr": 0.9613,
+        "n": 164
+      },
+      "HI": {
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9375,
+        "n": 8
+      },
+      "IA": {
+        "hit_at": {
+          "hit@1": 0.9056603773584906,
+          "hit@10": 0.9622641509433962,
+          "hit@25": 0.9811320754716981,
+          "hit@5": 0.9622641509433962
+        },
+        "mrr": 0.9321,
+        "n": 53
+      },
+      "ID": {
+        "hit_at": {
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 22
+      },
+      "IL": {
+        "hit_at": {
+          "hit@1": 0.850828729281768,
+          "hit@10": 0.9834254143646409,
+          "hit@25": 0.994475138121547,
+          "hit@5": 0.9834254143646409
+        },
+        "mrr": 0.9129,
+        "n": 181
+      },
+      "IN": {
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@10": 0.984375,
+          "hit@25": 1,
+          "hit@5": 0.984375
+        },
+        "mrr": 0.9278,
+        "n": 64
+      },
+      "KS": {
+        "hit_at": {
+          "hit@1": 0.925,
+          "hit@10": 0.975,
+          "hit@25": 0.975,
+          "hit@5": 0.975
+        },
+        "mrr": 0.95,
+        "n": 40
+      },
+      "KY": {
+        "hit_at": {
+          "hit@1": 0.958904109589041,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9753,
+        "n": 73
+      },
+      "LA": {
+        "hit_at": {
+          "hit@1": 0.916083916083916,
+          "hit@10": 0.9790209790209791,
+          "hit@25": 0.986013986013986,
+          "hit@5": 0.972027972027972
+        },
+        "mrr": 0.941,
+        "n": 143
+      },
+      "MA": {
+        "hit_at": {
+          "hit@1": 0.9425287356321839,
+          "hit@10": 0.9655172413793104,
+          "hit@25": 0.9885057471264368,
+          "hit@5": 0.9655172413793104
+        },
+        "mrr": 0.9522,
+        "n": 87
+      },
+      "MD": {
+        "hit_at": {
+          "hit@1": 0.8695652173913043,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 0.9782608695652174
+        },
+        "mrr": 0.923,
+        "n": 46
+      },
+      "ME": {
+        "hit_at": {
+          "hit@1": 0.9285714285714286,
+          "hit@10": 0.9642857142857143,
+          "hit@25": 1,
+          "hit@5": 0.9642857142857143
+        },
+        "mrr": 0.9423,
+        "n": 28
+      },
+      "MI": {
+        "hit_at": {
+          "hit@1": 0.8787878787878788,
+          "hit@10": 0.9848484848484849,
+          "hit@25": 0.9848484848484849,
+          "hit@5": 0.9848484848484849
+        },
+        "mrr": 0.9146,
+        "n": 66
+      },
+      "MN": {
+        "hit_at": {
+          "hit@1": 0.9803921568627451,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9852,
+        "n": 51
+      },
+      "MO": {
+        "hit_at": {
+          "hit@1": 0.9215686274509803,
+          "hit@10": 0.9803921568627451,
+          "hit@25": 0.9901960784313726,
+          "hit@5": 0.9509803921568627
+        },
+        "mrr": 0.9418,
+        "n": 102
+      },
+      "MS": {
+        "hit_at": {
+          "hit@1": 0.9615384615384616,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9807,
+        "n": 52
+      },
+      "MT": {
+        "hit_at": {
+          "hit@1": 0.85,
+          "hit@10": 0.9,
+          "hit@25": 0.9,
+          "hit@5": 0.9
+        },
+        "mrr": 0.875,
+        "n": 20
+      },
+      "NC": {
+        "hit_at": {
+          "hit@1": 0.8888888888888888,
+          "hit@10": 0.9722222222222222,
+          "hit@25": 0.9722222222222222,
+          "hit@5": 0.9444444444444444
+        },
+        "mrr": 0.9125,
+        "n": 72
+      },
+      "ND": {
+        "hit_at": {
+          "hit@1": 0.9047619047619048,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 0.9523809523809523
+        },
+        "mrr": 0.9365,
+        "n": 21
+      },
+      "NE": {
+        "hit_at": {
+          "hit@1": 0.9047619047619048,
+          "hit@10": 0.9761904761904762,
+          "hit@25": 0.9761904761904762,
+          "hit@5": 0.9761904761904762
+        },
+        "mrr": 0.9293,
+        "n": 42
+      },
+      "NH": {
+        "hit_at": {
+          "hit@1": 0.9333333333333333,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9666,
+        "n": 15
+      },
+      "NJ": {
+        "hit_at": {
+          "hit@1": 0.9038461538461539,
+          "hit@10": 0.9615384615384616,
+          "hit@25": 0.9807692307692307,
+          "hit@5": 0.9615384615384616
+        },
+        "mrr": 0.9335,
+        "n": 52
+      },
+      "NM": {
+        "hit_at": {
+          "hit@1": 0.7727272727272727,
+          "hit@10": 0.9545454545454546,
+          "hit@25": 1,
+          "hit@5": 0.9545454545454546
+        },
+        "mrr": 0.8677,
+        "n": 22
+      },
+      "NV": {
+        "hit_at": {
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 10
+      },
+      "NY": {
+        "hit_at": {
+          "hit@1": 0.8864406779661017,
+          "hit@10": 0.9610169491525423,
+          "hit@25": 0.976271186440678,
+          "hit@5": 0.9525423728813559
+        },
+        "mrr": 0.9157,
+        "n": 590
+      },
+      "OH": {
+        "hit_at": {
+          "hit@1": 0.863905325443787,
+          "hit@10": 0.9585798816568047,
+          "hit@25": 0.9585798816568047,
+          "hit@5": 0.9526627218934911
+        },
+        "mrr": 0.9043,
+        "n": 169
+      },
+      "OK": {
+        "hit_at": {
+          "hit@1": 0.8275862068965517,
+          "hit@10": 0.9655172413793104,
+          "hit@25": 0.9655172413793104,
+          "hit@5": 0.9655172413793104
+        },
+        "mrr": 0.8879,
+        "n": 58
+      },
+      "OR": {
+        "hit_at": {
+          "hit@1": 0.9354838709677419,
+          "hit@10": 0.9838709677419355,
+          "hit@25": 0.9838709677419355,
+          "hit@5": 0.9838709677419355
+        },
+        "mrr": 0.9569,
+        "n": 62
+      },
+      "PA": {
+        "hit_at": {
+          "hit@1": 0.8819875776397516,
+          "hit@10": 0.9751552795031055,
+          "hit@25": 0.9751552795031055,
+          "hit@5": 0.9751552795031055
+        },
+        "mrr": 0.9217,
+        "n": 161
+      },
+      "RI": {
+        "hit_at": {
+          "hit@1": 0.9310344827586207,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9568,
+        "n": 29
+      },
+      "SC": {
+        "hit_at": {
+          "hit@1": 0.8666666666666667,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9333,
+        "n": 45
+      },
+      "SD": {
+        "hit_at": {
+          "hit@1": 0.9375,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9687,
+        "n": 16
+      },
+      "TN": {
+        "hit_at": {
+          "hit@1": 0.9791666666666666,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9895,
+        "n": 48
+      },
+      "TX": {
+        "hit_at": {
+          "hit@1": 0.9171597633136095,
+          "hit@10": 0.9763313609467456,
+          "hit@25": 0.9940828402366864,
+          "hit@5": 0.9763313609467456
+        },
+        "mrr": 0.9433,
+        "n": 169
+      },
+      "UT": {
+        "hit_at": {
+          "hit@1": 0.9,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.95,
+        "n": 20
+      },
+      "VA": {
+        "hit_at": {
+          "hit@1": 0.9302325581395349,
+          "hit@10": 0.9767441860465116,
+          "hit@25": 0.9767441860465116,
+          "hit@5": 0.9767441860465116
+        },
+        "mrr": 0.9465,
+        "n": 43
+      },
+      "VT": {
+        "hit_at": {
+          "hit@1": 0.9565217391304348,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.971,
+        "n": 23
+      },
+      "WA": {
+        "hit_at": {
+          "hit@1": 0.921875,
+          "hit@10": 0.984375,
+          "hit@25": 1,
+          "hit@5": 0.984375
+        },
+        "mrr": 0.9498,
+        "n": 64
+      },
+      "WI": {
+        "hit_at": {
+          "hit@1": 0.9473684210526315,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9671,
+        "n": 38
+      },
+      "WV": {
+        "hit_at": {
+          "hit@1": 0.9459459459459459,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9729,
+        "n": 37
+      },
+      "WY": {
+        "hit_at": {
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 10
+      }
+    },
+    "providerFailures": 0,
+    "quality": {
+      "failure_rate": 0,
+      "n_empty_gold": 0,
+      "n_failed": 0,
+      "n_malformed_gold": 0,
+      "n_success": 5000,
+      "n_total": 5000,
+      "n_valid_gold": 5000,
+      "n_valid_success": 5000
+    },
+    "scored": 5000,
+    "strict_overall": {
+      "hit_at": {
+        "hit@1": 0.8726,
+        "hit@10": 0.9688,
+        "hit@25": 0.9762,
+        "hit@5": 0.961
+      },
+      "mrr": 0.9124,
+      "n": 5000
+    },
+    "strict_per_state": {
+      "AK": {
+        "hit_at": {
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 12
+      },
+      "AL": {
+        "hit_at": {
+          "hit@1": 0.8928571428571429,
+          "hit@10": 0.9880952380952381,
+          "hit@25": 1,
+          "hit@5": 0.9880952380952381
+        },
+        "mrr": 0.935,
+        "n": 84
+      },
+      "AR": {
+        "hit_at": {
+          "hit@1": 0.9361702127659575,
+          "hit@10": 0.9787234042553191,
+          "hit@25": 1,
+          "hit@5": 0.9787234042553191
+        },
+        "mrr": 0.9551,
+        "n": 47
+      },
+      "AZ": {
+        "hit_at": {
+          "hit@1": 0.9545454545454546,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9772,
+        "n": 22
+      },
+      "CA": {
+        "hit_at": {
+          "hit@1": 0.9111111111111111,
+          "hit@10": 0.9777777777777777,
+          "hit@25": 0.9777777777777777,
+          "hit@5": 0.9777777777777777
+        },
+        "mrr": 0.9345,
+        "n": 135
+      },
+      "CO": {
+        "hit_at": {
+          "hit@1": 0.9,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 0.975
+        },
+        "mrr": 0.9289,
+        "n": 40
+      },
+      "CT": {
+        "hit_at": {
+          "hit@1": 0.8452380952380952,
+          "hit@10": 0.9880952380952381,
+          "hit@25": 0.9880952380952381,
+          "hit@5": 0.9642857142857143
+        },
+        "mrr": 0.8945,
+        "n": 84
+      },
+      "DC": {
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.8645,
+        "n": 16
+      },
+      "DE": {
+        "hit_at": {
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 12
+      },
+      "FED": {
+        "hit_at": {
+          "hit@1": 0.7973856209150327,
+          "hit@10": 0.9455337690631809,
+          "hit@25": 0.9527959331880901,
+          "hit@5": 0.9317356572258533
+        },
+        "mrr": 0.8583,
+        "n": 1377
+      },
+      "FL": {
+        "hit_at": {
+          "hit@1": 0.864516129032258,
+          "hit@10": 0.967741935483871,
+          "hit@25": 0.9741935483870968,
+          "hit@5": 0.9548387096774194
+        },
+        "mrr": 0.9054,
+        "n": 155
+      },
+      "GA": {
+        "hit_at": {
+          "hit@1": 0.9390243902439024,
+          "hit@10": 0.9878048780487805,
+          "hit@25": 0.9878048780487805,
+          "hit@5": 0.9817073170731707
+        },
+        "mrr": 0.9613,
+        "n": 164
+      },
+      "HI": {
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9375,
+        "n": 8
+      },
+      "IA": {
+        "hit_at": {
+          "hit@1": 0.9056603773584906,
+          "hit@10": 0.9622641509433962,
+          "hit@25": 0.9811320754716981,
+          "hit@5": 0.9622641509433962
+        },
+        "mrr": 0.9321,
+        "n": 53
+      },
+      "ID": {
+        "hit_at": {
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 22
+      },
+      "IL": {
+        "hit_at": {
+          "hit@1": 0.850828729281768,
+          "hit@10": 0.9834254143646409,
+          "hit@25": 0.994475138121547,
+          "hit@5": 0.9834254143646409
+        },
+        "mrr": 0.9129,
+        "n": 181
+      },
+      "IN": {
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@10": 0.984375,
+          "hit@25": 1,
+          "hit@5": 0.984375
+        },
+        "mrr": 0.9278,
+        "n": 64
+      },
+      "KS": {
+        "hit_at": {
+          "hit@1": 0.925,
+          "hit@10": 0.975,
+          "hit@25": 0.975,
+          "hit@5": 0.975
+        },
+        "mrr": 0.95,
+        "n": 40
+      },
+      "KY": {
+        "hit_at": {
+          "hit@1": 0.958904109589041,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9753,
+        "n": 73
+      },
+      "LA": {
+        "hit_at": {
+          "hit@1": 0.916083916083916,
+          "hit@10": 0.9790209790209791,
+          "hit@25": 0.986013986013986,
+          "hit@5": 0.972027972027972
+        },
+        "mrr": 0.941,
+        "n": 143
+      },
+      "MA": {
+        "hit_at": {
+          "hit@1": 0.9425287356321839,
+          "hit@10": 0.9655172413793104,
+          "hit@25": 0.9885057471264368,
+          "hit@5": 0.9655172413793104
+        },
+        "mrr": 0.9522,
+        "n": 87
+      },
+      "MD": {
+        "hit_at": {
+          "hit@1": 0.8695652173913043,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 0.9782608695652174
+        },
+        "mrr": 0.923,
+        "n": 46
+      },
+      "ME": {
+        "hit_at": {
+          "hit@1": 0.9285714285714286,
+          "hit@10": 0.9642857142857143,
+          "hit@25": 1,
+          "hit@5": 0.9642857142857143
+        },
+        "mrr": 0.9423,
+        "n": 28
+      },
+      "MI": {
+        "hit_at": {
+          "hit@1": 0.8787878787878788,
+          "hit@10": 0.9848484848484849,
+          "hit@25": 0.9848484848484849,
+          "hit@5": 0.9848484848484849
+        },
+        "mrr": 0.9146,
+        "n": 66
+      },
+      "MN": {
+        "hit_at": {
+          "hit@1": 0.9803921568627451,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9852,
+        "n": 51
+      },
+      "MO": {
+        "hit_at": {
+          "hit@1": 0.9215686274509803,
+          "hit@10": 0.9803921568627451,
+          "hit@25": 0.9901960784313726,
+          "hit@5": 0.9509803921568627
+        },
+        "mrr": 0.9418,
+        "n": 102
+      },
+      "MS": {
+        "hit_at": {
+          "hit@1": 0.9615384615384616,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9807,
+        "n": 52
+      },
+      "MT": {
+        "hit_at": {
+          "hit@1": 0.85,
+          "hit@10": 0.9,
+          "hit@25": 0.9,
+          "hit@5": 0.9
+        },
+        "mrr": 0.875,
+        "n": 20
+      },
+      "NC": {
+        "hit_at": {
+          "hit@1": 0.8888888888888888,
+          "hit@10": 0.9722222222222222,
+          "hit@25": 0.9722222222222222,
+          "hit@5": 0.9444444444444444
+        },
+        "mrr": 0.9125,
+        "n": 72
+      },
+      "ND": {
+        "hit_at": {
+          "hit@1": 0.9047619047619048,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 0.9523809523809523
+        },
+        "mrr": 0.9365,
+        "n": 21
+      },
+      "NE": {
+        "hit_at": {
+          "hit@1": 0.9047619047619048,
+          "hit@10": 0.9761904761904762,
+          "hit@25": 0.9761904761904762,
+          "hit@5": 0.9761904761904762
+        },
+        "mrr": 0.9293,
+        "n": 42
+      },
+      "NH": {
+        "hit_at": {
+          "hit@1": 0.9333333333333333,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9666,
+        "n": 15
+      },
+      "NJ": {
+        "hit_at": {
+          "hit@1": 0.9038461538461539,
+          "hit@10": 0.9615384615384616,
+          "hit@25": 0.9807692307692307,
+          "hit@5": 0.9615384615384616
+        },
+        "mrr": 0.9335,
+        "n": 52
+      },
+      "NM": {
+        "hit_at": {
+          "hit@1": 0.7727272727272727,
+          "hit@10": 0.9545454545454546,
+          "hit@25": 1,
+          "hit@5": 0.9545454545454546
+        },
+        "mrr": 0.8677,
+        "n": 22
+      },
+      "NV": {
+        "hit_at": {
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 10
+      },
+      "NY": {
+        "hit_at": {
+          "hit@1": 0.8864406779661017,
+          "hit@10": 0.9610169491525423,
+          "hit@25": 0.976271186440678,
+          "hit@5": 0.9525423728813559
+        },
+        "mrr": 0.9157,
+        "n": 590
+      },
+      "OH": {
+        "hit_at": {
+          "hit@1": 0.863905325443787,
+          "hit@10": 0.9585798816568047,
+          "hit@25": 0.9585798816568047,
+          "hit@5": 0.9526627218934911
+        },
+        "mrr": 0.9043,
+        "n": 169
+      },
+      "OK": {
+        "hit_at": {
+          "hit@1": 0.8275862068965517,
+          "hit@10": 0.9655172413793104,
+          "hit@25": 0.9655172413793104,
+          "hit@5": 0.9655172413793104
+        },
+        "mrr": 0.8879,
+        "n": 58
+      },
+      "OR": {
+        "hit_at": {
+          "hit@1": 0.9354838709677419,
+          "hit@10": 0.9838709677419355,
+          "hit@25": 0.9838709677419355,
+          "hit@5": 0.9838709677419355
+        },
+        "mrr": 0.9569,
+        "n": 62
+      },
+      "PA": {
+        "hit_at": {
+          "hit@1": 0.8819875776397516,
+          "hit@10": 0.9751552795031055,
+          "hit@25": 0.9751552795031055,
+          "hit@5": 0.9751552795031055
+        },
+        "mrr": 0.9217,
+        "n": 161
+      },
+      "RI": {
+        "hit_at": {
+          "hit@1": 0.9310344827586207,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9568,
+        "n": 29
+      },
+      "SC": {
+        "hit_at": {
+          "hit@1": 0.8666666666666667,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9333,
+        "n": 45
+      },
+      "SD": {
+        "hit_at": {
+          "hit@1": 0.9375,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9687,
+        "n": 16
+      },
+      "TN": {
+        "hit_at": {
+          "hit@1": 0.9791666666666666,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9895,
+        "n": 48
+      },
+      "TX": {
+        "hit_at": {
+          "hit@1": 0.9171597633136095,
+          "hit@10": 0.9763313609467456,
+          "hit@25": 0.9940828402366864,
+          "hit@5": 0.9763313609467456
+        },
+        "mrr": 0.9433,
+        "n": 169
+      },
+      "UT": {
+        "hit_at": {
+          "hit@1": 0.9,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.95,
+        "n": 20
+      },
+      "VA": {
+        "hit_at": {
+          "hit@1": 0.9302325581395349,
+          "hit@10": 0.9767441860465116,
+          "hit@25": 0.9767441860465116,
+          "hit@5": 0.9767441860465116
+        },
+        "mrr": 0.9465,
+        "n": 43
+      },
+      "VT": {
+        "hit_at": {
+          "hit@1": 0.9565217391304348,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.971,
+        "n": 23
+      },
+      "WA": {
+        "hit_at": {
+          "hit@1": 0.921875,
+          "hit@10": 0.984375,
+          "hit@25": 1,
+          "hit@5": 0.984375
+        },
+        "mrr": 0.9498,
+        "n": 64
+      },
+      "WI": {
+        "hit_at": {
+          "hit@1": 0.9473684210526315,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9671,
+        "n": 38
+      },
+      "WV": {
+        "hit_at": {
+          "hit@1": 0.9459459459459459,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 0.9729,
+        "n": 37
+      },
+      "WY": {
+        "hit_at": {
+          "hit@1": 1,
+          "hit@10": 1,
+          "hit@25": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 10
+      }
+    },
+    "supportedScore": 0.9762,
+    "total": 5000
+  }
+}
