@@ -7,9 +7,10 @@
 #   docker run --rm -e TF_API_KEY=$TF_API_KEY \
 #     -e BENCHMARK_SIZE=200 -e MODEL_TYPES=case-questions ttf-benchmarks
 #
-# Run (with GCS upload of each verified bundle):
+# Run (with upload of each verified bundle — cloud-agnostic, dispatched by
+# URI scheme; gs:// uses the bundled gcloud SDK, file:///abs/path uses cp):
 #   docker run --rm -e TF_API_KEY=$TF_API_KEY \
-#     -e OUTPUT_GCS_URI=gs://your-bucket/some/prefix \
+#     -e OUTPUT_BUNDLE_URI=gs://your-bucket/some/prefix \
 #     -v $HOME/.config/gcloud:/root/.config/gcloud \
 #     ttf-benchmarks
 #
@@ -23,9 +24,11 @@ FROM ${NODE_IMAGE}
 ARG HARNESS_COMMIT_SHA=unknown
 ENV HARNESS_COMMIT_SHA=${HARNESS_COMMIT_SHA}
 
-# gcloud SDK supplies `gcloud storage cp` for the optional upload step.
-# It only runs when OUTPUT_GCS_URI is set, so a local-only run does not
-# require GCP credentials to be mounted.
+# gcloud SDK is bundled so the entrypoint's gs:// uploader path works out
+# of the box. The upload step only runs when OUTPUT_BUNDLE_URI is set, so
+# a local-only run does not require GCP credentials to be mounted. To
+# support other clouds (s3://, etc.), add the corresponding CLI here and
+# extend the upload_bundle dispatch in entrypoint.sh.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         curl ca-certificates python3 gnupg apt-transport-https \
