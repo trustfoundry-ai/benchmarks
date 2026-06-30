@@ -7,10 +7,10 @@
     },
     "result": {
       "path": "result.json",
-      "sha256": "d2ad30829a94352ca3ec9aa32230aee354ef00b3742e629db7eba29eff2d6e8d"
+      "sha256": "d109f02f34c6411a9af235ee059db15ec4a7b8e45500e7beea8d0fb1bc6eb705"
     }
   },
-  "generated_at": "2026-06-30T00:11:40.278Z",
+  "generated_at": "2026-06-30T00:28:16.859Z",
   "schema_version": "trustfoundry.benchmarks.result-manifest.v1",
   "source_run_id": "trustfoundry-legal-search-key-facts-200-c8",
   "status": "self-reported",
@@ -27,7 +27,7 @@
     ],
     "provider_config": {
       "path": "configs/providers/trustfoundry-public-search.json",
-      "sha256": "281a2d37dc4947db4e5006c6aba8b2ae6cdaed3c18bb0667da5cab7319a94603"
+      "sha256": "e466925546b44be0bc0a2c085d08dee2434df3b881b7b4ee61313dc94651b304"
     },
     "scorer_config": {
       "path": "configs/scorers/search-recall.json",

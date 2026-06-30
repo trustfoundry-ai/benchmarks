@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-30T00:11:40.251Z",
+  "generated_at": "2026-06-30T00:28:16.799Z",
   "metadata": {
     "cutoffs": [
       1,
@@ -40,7 +40,7 @@
     "provider": {
       "apiKeyEnv": "TF_API_KEY",
       "configPath": "configs/providers/trustfoundry-public-search.json",
-      "configSha256": "281a2d37dc4947db4e5006c6aba8b2ae6cdaed3c18bb0667da5cab7319a94603",
+      "configSha256": "e466925546b44be0bc0a2c085d08dee2434df3b881b7b4ee61313dc94651b304",
       "id": "trustfoundry-public-search",
       "settings": {
         "limit": 25,
@@ -737,7 +737,7 @@
       "provider": {
         "apiKeyEnv": "TF_API_KEY",
         "configPath": "configs/providers/trustfoundry-public-search.json",
-        "configSha256": "281a2d37dc4947db4e5006c6aba8b2ae6cdaed3c18bb0667da5cab7319a94603",
+        "configSha256": "e466925546b44be0bc0a2c085d08dee2434df3b881b7b4ee61313dc94651b304",
         "id": "trustfoundry-public-search",
         "settings": {
           "limit": 25,

@@ -1,5 +1,5 @@
 {
-  "_comment": "TrustFoundry public API search provider for Legal Search rows. Omits model_type so each request uses the row-level model_type: case_key_fact, law_question, or reg_question.",
+  "_comment": "TrustFoundry public API search provider for Legal Search rows. Omits model_type so each request uses the row-level model_type: case_question, case_key_fact, law_question, or reg_question.",
   "endpoint": "https://api.trustfoundry.ai/public/v1/search",
   "api_key_env": "TF_API_KEY",
   "request_timeout_ms": 60000,
