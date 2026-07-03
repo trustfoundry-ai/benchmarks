@@ -14,14 +14,15 @@ import {
 } from './fs.mjs';
 import { getAdapter } from './registry.mjs';
 import {
-  SUPPORTED_CUTOFFS,
-  SUPPORTED_HEADLINE_CUTOFF
+  SUPPORTED_CUTOFFS as SEARCH_RECALL_SUPPORTED_CUTOFFS,
+  SUPPORTED_HEADLINE_CUTOFF as SEARCH_RECALL_SUPPORTED_HEADLINE_CUTOFF
 } from '../adapters/scorers/search-recall.mjs';
 
 const DEFAULT_BENCHMARK_CONFIG = 'configs/benchmarks/trustfoundry-legal-search-case-questions-200.json';
 const DEFAULT_PROVIDER_CONFIG = 'configs/providers/trustfoundry-public-search.json';
 const DEFAULT_SCORER_CONFIG = 'configs/scorers/search-recall.json';
 const DEFAULT_BENCHMARK_ADAPTER = 'trustfoundry-legal-search';
+const DEFAULT_SCORER_ID = 'search-recall';
 
 function nowCompact() {
   return new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
@@ -61,27 +62,34 @@ function sameIntegerSet(a, b) {
   return sortA.every((value, idx) => value === sortB[idx]);
 }
 
-export function validateScorerCutoffsMatchImplementation(scorerConfig = {}) {
+export function validateScorerCutoffsMatchImplementation(
+  scorerConfig = {},
+  {
+    supportedCutoffs = SEARCH_RECALL_SUPPORTED_CUTOFFS,
+    supportedHeadlineCutoff = SEARCH_RECALL_SUPPORTED_HEADLINE_CUTOFF,
+    scorerId = DEFAULT_SCORER_ID
+  } = {}
+) {
   const configuredCutoffs = scorerConfig.cutoffs;
   const configuredHeadline =
     scorerConfig.headline_cutoff ?? scorerConfig.headlineCutoff;
 
-  if (configuredCutoffs !== undefined && !sameIntegerSet(configuredCutoffs, SUPPORTED_CUTOFFS)) {
+  if (configuredCutoffs !== undefined && !sameIntegerSet(configuredCutoffs, supportedCutoffs)) {
     throw new Error(
       `Scorer config invalid: cutoffs ${JSON.stringify(configuredCutoffs)} ` +
-        `differs from the scorer's implementation ${JSON.stringify(SUPPORTED_CUTOFFS)}. ` +
+        `differs from the scorer's implementation ${JSON.stringify(supportedCutoffs)}. ` +
         `The result-bundle schema currently pins hits@K to these specific K values; ` +
-        `update both src/adapters/scorers/search-recall.mjs and the artifact schema ` +
+        `update both src/adapters/scorers/${scorerId}.mjs and the artifact schema ` +
         `together to change them.`
     );
   }
   if (
     configuredHeadline !== undefined &&
-    Number.parseInt(String(configuredHeadline), 10) !== SUPPORTED_HEADLINE_CUTOFF
+    Number.parseInt(String(configuredHeadline), 10) !== supportedHeadlineCutoff
   ) {
     throw new Error(
       `Scorer config invalid: headline_cutoff ${configuredHeadline} ` +
-        `differs from the scorer's implementation ${SUPPORTED_HEADLINE_CUTOFF}.`
+        `differs from the scorer's implementation ${supportedHeadlineCutoff}.`
     );
   }
 }
@@ -132,6 +140,30 @@ export function benchmarkAdapterId(config = {}) {
   );
 }
 
+// Resolves the scorer adapter id from the benchmark + scorer configs.
+// Precedence: benchmarkConfig.scorer (or aliases) > scorerConfig.scorer (or
+// aliases) > 'search-recall' (default). Existing configs that omit the
+// scorer field continue to select search-recall unchanged.
+export function scorerAdapterId(benchmarkConfig = {}, scorerConfig = {}) {
+  return (
+    benchmarkConfig.scorer ??
+    benchmarkConfig.scorer_id ??
+    benchmarkConfig.scorerId ??
+    scorerConfig.scorer ??
+    scorerConfig.scorer_id ??
+    scorerConfig.id ??
+    DEFAULT_SCORER_ID
+  );
+}
+
+function scorerConstants(scorerAdapter) {
+  return {
+    supportedCutoffs: scorerAdapter?.SUPPORTED_CUTOFFS ?? SEARCH_RECALL_SUPPORTED_CUTOFFS,
+    supportedHeadlineCutoff:
+      scorerAdapter?.SUPPORTED_HEADLINE_CUTOFF ?? SEARCH_RECALL_SUPPORTED_HEADLINE_CUTOFF
+  };
+}
+
 export async function loadRunInputs({
   repoRoot,
   benchmarkConfigPath = DEFAULT_BENCHMARK_CONFIG,
@@ -148,12 +180,22 @@ export async function loadRunInputs({
   const scorerConfig = await readJson(scorerConfigFile);
   if (limit !== null) benchmarkConfig.limit = limit;
   if (offset !== null) benchmarkConfig.offset = offset;
+  // Resolve the scorer adapter before validating cutoffs — the validator
+  // consults the selected scorer's exported SUPPORTED_CUTOFFS /
+  // SUPPORTED_HEADLINE_CUTOFF, not a global constant.
+  const scorerId = scorerAdapterId(benchmarkConfig, scorerConfig);
+  const scorerAdapter = getAdapter('scorers', scorerId);
+  const { supportedCutoffs, supportedHeadlineCutoff } = scorerConstants(scorerAdapter);
   // Validate the scorer config: its cutoffs must match the scorer's
   // implementation (the result-bundle schema currently pins hits@K), and
   // api_request_limit must be >= the largest hits@K cutoff. See
-  // configs/scorers/search-recall.json for the rationale and the link to the
+  // configs/scorers/<scorerId>.json for the rationale and the link to the
   // public-api caller cap at https://api.trustfoundry.ai.
-  validateScorerCutoffsMatchImplementation(scorerConfig);
+  validateScorerCutoffsMatchImplementation(scorerConfig, {
+    supportedCutoffs,
+    supportedHeadlineCutoff,
+    scorerId
+  });
   const { apiRequestLimit } = validateApiRequestLimitAgainstCutoffs(scorerConfig);
   if (apiRequestLimit !== null && providerConfig.limit === undefined) {
     providerConfig.limit = apiRequestLimit;
@@ -162,6 +204,8 @@ export async function loadRunInputs({
     benchmarkConfig,
     providerConfig,
     scorerConfig,
+    scorerId,
+    scorerAdapter,
     paths: {
       benchmarkConfigFile,
       providerConfigFile,
@@ -181,7 +225,8 @@ async function createManifest({
   providerDescription,
   paths,
   parallel,
-  caseCount
+  caseCount,
+  scorerId
 }) {
   const sourceFiles = benchmark.sourceFiles ?? [];
   const dataFiles = await Promise.all(
@@ -216,7 +261,7 @@ async function createManifest({
       configSha256: await sha256File(paths.providerConfigFile)
     },
     scorer: {
-      id: 'search-recall',
+      id: scorerId ?? DEFAULT_SCORER_ID,
       configPath: paths.scorerConfigPath,
       configSha256: await sha256File(paths.scorerConfigFile)
     },
@@ -344,7 +389,7 @@ export async function executeRun({
     inputs.providerConfig.providerId ??
     'trustfoundry-public-search';
   const providerAdapter = getAdapter('providers', providerId);
-  const scorerAdapter = getAdapter('scorers', 'search-recall');
+  const scorerAdapter = inputs.scorerAdapter;
   const loaded = await benchmarkAdapter.loadCases({
     config: inputs.benchmarkConfig,
     repoRoot
@@ -359,7 +404,8 @@ export async function executeRun({
     providerDescription,
     paths: inputs.paths,
     parallel: schedulerParallel,
-    caseCount: loaded.cases.length
+    caseCount: loaded.cases.length,
+    scorerId: inputs.scorerId
   });
 
   await writeJson(path.join(resolvedOut, 'manifest.json'), manifest);
@@ -536,7 +582,7 @@ export async function mergeRuns({ repoRoot, runDirs, outDir, force = false }) {
     });
   }
 
-  const scorerAdapter = getAdapter('scorers', 'search-recall');
+  const scorerAdapter = getAdapter('scorers', mergedManifest.scorer?.id ?? DEFAULT_SCORER_ID);
   const scores = await scoreFromDisk({
     scorerAdapter,
     manifest: mergedManifest,
@@ -558,7 +604,7 @@ export async function scoreRun({ repoRoot, runDir }) {
   const resolvedRun = path.resolve(repoRoot, runDir);
   const manifest = await readJson(path.join(resolvedRun, 'manifest.json'));
   const cases = await readJsonl(path.join(resolvedRun, 'cases.jsonl'));
-  const scorerAdapter = getAdapter('scorers', 'search-recall');
+  const scorerAdapter = getAdapter('scorers', manifest.scorer?.id ?? DEFAULT_SCORER_ID);
   const scores = await scoreFromDisk({
     scorerAdapter,
     manifest,

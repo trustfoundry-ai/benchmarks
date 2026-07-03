@@ -483,6 +483,8 @@ function buildSummary(caseScores, { manifest = null } = {}) {
 export const searchRecallScorerAdapter = {
   id: 'search-recall',
   version: VERSION,
+  SUPPORTED_CUTOFFS: CUTOFFS,
+  SUPPORTED_HEADLINE_CUTOFF: HEADLINE_CUTOFF,
 
   async describe() {
     return {

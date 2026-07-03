@@ -78,6 +78,7 @@ For full runs with large raw artifacts, raw rows may be stored as `raw.jsonl.gz`
 ## Suites
 
 - [TrustFoundry Legal Search](suites/public-search/README.md): legal search recall over public 5,000-row case-question, key-fact, law, and regulation datasets.
+- [Citation Lookup](suites/citation-lookup/README.md): rank-1 citation-lookup accuracy over 4,618 rows of case-law, statute, regulation, and held-out non-citation negative queries, stratified by difficulty (clean vs. sloppy vs. reporter-variation).
 
 ## Setup
 

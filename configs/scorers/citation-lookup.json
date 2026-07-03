@@ -1,0 +1,5 @@
+{
+  "cutoffs": [1, 5, 10, 25],
+  "headline_cutoff": 1,
+  "api_request_limit": 25
+}

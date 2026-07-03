@@ -1,16 +1,20 @@
+import { citationLookupBenchmarkAdapter } from '../adapters/benchmarks/citation-lookup.mjs';
 import { trustfoundryLegalSearchBenchmarkAdapter } from '../adapters/benchmarks/trustfoundry-legal-search.mjs';
 import { trustfoundryPublicSearchProviderAdapter } from '../adapters/providers/trustfoundry-public-search.mjs';
+import { citationLookupScorerAdapter } from '../adapters/scorers/citation-lookup.mjs';
 import { searchRecallScorerAdapter } from '../adapters/scorers/search-recall.mjs';
 
 export const registry = {
   benchmarks: new Map([
-    [trustfoundryLegalSearchBenchmarkAdapter.id, trustfoundryLegalSearchBenchmarkAdapter]
+    [trustfoundryLegalSearchBenchmarkAdapter.id, trustfoundryLegalSearchBenchmarkAdapter],
+    [citationLookupBenchmarkAdapter.id, citationLookupBenchmarkAdapter]
   ]),
   providers: new Map([
     [trustfoundryPublicSearchProviderAdapter.id, trustfoundryPublicSearchProviderAdapter]
   ]),
   scorers: new Map([
-    [searchRecallScorerAdapter.id, searchRecallScorerAdapter]
+    [searchRecallScorerAdapter.id, searchRecallScorerAdapter],
+    [citationLookupScorerAdapter.id, citationLookupScorerAdapter]
   ])
 };
 

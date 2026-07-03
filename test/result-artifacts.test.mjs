@@ -237,7 +237,12 @@ test('raw rows preserve non-case legal search metadata for recomputation', () =>
     model_type: 'law_question',
     datasource_id: 'me-laws',
     authority_identifier: 'mainelegislature.org',
-    jurisdiction_id: 'me'
+    jurisdiction_id: 'me',
+    document_type: null,
+    difficulty: null,
+    kind: null,
+    negative_category: null,
+    geo_level_2: null
   });
 
   const reconstructed = reconstructFromRawRows(rawRows);

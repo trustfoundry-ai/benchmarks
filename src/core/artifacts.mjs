@@ -21,6 +21,7 @@ import {
 import { getAdapter } from './registry.mjs';
 
 const LARGE_RAW_GZIP_THRESHOLD_BYTES = 95 * 1024 * 1024;
+const DEFAULT_SCORER_ID = 'search-recall';
 const gunzipAsync = promisify(gunzip);
 
 function safeParseJson(text) {
@@ -110,6 +111,12 @@ function normalizedResults(providerResult) {
 // Builds a single raw-row record from one case + its provider result + its
 // score. Pure; safe to call in a streaming pipeline. The field set is the
 // raw-row.v1 schema — keep it in sync with reconstructPairFromRawRow.
+//
+// Additive fields (missing on older bundles → null on reconstruction) support
+// benchmark-specific stratifications without a schema version bump:
+// `metadata.document_type`, `metadata.difficulty`, `metadata.kind`,
+// `metadata.negative_category`, `metadata.geo_level_2`, and
+// `expected.kind` / `expected.negative_category` for citation-lookup.
 export function buildRawRow({ benchmarkCase, providerResult, caseScore }) {
   const parsed = safeParseJson(providerResult?.finalOutputText) ?? {};
   return {
@@ -126,7 +133,12 @@ export function buildRawRow({ benchmarkCase, providerResult, caseScore }) {
       model_type: benchmarkCase.metadata?.model_type ?? null,
       datasource_id: benchmarkCase.metadata?.datasource_id ?? null,
       authority_identifier: benchmarkCase.metadata?.authority_identifier ?? null,
-      jurisdiction_id: benchmarkCase.metadata?.jurisdiction_id ?? null
+      jurisdiction_id: benchmarkCase.metadata?.jurisdiction_id ?? null,
+      document_type: benchmarkCase.metadata?.document_type ?? null,
+      difficulty: benchmarkCase.metadata?.difficulty ?? null,
+      kind: benchmarkCase.metadata?.kind ?? null,
+      negative_category: benchmarkCase.metadata?.negative_category ?? null,
+      geo_level_2: benchmarkCase.metadata?.geo_level_2 ?? null
     },
     expected: {
       document_uuid: benchmarkCase.metadata?.document_uuid ?? null,
@@ -135,7 +147,9 @@ export function buildRawRow({ benchmarkCase, providerResult, caseScore }) {
       cl_cluster_id: benchmarkCase.metadata?.expected?.cl_cluster_id ?? null,
       document_title: benchmarkCase.metadata?.document_title ?? null,
       state: benchmarkCase.metadata?.state ?? null,
-      source_index: benchmarkCase.metadata?.source_index ?? null
+      source_index: benchmarkCase.metadata?.source_index ?? null,
+      kind: benchmarkCase.metadata?.expected?.kind ?? null,
+      negative_category: benchmarkCase.metadata?.expected?.negative_category ?? null
     },
     request: providerResult?.rawOutput?.request ?? null,
     response: {
@@ -186,7 +200,13 @@ export function buildRawRows({ cases, providerResults, caseScores }) {
 // Reconstructs the (case, provider-result) pair needed by the scorer from a
 // single raw row. Pure; safe to call in a streaming verify pipeline. Keep
 // field defaults in sync with buildRawRow above.
+//
+// Populates optional benchmark-specific fields (document_type, difficulty,
+// kind, negative_category, geo_level_2) when the raw row has them; older
+// bundles missing those fields get null defaults so search-recall's scoring
+// path continues to work unchanged.
 export function reconstructPairFromRawRow(row) {
+  const expectedKind = row.expected?.kind ?? 'exact';
   const benchmarkCase = {
     caseId: row.case_id,
     benchmarkId: row.benchmark_id ?? 'trustfoundry-legal-search',
@@ -201,13 +221,22 @@ export function reconstructPairFromRawRow(row) {
       datasource_id: row.metadata?.datasource_id ?? null,
       authority_identifier: row.metadata?.authority_identifier ?? null,
       jurisdiction_id: row.metadata?.jurisdiction_id ?? null,
+      document_type: row.metadata?.document_type ?? null,
+      difficulty: row.metadata?.difficulty ?? null,
+      kind: row.metadata?.kind ?? null,
+      negative_category: row.metadata?.negative_category ?? null,
+      geo_level_2: row.metadata?.geo_level_2 ?? null,
       state: row.expected?.state ?? row.request?.state ?? null,
       document_uuid: row.expected?.document_uuid ?? null,
       expected: {
-        kind: 'exact',
+        kind: expectedKind,
         canonical_citation: row.expected?.canonical_citation ?? null,
         alternates: row.expected?.alternates ?? [],
-        cl_cluster_id: row.expected?.cl_cluster_id ?? null
+        cl_cluster_id: row.expected?.cl_cluster_id ?? null,
+        document_type: row.metadata?.document_type ?? null,
+        difficulty: row.metadata?.difficulty ?? null,
+        authority_identifier: row.metadata?.authority_identifier ?? null,
+        negative_category: row.expected?.negative_category ?? null
       }
     }
   };
@@ -243,10 +272,22 @@ export function reconstructFromRawRows(rawRows) {
   return { cases, providerResults };
 }
 
+function resolveScorerId({ manifest, fallback = DEFAULT_SCORER_ID }) {
+  return (
+    manifest?.scorer?.id ??
+    manifest?.run?.scorer?.id ??
+    manifest?.scorer_id ??
+    fallback
+  );
+}
+
 // Streams raw rows through the scorer; never materializes more than one pair
-// in memory at a time. Returns the same shape as scorer.score().
-async function scoreRawRowsStream({ rawRowsIterable, manifest = null }) {
-  const scorer = getAdapter('scorers', 'search-recall');
+// in memory at a time. Returns the same shape as scorer.score(). The scorer
+// id is read from `manifest.scorer.id` when provided (existing bundles set
+// this); callers can also pass an explicit `scorerId` to override.
+async function scoreRawRowsStream({ rawRowsIterable, manifest = null, scorerId = null }) {
+  const resolvedScorerId = scorerId ?? resolveScorerId({ manifest });
+  const scorer = getAdapter('scorers', resolvedScorerId);
   async function* pairs() {
     for await (const row of rawRowsIterable) {
       yield reconstructPairFromRawRow(row);
@@ -256,11 +297,11 @@ async function scoreRawRowsStream({ rawRowsIterable, manifest = null }) {
 }
 
 // Backward-compat array form. Prefer scoreRawRowsStream for large bundles.
-export async function scoreRawRows({ rawRows, manifest = null }) {
+export async function scoreRawRows({ rawRows, manifest = null, scorerId = null }) {
   async function* asIterable() {
     for (const row of rawRows) yield row;
   }
-  return scoreRawRowsStream({ rawRowsIterable: asIterable(), manifest });
+  return scoreRawRowsStream({ rawRowsIterable: asIterable(), manifest, scorerId });
 }
 
 function resultEnvelope({ manifest, scores }) {
@@ -273,6 +314,7 @@ function resultEnvelope({ manifest, scores }) {
       harness: manifest.harness ?? null,
       benchmark: manifest.benchmark ?? null,
       provider: manifest.provider ?? null,
+      scorer: manifest.scorer ?? null,
       scheduler: manifest.scheduler ?? null
     },
     summary: scores.summary,
@@ -312,7 +354,7 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
     }
   }
 
-  const scorer = getAdapter('scorers', 'search-recall');
+  const scorer = getAdapter('scorers', resolveScorerId({ manifest }));
   const scoreResult = await scorer.scoreStream({
     manifest,
     pairs: providerPairs(),
@@ -411,6 +453,11 @@ export async function verifyResultBundle({ repoRoot, bundleDir, verifyInputs = t
       yield row;
     }
   }
+  // Prefer the scorer id recorded on the bundled result. Existing bundles
+  // published pre-refactor omit `result.run.scorer` — fall back to
+  // search-recall so those bundles still verify byte-for-byte.
+  const scorerIdForVerify =
+    result.run?.scorer?.id ?? result.summary?.execution?.scorer?.id ?? DEFAULT_SCORER_ID;
   const recomputed = await scoreRawRowsStream({
     rawRowsIterable: countingRawRows(),
     manifest: result.run
@@ -418,9 +465,11 @@ export async function verifyResultBundle({ repoRoot, bundleDir, verifyInputs = t
           run_id: result.run.run_id,
           benchmark: result.run.benchmark,
           provider: result.run.provider,
-          scheduler: result.run.scheduler
+          scheduler: result.run.scheduler,
+          scorer: result.run.scorer ?? { id: scorerIdForVerify }
         }
-      : null
+      : null,
+    scorerId: scorerIdForVerify
   });
   assertEqual(rowCount, manifest.artifacts.raw.rows, 'raw row count mismatch');
   const recomputedSummary = canonicalStringify(recomputed.summary);

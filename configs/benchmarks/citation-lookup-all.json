@@ -1,0 +1,11 @@
+{
+  "adapter": "citation-lookup",
+  "benchmarkId": "citation-lookup",
+  "datasetPaths": [
+    "data/citation-lookup-cases/dataset.jsonl",
+    "data/citation-lookup-statutes/dataset.jsonl",
+    "data/citation-lookup-regulations/dataset.jsonl",
+    "data/citation-lookup-negatives/dataset.jsonl"
+  ],
+  "scorer": "citation-lookup"
+}

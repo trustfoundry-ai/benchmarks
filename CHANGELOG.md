@@ -6,14 +6,21 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ### Added
 
+- **New suite: `citation-lookup`.** Four public datasets under
+  `data/citation-lookup-{cases,statutes,regulations,negatives}/` totaling
+  4,618 rows. Measures rank-1 citation-lookup accuracy on clean, sloppy,
+  and reporter-variation citation surfaces (positives) plus false-positive
+  rate on held-out non-citation strings (negatives). New benchmark loader
+  (`src/adapters/benchmarks/citation-lookup.mjs`) and per-benchmark scorer
+  (`src/adapters/scorers/citation-lookup.mjs`) with citation-first matching
+  and a generic native-`cluster_id` fallback. Five benchmark configs plus
+  a scorer config live under `configs/`. See
+  [`suites/citation-lookup/README.md`](suites/citation-lookup/README.md).
 - **Dataset**: `expected.cl_cluster_id` field on every case-law row in
   `data/trustfoundry-legal-search-5k/case_questions.jsonl` and
-  `case_key_facts.jsonl`. Values were extracted from TrustFoundry's Spanner
-  (`document.identifier` column, which stores `courtlistener_<cluster_id>`
-  for every doc TF ingested from CourtListener's bulk data). 100% coverage
-  on both files (10,000 rows total). Enables native-ID matching against CL
-  search results — every CL result carries a top-level `cluster_id`, so
-  citation-string normalization is no longer the only path for CL scoring.
+  `case_key_facts.jsonl`. 100% coverage on both files (10,000 rows total).
+  Enables native-ID matching for adapters whose results carry a top-level
+  `cluster_id`.
 - **`--offset N` flag** on `pnpm benchmark run` and a **`merge-runs`
   subcommand** to combine multiple chunked runs into one canonical run
   directory. Both are strictly additive; existing invocations are
@@ -21,14 +28,32 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ### Changed
 
+- **Runner**: scorer selection is now dynamic. The scorer id is read from
+  the benchmark config's `scorer` field (or the scorer config's `id`
+  field), defaulting to `search-recall` when both are omitted. The cutoffs
+  validator now consults the selected scorer's exported
+  `SUPPORTED_CUTOFFS` / `SUPPORTED_HEADLINE_CUTOFF`, so scorers with
+  different K values (e.g. `citation-lookup` with headline `hit@1`) can
+  register without a runner change. Existing configs and result bundles
+  continue to work unchanged.
+- **Artifacts**: `publishResultBundle` and `verifyResultBundle` also read
+  the scorer id dynamically (from `manifest.scorer.id` and
+  `result.run.scorer.id` respectively). Existing bundles without those
+  fields fall back to `search-recall` and continue to verify.
 - **Scorer** (`search-recall`): matches native IDs first (`document_uuid`,
-  then `cl_cluster_id`), falls back to citation matching. The hit@K math
+  then `cluster_id`), falls back to citation matching. The hit@K math
   is unchanged — any match at rank K still counts — but the code path
   makes the priority explicit and immune to citation-normalization drift.
-- **Raw-row schema** (`trustfoundry.benchmarks.raw-row.v1`): gains an
-  optional `expected.cl_cluster_id` string field. This is an additive
-  change; older bundles that lack the field verify unchanged (missing
-  field → null → scorer skips the cluster-id path).
+- **Raw-row schema** (`trustfoundry.benchmarks.raw-row.v1`): additively
+  gains optional `expected.cl_cluster_id`, `expected.kind`,
+  `expected.negative_category`, and `metadata.{document_type, difficulty,
+  kind, negative_category, geo_level_2}` fields so citation-lookup
+  bundles preserve stratification-relevant metadata on the roundtrip.
+  Older bundles that lack the fields verify unchanged (missing → null).
+- **Result envelope** (`trustfoundry.benchmarks.result.v1`): additively
+  records `run.scorer` so `verify-result` can pick the correct scorer
+  when recomputing summaries. Existing bundles without `run.scorer` fall
+  back to `search-recall`.
 
 ### Notes for auditors and downstream consumers
 
@@ -41,7 +66,12 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
   report a data-file sha mismatch until those bundles are regenerated
   against the enriched dataset. Laws/regs bundles are untouched (their
   data files were not modified).
-- TrustFoundry scores are unchanged by this enrichment: TF provider results
-  match via `document_uuid` (which is unchanged) and do not populate a
-  `cluster_id` on returned rows. The new `cl_cluster_id` field is
-  consulted only when a result has one.
+- TrustFoundry scores on the legal-search suite are unchanged by the
+  cluster_id enrichment: TF provider results match via `document_uuid`
+  (unchanged) and do not populate a `cluster_id` on returned rows. The
+  new `cl_cluster_id` field is consulted only when a result exposes one.
+- The manifest `scorer.id` string was already recorded on every existing
+  bundle as `"search-recall"`; the runner and artifacts pipeline changes
+  keep writing that value for legal-search runs. Only new suites with a
+  different `scorer` field in their benchmark config will produce
+  bundles with a different `scorer.id`.
