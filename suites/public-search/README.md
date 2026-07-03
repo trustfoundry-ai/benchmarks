@@ -59,6 +59,7 @@ Each line in a dataset JSONL file is one JSON object. The main fields are:
 | `document_uuid` | TrustFoundry document UUID for the expected document. TrustFoundry runs can score against this because the public search API returns document UUIDs in results. |
 | `expected.canonical_citation` | Primary citation for the expected document. |
 | `expected.alternates` | Additional accepted citations for the expected document. |
+| `expected.cl_cluster_id` | CourtListener opinion-cluster ID for the expected document (case-law rows only). Sourced from `document.identifier` in TrustFoundry's Spanner, which came from CL bulk data. Enables native-ID matching against CL search results (each CL result carries a top-level `cluster_id`). `null` on laws/regs rows. |
 | `geo_level_1_identifier` | Row-level state or `FED` jurisdiction value. The TrustFoundry provider sends this as the state filter when state filtering is enabled. |
 | `model_type` | Expected model type for the row: `case_question`, `case_key_fact`, `law_question`, or `reg_question`. The generic TrustFoundry provider config uses this row-level value. |
 | `doc_type` / `document_type` | Source document category metadata. |
@@ -66,7 +67,11 @@ Each line in a dataset JSONL file is one JSON object. The main fields are:
 | `split` | Dataset split, currently `test` for public rows. |
 | `source_dataset` / `source_index` | Provenance fields for tracing the row back to the source generation set. |
 
-The scorer accepts either identifier path. The TrustFoundry adapter uses `document_uuid` for apples-to-apples scoring against TrustFoundry results, while adapters for other systems can omit UUIDs and return citation fields that match `expected.canonical_citation` or `expected.alternates`.
+The scorer tries native IDs first (`document_uuid` for TrustFoundry, `cl_cluster_id` for CourtListener), then falls back to citation matching. Any match at rank K counts as a hit@K; ordering does not change the metric math. Adapters that don't populate any native ID on their results still score via citation matching, which remains the general fallback.
+
+### Dataset schema history
+
+Field additions and other dataset-shape changes are documented in the repo-root [CHANGELOG.md](../../CHANGELOG.md). The most recent change added `expected.cl_cluster_id` (case-law rows only) so CourtListener runs can match on CL's native opinion-cluster ID instead of relying on citation-string normalization.
 
 ### Commands
 
