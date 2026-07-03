@@ -1,7 +1,7 @@
 import path from 'node:path';
 
 import { publishResultBundle, verifyResultBundle } from './core/artifacts.mjs';
-import { defaultPaths, executeRun, scoreRun } from './core/runner.mjs';
+import { defaultPaths, executeRun, mergeRuns, scoreRun } from './core/runner.mjs';
 import { registry } from './core/registry.mjs';
 
 function printHelp() {
@@ -9,10 +9,11 @@ function printHelp() {
 
 Commands:
   adapters
-  run [--benchmark-config PATH] [--provider-config PATH] [--scorer-config PATH] [--out DIR] [--parallel N] [--limit N] [--run-id ID] [--force]
+  run [--benchmark-config PATH] [--provider-config PATH] [--scorer-config PATH] [--out DIR] [--parallel N] [--limit N] [--offset N] [--run-id ID] [--force]
   score --run DIR
   publish-result --run DIR --out DIR [--force]
   verify-result DIR
+  merge-runs --runs DIR[,DIR,...] --out DIR [--force]
 
 Defaults:
   benchmark-config ${defaultPaths().benchmarkConfig}
@@ -78,6 +79,7 @@ async function runCommand(options) {
     providerConfigPath: options['provider-config'] ?? defaultPaths().providerConfig,
     scorerConfigPath: options['scorer-config'] ?? defaultPaths().scorerConfig,
     limit: numberOption(options.limit, null),
+    offset: numberOption(options.offset, null),
     parallel: numberOption(options.parallel, 4),
     runId: options['run-id'] ?? undefined,
     force: Boolean(options.force)
@@ -92,7 +94,16 @@ async function runCommand(options) {
     hitAt10: result.scores.summary.hitAt10,
     hitAt25: result.scores.summary.hitAt25,
     mrr: result.scores.summary.mrr,
-    latency_ms: result.scores.summary.latency_ms
+    latency_ms: result.scores.summary.latency_ms,
+    ...(result.scores.summary.server_response_duration_ms
+      ? { server_response_duration_ms: result.scores.summary.server_response_duration_ms }
+      : {}),
+    ...(result.scores.summary.token_usage
+      ? { token_usage: result.scores.summary.token_usage }
+      : {}),
+    ...(result.scores.summary.token_cost
+      ? { token_cost: result.scores.summary.token_cost }
+      : {})
   }, null, 2));
 }
 
@@ -121,6 +132,42 @@ async function verifyResultCommand(positionals) {
   console.log(JSON.stringify(verification, null, 2));
 }
 
+async function mergeRunsCommand(options) {
+  if (!options.runs || options.runs === true) {
+    throw new Error('merge-runs requires --runs DIR[,DIR,...]');
+  }
+  if (!options.out || options.out === true) throw new Error('merge-runs requires --out DIR');
+  const runDirs = String(options.runs)
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  if (!runDirs.length) throw new Error('merge-runs --runs must list at least one directory');
+  const result = await mergeRuns({
+    repoRoot: repoRoot(),
+    runDirs,
+    outDir: options.out,
+    force: Boolean(options.force)
+  });
+  console.log(`merged: ${path.relative(repoRoot(), result.outDir)}`);
+  console.log(JSON.stringify({
+    chunks: result.chunkCount,
+    total: result.scores.summary.total,
+    scored: result.scores.summary.scored,
+    providerFailures: result.scores.summary.providerFailures,
+    hitAt1: result.scores.summary.hitAt1,
+    hitAt5: result.scores.summary.hitAt5,
+    hitAt10: result.scores.summary.hitAt10,
+    hitAt25: result.scores.summary.hitAt25,
+    mrr: result.scores.summary.mrr,
+    ...(result.scores.summary.token_usage
+      ? { token_usage: result.scores.summary.token_usage }
+      : {}),
+    ...(result.scores.summary.token_cost
+      ? { token_cost: result.scores.summary.token_cost }
+      : {})
+  }, null, 2));
+}
+
 export async function main(args) {
   const command = args[0] ?? 'help';
   const { options, positionals } = parseArgs(args.slice(1));
@@ -146,6 +193,10 @@ export async function main(args) {
   }
   if (command === 'verify-result') {
     await verifyResultCommand(positionals);
+    return;
+  }
+  if (command === 'merge-runs') {
+    await mergeRunsCommand(options);
     return;
   }
   throw new Error(`Unknown command: ${command}`);

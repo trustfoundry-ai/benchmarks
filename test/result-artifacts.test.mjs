@@ -56,7 +56,7 @@ async function makeRun(repoRoot, root) {
         ]
       }),
       providerMetadata: { httpStatus: 200, totalAvailable: 1 },
-      timing: { durationMs: 10 }
+      timing: { durationMs: 10, serverResponseDurationMs: 8 }
     }
   ];
   const manifest = {
@@ -199,7 +199,14 @@ test('raw rows preserve non-case legal search metadata for recomputation', () =>
           { rank: 1, document_uuid: '22222222-2222-2222-2222-222222222222' }
         ]
       }),
-      timing: { durationMs: 10 }
+      timing: { durationMs: 10, serverResponseDurationMs: 8 },
+      tokenUsage: {
+        inputTokens: 100,
+        outputTokens: 200,
+        cacheCreationInputTokens: 3,
+        cacheReadInputTokens: 4,
+        totalTokens: 307
+      }
     }
   ];
   const caseScores = [
@@ -216,6 +223,14 @@ test('raw rows preserve non-case legal search metadata for recomputation', () =>
   ];
   const rawRows = buildRawRows({ cases, providerResults, caseScores });
   assert.equal(rawRows[0].benchmark_id, 'trustfoundry-legal-search');
+  assert.equal(rawRows[0].timing.server_response_duration_ms, 8);
+  assert.deepEqual(rawRows[0].token_usage, {
+    inputTokens: 100,
+    outputTokens: 200,
+    cacheCreationInputTokens: 3,
+    cacheReadInputTokens: 4,
+    totalTokens: 307
+  });
   assert.deepEqual(rawRows[0].metadata, {
     doc_type: 'law',
     field: 'questions',
@@ -230,4 +245,84 @@ test('raw rows preserve non-case legal search metadata for recomputation', () =>
   assert.equal(reconstructed.cases[0].metadata.doc_type, 'law');
   assert.equal(reconstructed.cases[0].metadata.model_type, 'law_question');
   assert.equal(reconstructed.cases[0].metadata.datasource_id, 'me-laws');
+  assert.equal(reconstructed.providerResults[0].timing.serverResponseDurationMs, 8);
+  assert.deepEqual(reconstructed.providerResults[0].tokenUsage, {
+    inputTokens: 100,
+    outputTokens: 200,
+    cacheCreationInputTokens: 3,
+    cacheReadInputTokens: 4,
+    totalTokens: 307
+  });
+});
+
+test('raw row round-trip preserves cl_cluster_id when present on the case', () => {
+  const cases = [
+    {
+      caseId: 'cl-case-1',
+      benchmarkId: 'trustfoundry-legal-search',
+      split: 'test',
+      prompt: 'query',
+      metadata: {
+        datasetIndex: 0,
+        datasetName: 'case_questions',
+        doc_type: 'case',
+        field: 'questions',
+        model_type: 'case_question',
+        state: 'MI',
+        document_uuid: 'e09cb8d7-bbff-1bd1-773c-57517679901e',
+        expected: {
+          canonical_citation: '13 Mich. 233',
+          alternates: ['1865 Mich. LEXIS 19'],
+          cl_cluster_id: '6751062'
+        }
+      }
+    }
+  ];
+  const providerResults = [
+    {
+      caseId: 'cl-case-1',
+      status: 'completed',
+      finalOutputText: JSON.stringify({ results: [{ rank: 1, cluster_id: '6751062' }] }),
+      timing: { durationMs: 10 }
+    }
+  ];
+  const caseScores = [
+    {
+      caseId: 'cl-case-1',
+      status: 'scored',
+      hitRank: 1,
+      hitAt1: true,
+      hitAt5: true,
+      hitAt10: true,
+      hitAt25: true,
+      reciprocalRank: 1
+    }
+  ];
+  const rawRows = buildRawRows({ cases, providerResults, caseScores });
+  assert.equal(rawRows[0].expected.cl_cluster_id, '6751062');
+  const reconstructed = reconstructFromRawRows(rawRows);
+  assert.equal(reconstructed.cases[0].metadata.expected.cl_cluster_id, '6751062');
+});
+
+test('raw row round-trip: old-style rows without cl_cluster_id reconstruct as null (regression)', () => {
+  const rawRows = [
+    {
+      schema_version: 'trustfoundry.benchmarks.raw-row.v1',
+      case_id: 'legacy-1',
+      benchmark_id: 'trustfoundry-legal-search',
+      split: 'test',
+      prompt: 'q',
+      metadata: { doc_type: 'case', field: 'questions', model_type: 'case_question' },
+      // Deliberately no cl_cluster_id on this v1 row (older bundle shape).
+      expected: {
+        document_uuid: '11111111-1111-1111-1111-111111111111',
+        canonical_citation: '1 Test 1',
+        alternates: []
+      },
+      response: { provider_status: 'completed', result_count: 0, results: [] },
+      timing: {}
+    }
+  ];
+  const { cases } = reconstructFromRawRows(rawRows);
+  assert.equal(cases[0].metadata.expected.cl_cluster_id, null);
 });

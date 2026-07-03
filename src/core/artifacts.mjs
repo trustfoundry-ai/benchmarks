@@ -132,6 +132,7 @@ export function buildRawRow({ benchmarkCase, providerResult, caseScore }) {
       document_uuid: benchmarkCase.metadata?.document_uuid ?? null,
       canonical_citation: benchmarkCase.metadata?.expected?.canonical_citation ?? null,
       alternates: benchmarkCase.metadata?.expected?.alternates ?? [],
+      cl_cluster_id: benchmarkCase.metadata?.expected?.cl_cluster_id ?? null,
       document_title: benchmarkCase.metadata?.document_title ?? null,
       state: benchmarkCase.metadata?.state ?? null,
       source_index: benchmarkCase.metadata?.source_index ?? null
@@ -151,9 +152,11 @@ export function buildRawRow({ benchmarkCase, providerResult, caseScore }) {
       duration_ms: providerResult?.timing?.durationMs ?? null,
       ttfb_ms: providerResult?.timing?.ttfbMs ?? providerResult?.providerMetadata?.ttfbMs ?? null,
       stream_duration_ms: providerResult?.timing?.streamDurationMs ?? null,
+      server_response_duration_ms: providerResult?.timing?.serverResponseDurationMs ?? null,
       started_at: providerResult?.timing?.startedAt ?? null,
       completed_at: providerResult?.timing?.completedAt ?? null
     },
+    token_usage: providerResult?.tokenUsage ?? null,
     score: {
       status: caseScore?.status ?? null,
       hit_rank: caseScore?.hitRank ?? null,
@@ -203,7 +206,8 @@ export function reconstructPairFromRawRow(row) {
       expected: {
         kind: 'exact',
         canonical_citation: row.expected?.canonical_citation ?? null,
-        alternates: row.expected?.alternates ?? []
+        alternates: row.expected?.alternates ?? [],
+        cl_cluster_id: row.expected?.cl_cluster_id ?? null
       }
     }
   };
@@ -217,7 +221,11 @@ export function reconstructPairFromRawRow(row) {
       set_uuid: row.response?.set_uuid ?? null,
       results: row.response?.results ?? []
     }),
-    timing: { durationMs: row.timing?.duration_ms ?? null },
+    timing: {
+      durationMs: row.timing?.duration_ms ?? null,
+      serverResponseDurationMs: row.timing?.server_response_duration_ms ?? null
+    },
+    tokenUsage: row.token_usage ?? null,
     error: row.response?.error ?? null
   };
   return { benchmarkCase, providerResult };

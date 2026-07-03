@@ -174,6 +174,17 @@ function extractSearchSet(events) {
   return null;
 }
 
+function finiteNumber(value) {
+  const numeric = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
+function extractServerResponseDurationMs(searchSet) {
+  return finiteNumber(
+    searchSet?.server_response_duration_ms ?? searchSet?.serverResponseDurationMs
+  );
+}
+
 function findErrorEvent(events) {
   return events.find((event) => event?.type === 'error') ?? null;
 }
@@ -248,7 +259,12 @@ function makeFailure(benchmarkCase, kind, message, { request = null, endpoint = 
       error: kind,
       resultCount: 0
     },
-    timing: { startedAt: now, completedAt: now, durationMs: 0 },
+    timing: {
+      startedAt: now,
+      completedAt: now,
+      durationMs: 0,
+      serverResponseDurationMs: null
+    },
     tokenUsage: null,
     retryMetadata: null,
     error: { kind, message }
@@ -290,6 +306,7 @@ function attemptSummary(result, attempt) {
     error: result.error ?? null,
     httpStatus: result.providerMetadata?.httpStatus ?? result.rawOutput?.httpStatus ?? null,
     durationMs: result.timing?.durationMs ?? null,
+    serverResponseDurationMs: result.timing?.serverResponseDurationMs ?? null,
     startedAt: result.timing?.startedAt ?? null,
     completedAt: result.timing?.completedAt ?? null
   };
@@ -363,6 +380,7 @@ async function executeAttempt({ benchmarkCase, endpoint, request, apiKey, reques
   const resultsReadyDurationMs = resultsReadyAtMs - startedAtMs;
   const streamDurationMs = streamCompletedAtMs - startedAtMs;
   const searchSet = extractSearchSet(stream.events);
+  const serverResponseDurationMs = extractServerResponseDurationMs(searchSet);
   const errorEvent = findErrorEvent(stream.events);
   const envelope = normalizeEnvelope(request.query, searchSet, { maxResults });
   const message = failureMessage({
@@ -390,7 +408,8 @@ async function executeAttempt({ benchmarkCase, endpoint, request, apiKey, reques
       normalizedResults: envelope.results,
       ttfbMs,
       resultsReadyDurationMs,
-      streamDurationMs
+      streamDurationMs,
+      serverResponseDurationMs
     },
     finalOutputText: JSON.stringify(envelope),
     artifacts: [],
@@ -409,6 +428,7 @@ async function executeAttempt({ benchmarkCase, endpoint, request, apiKey, reques
       ttfbMs,
       resultsReadyDurationMs,
       streamDurationMs,
+      serverResponseDurationMs,
       citationsReadyObserved: stream.citationsReadyAtMs !== null
     },
     timing: {
@@ -420,7 +440,8 @@ async function executeAttempt({ benchmarkCase, endpoint, request, apiKey, reques
       streamCompletedAt: new Date(streamCompletedAtMs).toISOString(),
       streamDurationMs,
       firstByteAt: stream.firstByteAtMs === null ? null : new Date(stream.firstByteAtMs).toISOString(),
-      ttfbMs
+      ttfbMs,
+      serverResponseDurationMs
     },
     tokenUsage: null,
     retryMetadata: null,
@@ -498,6 +519,7 @@ export const _internals = {
   buildRequestBody,
   configuredModelType,
   extractSearchSet,
+  extractServerResponseDurationMs,
   normalizeEnvelope,
   normalizeState,
   readNdjsonResponse,

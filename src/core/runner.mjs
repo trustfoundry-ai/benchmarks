@@ -9,7 +9,8 @@ import {
   relativePath,
   sha256File,
   writeJson,
-  writeJsonl
+  writeJsonl,
+  writeText
 } from './fs.mjs';
 import { getAdapter } from './registry.mjs';
 import {
@@ -136,7 +137,8 @@ export async function loadRunInputs({
   benchmarkConfigPath = DEFAULT_BENCHMARK_CONFIG,
   providerConfigPath = DEFAULT_PROVIDER_CONFIG,
   scorerConfigPath = DEFAULT_SCORER_CONFIG,
-  limit = null
+  limit = null,
+  offset = null
 }) {
   const benchmarkConfigFile = path.resolve(repoRoot, benchmarkConfigPath);
   const providerConfigFile = path.resolve(repoRoot, providerConfigPath);
@@ -145,6 +147,7 @@ export async function loadRunInputs({
   const providerConfig = await readJson(providerConfigFile);
   const scorerConfig = await readJson(scorerConfigFile);
   if (limit !== null) benchmarkConfig.limit = limit;
+  if (offset !== null) benchmarkConfig.offset = offset;
   // Validate the scorer config: its cutoffs must match the scorer's
   // implementation (the result-bundle schema currently pins hits@K), and
   // api_request_limit must be >= the largest hits@K cutoff. See
@@ -229,8 +232,16 @@ async function createManifest({
 // result to disk as it completes (rather than buffering all results in
 // memory). JSONL output is in completion order; downstream consumers look
 // up cases by caseId so order does not matter. Returns counts only.
-async function runParallelToDisk({ items, parallel, worker, onProgress, outputPath }) {
+//
+// Per-case artifacts: if `result.artifacts` is populated, each entry is
+// materialized to `<outputDir>/<artifact.path>` so providers can persist
+// verbatim upstream responses (e.g. the CL adapter saves raw API bodies
+// to raw-responses/*.json for offline reprocessing without spending API
+// quota). Artifact writes are best-effort; a failed write logs a warning
+// but does not fail the case.
+async function runParallelToDisk({ items, parallel, worker, onProgress, outputPath, outputDir }) {
   const writer = await createJsonlWriter(outputPath);
+  const artifactBase = outputDir ?? path.dirname(outputPath);
   // Serialize writes via a chained promise — Node's writeStream is atomic
   // per call, but chaining gives clean backpressure across workers without
   // any explicit mutex bookkeeping.
@@ -239,6 +250,28 @@ async function runParallelToDisk({ items, parallel, worker, onProgress, outputPa
     const next = writeChain.then(() => writer.write(row));
     writeChain = next.catch(() => {});
     return next;
+  }
+
+  async function writeArtifacts(artifacts) {
+    if (!Array.isArray(artifacts) || artifacts.length === 0) return;
+    for (const artifact of artifacts) {
+      const relPath = artifact?.path;
+      if (typeof relPath !== 'string' || !relPath) continue;
+      if (relPath.includes('..')) {
+        console.error(`skipping artifact with path traversal: ${relPath}`);
+        continue;
+      }
+      const target = path.resolve(artifactBase, relPath);
+      try {
+        if (typeof artifact.content === 'string') {
+          await writeText(target, artifact.content);
+        } else if (artifact.content !== undefined && artifact.content !== null) {
+          await writeText(target, String(artifact.content));
+        }
+      } catch (error) {
+        console.error(`failed to write artifact ${relPath}: ${error.message}`);
+      }
+    }
   }
 
   let next = 0;
@@ -268,6 +301,7 @@ async function runParallelToDisk({ items, parallel, worker, onProgress, outputPa
         };
       }
       if (result.status !== 'completed') providerFailures += 1;
+      await writeArtifacts(result.artifacts);
       await writeRow(result);
       completed += 1;
       onProgress?.({ completed, total: items.length });
@@ -286,6 +320,7 @@ export async function executeRun({
   providerConfigPath = DEFAULT_PROVIDER_CONFIG,
   scorerConfigPath = DEFAULT_SCORER_CONFIG,
   limit = null,
+  offset = null,
   parallel = 4,
   runId = `public-search-${nowCompact()}`,
   force = false,
@@ -300,10 +335,15 @@ export async function executeRun({
     benchmarkConfigPath,
     providerConfigPath,
     scorerConfigPath,
-    limit
+    limit,
+    offset
   });
   const benchmarkAdapter = getAdapter('benchmarks', benchmarkAdapterId(inputs.benchmarkConfig));
-  const providerAdapter = getAdapter('providers', 'trustfoundry-public-search');
+  const providerId =
+    inputs.providerConfig.provider ??
+    inputs.providerConfig.providerId ??
+    'trustfoundry-public-search';
+  const providerAdapter = getAdapter('providers', providerId);
   const scorerAdapter = getAdapter('scorers', 'search-recall');
   const loaded = await benchmarkAdapter.loadCases({
     config: inputs.benchmarkConfig,
@@ -341,7 +381,8 @@ export async function executeRun({
         console.error(`progress ${completed}/${total}`);
       }
     },
-    outputPath: providerResultsPath
+    outputPath: providerResultsPath,
+    outputDir: resolvedOut
   });
 
   manifest.completedAt = new Date().toISOString();
@@ -380,6 +421,137 @@ async function scoreFromDisk({ scorerAdapter, manifest, cases, providerResultsPa
     }
   }
   return scorerAdapter.scoreStream({ manifest, pairs: pairs() });
+}
+
+// Merges N chunk runs into one canonical run directory: concatenates
+// cases.jsonl and provider-results.jsonl across chunks (last-wins dedup by
+// caseId, so a same-day retry chunk overrides a quota_exhausted row from
+// an earlier chunk), copies the first chunk's manifest with chunks: [...]
+// metadata, and re-scores. Refuses to merge chunks whose benchmark or
+// provider config sha256 disagree — that would silently mix runs that used
+// different inputs.
+export async function mergeRuns({ repoRoot, runDirs, outDir, force = false }) {
+  if (!Array.isArray(runDirs) || runDirs.length === 0) {
+    throw new Error('mergeRuns requires at least one input run directory');
+  }
+  const resolvedOut = path.resolve(repoRoot, outDir);
+  if ((await exists(resolvedOut)) && !force) {
+    throw new Error(`Output directory already exists: ${resolvedOut}. Use --force to overwrite.`);
+  }
+
+  const chunks = [];
+  for (const runDir of runDirs) {
+    const resolved = path.resolve(repoRoot, runDir);
+    const manifest = await readJson(path.join(resolved, 'manifest.json'));
+    chunks.push({ runDir: resolved, manifest });
+  }
+
+  const first = chunks[0].manifest;
+  const firstBenchmarkSha = first.benchmark?.configSha256 ?? null;
+  const firstProviderSha = first.provider?.configSha256 ?? null;
+  const firstScorerSha = first.scorer?.configSha256 ?? null;
+  for (const { runDir, manifest } of chunks) {
+    if ((manifest.benchmark?.configSha256 ?? null) !== firstBenchmarkSha) {
+      throw new Error(
+        `Chunk ${runDir} has benchmark config sha256 ${manifest.benchmark?.configSha256} ` +
+          `but expected ${firstBenchmarkSha} — refusing to merge across different benchmark configs.`
+      );
+    }
+    if ((manifest.provider?.configSha256 ?? null) !== firstProviderSha) {
+      throw new Error(
+        `Chunk ${runDir} has provider config sha256 ${manifest.provider?.configSha256} ` +
+          `but expected ${firstProviderSha} — refusing to merge across different provider configs.`
+      );
+    }
+    if ((manifest.scorer?.configSha256 ?? null) !== firstScorerSha) {
+      throw new Error(
+        `Chunk ${runDir} has scorer config sha256 ${manifest.scorer?.configSha256} ` +
+          `but expected ${firstScorerSha} — refusing to merge across different scorer configs.`
+      );
+    }
+  }
+
+  const casesById = new Map();
+  const resultsById = new Map();
+  const inventoryRecords = [];
+  for (const { runDir } of chunks) {
+    const chunkCases = await readJsonl(path.join(runDir, 'cases.jsonl'));
+    for (const benchmarkCase of chunkCases) {
+      if (!casesById.has(benchmarkCase.caseId)) casesById.set(benchmarkCase.caseId, benchmarkCase);
+    }
+    const chunkResults = await readJsonl(path.join(runDir, 'provider-results.jsonl'));
+    for (const providerResult of chunkResults) {
+      resultsById.set(providerResult.caseId, providerResult);
+    }
+    const inventoryPath = path.join(runDir, 'inventory.json');
+    if (await exists(inventoryPath)) {
+      const inventory = await readJson(inventoryPath);
+      if (Array.isArray(inventory.records)) inventoryRecords.push(...inventory.records);
+    }
+  }
+
+  const mergedCases = [...casesById.values()];
+  const mergedResults = [...resultsById.values()];
+  let providerFailures = 0;
+  for (const providerResult of mergedResults) {
+    if (providerResult.status !== 'completed') providerFailures += 1;
+  }
+
+  const runId = `merge-${nowCompact()}`;
+  const mergedManifest = {
+    ...first,
+    runId,
+    run_id: runId,
+    startedAt: chunks.reduce(
+      (min, chunk) => (min && min < chunk.manifest.startedAt ? min : chunk.manifest.startedAt),
+      null
+    ),
+    completedAt: chunks.reduce(
+      (max, chunk) => (max && max > (chunk.manifest.completedAt ?? '') ? max : chunk.manifest.completedAt),
+      null
+    ),
+    providerFailures,
+    scheduler: {
+      ...(first.scheduler ?? {}),
+      caseCount: mergedCases.length
+    },
+    chunks: chunks.map(({ runDir, manifest }) => ({
+      runDir: relativePath(repoRoot, runDir),
+      runId: manifest.runId ?? manifest.run_id ?? null,
+      startedAt: manifest.startedAt ?? null,
+      completedAt: manifest.completedAt ?? null,
+      caseCount: manifest.scheduler?.caseCount ?? null
+    }))
+  };
+
+  await writeJsonl(path.join(resolvedOut, 'cases.jsonl'), mergedCases);
+  const providerResultsPath = path.join(resolvedOut, 'provider-results.jsonl');
+  await writeJsonl(providerResultsPath, mergedResults);
+  await writeJson(path.join(resolvedOut, 'manifest.json'), mergedManifest);
+  if (inventoryRecords.length) {
+    await writeJson(path.join(resolvedOut, 'inventory.json'), {
+      benchmark: first.benchmark?.id ?? null,
+      records: inventoryRecords,
+      summary: { total: mergedCases.length, selected: mergedCases.length, available_skipped: 0 }
+    });
+  }
+
+  const scorerAdapter = getAdapter('scorers', 'search-recall');
+  const scores = await scoreFromDisk({
+    scorerAdapter,
+    manifest: mergedManifest,
+    cases: mergedCases,
+    providerResultsPath
+  });
+  await writeJson(path.join(resolvedOut, 'scores.json'), scores);
+
+  return {
+    outDir: resolvedOut,
+    manifest: mergedManifest,
+    scores,
+    caseCount: mergedCases.length,
+    chunkCount: chunks.length
+  };
 }
 
 export async function scoreRun({ repoRoot, runDir }) {

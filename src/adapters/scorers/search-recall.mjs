@@ -49,44 +49,109 @@ function resultDocumentIds(result) {
   ].filter(Boolean).map(String);
 }
 
+// Some search backends return a top-level `cluster_id` on each result — a
+// stable native identifier for the underlying document cluster. We match it
+// against `expected.cl_cluster_id` when the dataset supplies one. Providers
+// that don't populate `cluster_id` on results return [] here, so the check
+// is a no-op for them.
+function resultClusterIds(result) {
+  return [
+    result?.cluster_id,
+    result?.clusterId
+  ].filter((value) => value !== undefined && value !== null && value !== '').map(String);
+}
+
 function isUuid(value) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
     String(value ?? '')
   );
 }
 
-function firstHitRank(envelope, expected, expectedDocumentUuid = null) {
+// Match order at each ranked position: native IDs (document_uuid, then
+// cl_cluster_id) first, then citation-string matching as a fallback. Order
+// does not affect the hit@K math (first ranked result with any signal wins),
+// but the code intent is explicit — native IDs are exact and immune to
+// citation-normalization drift.
+function firstHitRank(envelope, expected, expectedDocumentUuid = null, expectedClusterId = null) {
   const accepted = acceptedCitationSet(expected);
-  if (!accepted.size && !expectedDocumentUuid) return null;
+  if (!accepted.size && !expectedDocumentUuid && !expectedClusterId) return null;
   const results = Array.isArray(envelope?.results) ? envelope.results : [];
   for (const [index, result] of results.entries()) {
-    const citations = resultCitations(result);
-    const matchesCitation = citations.some((citation) => accepted.has(normalizeCitation(citation)));
     const matchesDocument = expectedDocumentUuid
       ? resultDocumentIds(result).includes(expectedDocumentUuid)
       : false;
-    if (matchesCitation || matchesDocument) {
+    const matchesCluster = expectedClusterId
+      ? resultClusterIds(result).includes(String(expectedClusterId))
+      : false;
+    let matchesCitation = false;
+    if (!matchesDocument && !matchesCluster) {
+      const citations = resultCitations(result);
+      matchesCitation = citations.some((citation) => accepted.has(normalizeCitation(citation)));
+    }
+    if (matchesDocument || matchesCluster || matchesCitation) {
       return Number.isInteger(result.rank) && result.rank > 0 ? result.rank : index + 1;
     }
   }
   return null;
 }
 
-function goldQuality(expected, expectedDocumentUuid = null) {
+function goldQuality(expected, expectedDocumentUuid = null, expectedClusterId = null) {
   const hasCitationGold = acceptedCitationSet(expected).size > 0;
   const hasDocumentGold = Boolean(expectedDocumentUuid);
+  const hasClusterGold = Boolean(expectedClusterId);
   const malformedGold = hasDocumentGold && !isUuid(expectedDocumentUuid);
-  const emptyGold = !hasCitationGold && !hasDocumentGold;
+  const emptyGold = !hasCitationGold && !hasDocumentGold && !hasClusterGold;
   return {
     emptyGold,
     malformedGold,
-    validGold: hasCitationGold || (hasDocumentGold && !malformedGold)
+    validGold: hasCitationGold || hasClusterGold || (hasDocumentGold && !malformedGold)
   };
 }
 
 function latencyMs(providerResult) {
   const duration = providerResult?.timing?.durationMs;
   return Number.isFinite(duration) ? duration : null;
+}
+
+function serverResponseDurationMs(providerResult) {
+  const duration = providerResult?.timing?.serverResponseDurationMs;
+  return Number.isFinite(duration) ? duration : null;
+}
+
+function numericTokenField(tokenUsage, ...keys) {
+  for (const key of keys) {
+    const value = tokenUsage?.[key] ?? tokenUsage?.raw?.[key];
+    const numeric = typeof value === 'number' ? value : Number(value);
+    if (Number.isFinite(numeric)) return numeric;
+  }
+  return 0;
+}
+
+function tokenUsage(providerResult) {
+  const usage = providerResult?.tokenUsage;
+  if (!usage || typeof usage !== 'object') return null;
+  const inputTokens = numericTokenField(usage, 'inputTokens', 'input_tokens');
+  const outputTokens = numericTokenField(usage, 'outputTokens', 'output_tokens');
+  const cacheCreationInputTokens = numericTokenField(
+    usage,
+    'cacheCreationInputTokens',
+    'cache_creation_input_tokens'
+  );
+  const cacheReadInputTokens = numericTokenField(
+    usage,
+    'cacheReadInputTokens',
+    'cache_read_input_tokens'
+  );
+  const totalTokens =
+    numericTokenField(usage, 'totalTokens', 'total_tokens') ||
+    inputTokens + outputTokens + cacheCreationInputTokens + cacheReadInputTokens;
+  return {
+    inputTokens,
+    outputTokens,
+    cacheCreationInputTokens,
+    cacheReadInputTokens,
+    totalTokens
+  };
 }
 
 function truncateDecimal(value, decimalPlaces) {
@@ -98,7 +163,12 @@ function truncateDecimal(value, decimalPlaces) {
 function scoreCase({ benchmarkCase, providerResult }) {
   const expected = benchmarkCase.metadata?.expected ?? null;
   const expectedDocumentUuid = benchmarkCase.metadata?.document_uuid ?? null;
-  const { emptyGold, malformedGold, validGold } = goldQuality(expected, expectedDocumentUuid);
+  const expectedClusterId = expected?.cl_cluster_id ?? null;
+  const { emptyGold, malformedGold, validGold } = goldQuality(
+    expected,
+    expectedDocumentUuid,
+    expectedClusterId
+  );
   const matchDocumentUuid = malformedGold ? null : expectedDocumentUuid;
   const base = {
     caseId: benchmarkCase.caseId,
@@ -111,11 +181,14 @@ function scoreCase({ benchmarkCase, providerResult }) {
     state: benchmarkCase.metadata?.state ?? benchmarkCase.metadata?.geo_level_2_identifier ?? null,
     expected,
     expectedDocumentUuid,
+    expectedClusterId,
     emptyGold,
     malformedGold,
     validGold,
     providerStatus: providerResult?.status ?? 'missing'
   };
+  const usage = tokenUsage(providerResult);
+  if (usage) base.tokenUsage = usage;
 
   if (!providerResult || providerResult.status !== 'completed') {
     return {
@@ -130,12 +203,13 @@ function scoreCase({ benchmarkCase, providerResult }) {
       reciprocalRank: 0,
       resultCount: 0,
       latencyMs: latencyMs(providerResult),
+      serverResponseDurationMs: serverResponseDurationMs(providerResult),
       error: providerResult?.error ?? null
     };
   }
 
   const envelope = safeParse(providerResult.finalOutputText) ?? {};
-  const hitRank = firstHitRank(envelope, expected, matchDocumentUuid);
+  const hitRank = firstHitRank(envelope, expected, matchDocumentUuid, expectedClusterId);
   const resultCount = Array.isArray(envelope.results) ? envelope.results.length : 0;
   return {
     ...base,
@@ -149,6 +223,7 @@ function scoreCase({ benchmarkCase, providerResult }) {
     reciprocalRank: hitRank ? 1 / hitRank : 0,
     resultCount,
     latencyMs: latencyMs(providerResult),
+    serverResponseDurationMs: serverResponseDurationMs(providerResult),
     error: null
   };
 }
@@ -227,9 +302,9 @@ function qualityCounts(caseScores) {
   };
 }
 
-function latencySummary(caseScores) {
+function latencySummary(caseScores, field = 'latencyMs') {
   const values = caseScores
-    .map((item) => item.latencyMs)
+    .map((item) => item[field])
     .filter((value) => Number.isFinite(value));
   if (!values.length) return { n: 0, min: 0, mean: 0, p50: 0, p95: 0, max: 0 };
   return {
@@ -239,6 +314,91 @@ function latencySummary(caseScores) {
     p50: percentile(values, 50),
     p95: percentile(values, 95),
     max: Math.max(...values)
+  };
+}
+
+function tokenUsageSummary(caseScores) {
+  const values = caseScores
+    .map((item) => item.tokenUsage)
+    .filter((usage) => usage && typeof usage === 'object');
+  if (!values.length) return null;
+  const sum = (key) => values.reduce((total, usage) => total + (usage[key] ?? 0), 0);
+  return {
+    n: values.length,
+    input_tokens: sum('inputTokens'),
+    output_tokens: sum('outputTokens'),
+    cache_creation_input_tokens: sum('cacheCreationInputTokens'),
+    cache_read_input_tokens: sum('cacheReadInputTokens'),
+    total_tokens: sum('totalTokens')
+  };
+}
+
+function numericPricingField(pricing, ...keys) {
+  for (const key of keys) {
+    const value = pricing?.[key];
+    const numeric = typeof value === 'number' ? value : Number(value);
+    if (Number.isFinite(numeric)) return numeric;
+  }
+  return null;
+}
+
+function roundCost(value) {
+  return Number.isFinite(value) ? Number(value.toFixed(8)) : null;
+}
+
+function pricingSnapshotFromManifest(manifest) {
+  const pricing = manifest?.provider?.settings?.pricing ?? manifest?.provider?.pricing ?? null;
+  if (!pricing || typeof pricing !== 'object') return null;
+  const inputPerMillion = numericPricingField(
+    pricing,
+    'input_per_million_tokens',
+    'inputPerMillionTokens'
+  );
+  const outputPerMillion = numericPricingField(
+    pricing,
+    'output_per_million_tokens',
+    'outputPerMillionTokens'
+  );
+  if (inputPerMillion === null && outputPerMillion === null) return null;
+  return {
+    model: pricing.model ?? manifest?.provider?.settings?.model ?? null,
+    pricing_level: pricing.pricing_level ?? pricing.pricingLevel ?? null,
+    source: pricing.source ?? null,
+    source_accessed_at: pricing.source_accessed_at ?? pricing.sourceAccessedAt ?? null,
+    currency: pricing.currency ?? 'USD',
+    unit: pricing.unit ?? 'per_1m_tokens',
+    input_per_million_tokens: inputPerMillion,
+    output_per_million_tokens: outputPerMillion
+  };
+}
+
+function tokenCostSummary(tokenSummary, { manifest = null } = {}) {
+  if (!tokenSummary) return null;
+  const pricing = pricingSnapshotFromManifest(manifest);
+  if (!pricing) return null;
+  const inputCost =
+    pricing.input_per_million_tokens === null
+      ? null
+      : (tokenSummary.input_tokens / 1_000_000) * pricing.input_per_million_tokens;
+  const outputCost =
+    pricing.output_per_million_tokens === null
+      ? null
+      : (tokenSummary.output_tokens / 1_000_000) * pricing.output_per_million_tokens;
+  const totalCost = [inputCost, outputCost]
+    .filter((value) => Number.isFinite(value))
+    .reduce((sum, value) => sum + value, 0);
+  return {
+    currency: pricing.currency,
+    model: pricing.model,
+    pricing_level: pricing.pricing_level,
+    source: pricing.source,
+    source_accessed_at: pricing.source_accessed_at,
+    unit: pricing.unit,
+    input_per_million_tokens: pricing.input_per_million_tokens,
+    output_per_million_tokens: pricing.output_per_million_tokens,
+    input_cost: roundCost(inputCost),
+    output_cost: roundCost(outputCost),
+    total_cost: roundCost(totalCost)
   };
 }
 
@@ -271,7 +431,9 @@ function grouped(caseScores, key) {
 function buildSummary(caseScores, { manifest = null } = {}) {
   const validSuccess = caseScores.filter((item) => item.status === 'scored' && item.validGold);
   const strict = caseScores.filter((item) => item.validGold);
-  return {
+  const successfulScores = caseScores.filter((item) => item.status === 'scored');
+  const failedScores = caseScores.filter((item) => item.status !== 'scored');
+  const summary = {
     ...legacyAggregate(caseScores),
     execution: {
       runId: manifest?.runId ?? manifest?.run_id ?? null,
@@ -288,7 +450,7 @@ function buildSummary(caseScores, { manifest = null } = {}) {
       caseCount: caseScores.length
     },
     quality: qualityCounts(caseScores),
-    latency_ms: latencySummary(caseScores),
+    latency_ms: latencySummary(successfulScores),
     overall: aggregate(validSuccess),
     strict_overall: aggregate(strict),
     per_state: aggregateByState(validSuccess),
@@ -300,6 +462,22 @@ function buildSummary(caseScores, { manifest = null } = {}) {
     byModelType: grouped(caseScores, 'modelType'),
     byState: grouped(caseScores, 'state')
   };
+  if (failedScores.some((item) => Number.isFinite(item.latencyMs))) {
+    summary.provider_failure_latency_ms = latencySummary(failedScores);
+  }
+  if (caseScores.some((item) => Number.isFinite(item.serverResponseDurationMs))) {
+    summary.server_response_duration_ms = latencySummary(
+      successfulScores,
+      'serverResponseDurationMs'
+    );
+  }
+  const tokens = tokenUsageSummary(caseScores);
+  if (tokens) {
+    summary.token_usage = tokens;
+    const cost = tokenCostSummary(tokens, { manifest });
+    if (cost) summary.token_cost = cost;
+  }
+  return summary;
 }
 
 export const searchRecallScorerAdapter = {
@@ -367,6 +545,7 @@ export const SUPPORTED_HEADLINE_CUTOFF = HEADLINE_CUTOFF;
 export const _internals = {
   resultCitations,
   resultDocumentIds,
+  resultClusterIds,
   firstHitRank,
   goldQuality,
   scoreCase,
@@ -374,5 +553,9 @@ export const _internals = {
   truncateDecimal,
   qualityCounts,
   latencySummary,
+  tokenUsage,
+  tokenUsageSummary,
+  tokenCostSummary,
+  pricingSnapshotFromManifest,
   buildSummary
 };

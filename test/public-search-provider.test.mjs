@@ -112,6 +112,7 @@ test('extracts SearchSet content from citations_ready events', () => {
       type: 'citations_ready',
       content: JSON.stringify({
         uuid: 'set-1',
+        server_response_duration_ms: 123,
         search_results: [{
           document_uuid: '11111111-1111-1111-1111-111111111111',
           citation: '1 F.2d 3',
@@ -125,6 +126,7 @@ test('extracts SearchSet content from citations_ready events', () => {
   assert.equal(envelope.results[0].document_uuid, '11111111-1111-1111-1111-111111111111');
   assert.equal(envelope.results[0].citation, '1 F.2d 3');
   assert.equal(envelope.results[0].citation_tag, '[Example Case - 1 F.2d 3](https://example.test)');
+  assert.equal(_internals.extractServerResponseDurationMs(searchSet), 123);
 });
 
 test('retry classification only retries transient provider failures', () => {

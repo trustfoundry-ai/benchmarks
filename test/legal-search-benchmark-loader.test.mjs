@@ -23,6 +23,28 @@ test('loads the first 200 key-fact rows deterministically', async () => {
   assert.equal(loaded.cases[0].metadata.field, 'key_facts');
   assert.equal(loaded.cases[0].metadata.model_type, 'case_key_fact');
   assert.equal(loaded.cases[0].metadata.state, 'FED');
+  // Enrichment: every case-law row is expected to carry a cluster_id
+  // (populated during the dataset enrichment step; see CHANGELOG).
+  assert.equal(typeof loaded.cases[0].metadata.expected.cl_cluster_id, 'string');
+  assert.match(loaded.cases[0].metadata.expected.cl_cluster_id, /^\d+$/);
+});
+
+test('case-question rows carry a cl_cluster_id in expected', async () => {
+  const loaded = await load('configs/benchmarks/trustfoundry-legal-search-case-questions-200.json');
+  const first = loaded.cases[0];
+  // Locked-in value verified against the enriched dataset for this case;
+  // see CHANGELOG for enrichment provenance.
+  assert.equal(first.caseId, 'synthetic-search-recall:case_questions:test:76eaa103b27c');
+  assert.equal(first.metadata.expected.cl_cluster_id, '6751062');
+  // Every row in this suite should have a mapping (100% coverage confirmed
+  // during the enrichment step).
+  const withoutCluster = loaded.cases.filter((c) => !c.metadata.expected.cl_cluster_id);
+  assert.equal(withoutCluster.length, 0, 'expected every case-question row to have a cl_cluster_id');
+});
+
+test('laws/regs rows have null cl_cluster_id (they aren\'t case-law)', async () => {
+  const loaded = await load('configs/benchmarks/trustfoundry-legal-search-laws-200.json');
+  assert.equal(loaded.cases[0].metadata.expected.cl_cluster_id, null);
 });
 
 test('loads law rows with law model metadata', async () => {
