@@ -4,6 +4,23 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-07-04
+
+### Added
+
+- Every run's `manifest.json` now records `harness.originUrl`
+  (`https://github.com/trustfoundry-ai/benchmarks.git`) alongside
+  `harness.commit` and `harness.version` so consumers can reconstruct
+  the exact reproduction recipe from the manifest alone. Existing
+  bundle checksums are unaffected; new runs pick up the field
+  automatically.
+
+### Documentation
+
+- README documents the `manifest.harness` fields and the three
+  fingerprints (compatibility / resume / manifest) so external
+  consumers understand the reproducibility model.
+
 ## [0.7.0] - 2026-07-04
 
 ### Changed

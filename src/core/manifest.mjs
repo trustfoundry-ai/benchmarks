@@ -28,6 +28,7 @@ import {
 } from './fs.mjs';
 
 const HARNESS_NAME = '@trustfoundry-ai/benchmarks-harness';
+const HARNESS_ORIGIN_URL = 'https://github.com/trustfoundry-ai/benchmarks.git';
 const SCHEMA_VERSION = 'trustfoundry.benchmarks.run.v1';
 
 async function gitCommit(repoRoot) {
@@ -171,6 +172,7 @@ export async function buildManifest({
     completedAt: null,
     harness: {
       name: HARNESS_NAME,
+      originUrl: HARNESS_ORIGIN_URL,
       commit: process.env.GITHUB_SHA ?? process.env.EVAL_HARNESS_SHA ?? harnessCommit,
       version: process.env.EVAL_HARNESS_VERSION ?? harnessVersion,
       ...(includeHostname ? { hostname: hostname() } : {})

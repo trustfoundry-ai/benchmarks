@@ -153,6 +153,37 @@ The image stamps the source commit it was built from into `$HARNESS_COMMIT_SHA`,
 - `agent-skills/`: optional agent workflow instructions.
 - `Dockerfile`, `entrypoint.sh`: reproducible container image (see "Running the harness in a container" above).
 
+## Manifest And Reproducibility
+
+Every run writes a `manifest.json` that pins the exact harness version and
+inputs used. Consumers can rerun the same benchmark against the same
+harness build by cloning the repo at the recorded commit:
+
+```json
+{
+  "harness": {
+    "name": "@trustfoundry-ai/benchmarks-harness",
+    "originUrl": "https://github.com/trustfoundry-ai/benchmarks.git",
+    "commit": "<git sha>",
+    "version": "<package version>"
+  },
+  "benchmark": { "id": ..., "configSha256": ..., "sourceFiles": [ ... ] },
+  "provider":  { "id": ..., "configSha256": ..., "subject": ..., "model": ... },
+  "scorer":    { "id": ..., "configSha256": ..., "extractionVersion": ... },
+  "fingerprints": { "compatibility": ..., "resume": ..., "manifest": ... }
+}
+```
+
+`harness.commit` and `harness.version` are populated automatically from
+this repo's git HEAD and `package.json`; overrides (`GITHUB_SHA`,
+`EVAL_HARNESS_SHA`, `EVAL_HARNESS_VERSION`) are honored for CI images
+that carry the source out of a git tree.
+
+The three fingerprints let downstream tooling reason about run identity:
+matching `compatibility` fingerprints can be merged and compared;
+matching `resume` fingerprints share the same shard slice; the
+`manifest` fingerprint is unique per run.
+
 ## Extending
 
 The harness keeps benchmarks, providers, and scorers behind adapter boundaries. Future public suites can add a benchmark loader and scorer, while alternative platforms can add a provider adapter that returns the same normalized result shape used by the scorer.
