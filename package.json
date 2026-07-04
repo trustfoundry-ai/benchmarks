@@ -1,9 +1,31 @@
 {
-  "name": "@trustfoundry-ai/benchmarks",
-  "version": "0.5.0",
+  "name": "@trustfoundry-ai/benchmarks-harness",
+  "version": "0.6.0",
   "private": false,
   "license": "Apache-2.0",
   "type": "module",
+  "main": "./src/index.mjs",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./contracts": "./src/core/contracts/index.mjs",
+    "./adapters/registry": "./src/core/registry.mjs",
+    "./artifacts": "./src/core/artifacts.mjs",
+    "./testing": "./src/testing/index.mjs",
+    "./cli": "./src/cli.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin",
+    "src",
+    "configs",
+    "data",
+    "suites",
+    "scripts",
+    "CHANGELOG.md",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
   "bin": {
     "trustfoundry-benchmarks": "bin/benchmarks.mjs"
   },

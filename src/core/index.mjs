@@ -15,6 +15,13 @@ export * from './retry.mjs';
 export * from './token-usage.mjs';
 export * from './checkpoint.mjs';
 export * from './manifest.mjs';
+export * from './scheduler.mjs';
+export * from './git.mjs';
+export * from './config.mjs';
+// hash.mjs re-exports `sha256Text` which fs.mjs also exports (same
+// implementation). To avoid the ES-spec silent-drop of duplicate
+// `export *` identifiers, only re-export hash's other members.
+export { stableJson, hashObject, hashFile } from './hash.mjs';
 // merge.mjs is intentionally NOT `export *`-ed here: its `mergeRuns`
 // symbol is already re-exported via runner.mjs above, and duplicate
 // `export *` re-exports for the same identifier become silently

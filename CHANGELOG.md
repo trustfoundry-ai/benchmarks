@@ -4,6 +4,54 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-07-04
+
+### Changed
+
+- **Package renamed** from `@trustfoundry-ai/benchmarks` to
+  `@trustfoundry-ai/benchmarks-harness`. The `-harness` suffix signals
+  that this package ships the benchmark harness (runner, contracts,
+  helpers) rather than just benchmark data. Downstream consumers can
+  update their `package.json` in a single line change.
+- **`package.json` gains an `exports` map** so consumers can import
+  from sub-paths: `@trustfoundry-ai/benchmarks-harness/contracts`,
+  `.../testing`, `.../adapters/registry`, `.../artifacts`, `.../cli`.
+- **`src/index.mjs`** is the new default entry point and re-exports
+  from `src/core/index.mjs`.
+- **`src/core/registry.mjs`** now exports `defaultRegistry` (the
+  pre-populated registry) and `createRegistry()` (a factory for
+  producing a fresh empty registry). The existing `registry` export
+  remains as an alias of `defaultRegistry` for backward compatibility.
+  `getBenchmarkAdapter`, `getProviderAdapter`, `getScorerAdapter`, and
+  `adapterInventory` are exported alongside the pre-existing
+  `getAdapter(kind, id)` so downstream consumers can use whichever
+  ergonomics they prefer.
+
+### Added
+
+- **Adapter factory helpers** (`src/core/contracts/index.mjs`):
+  `defineProviderAdapter`, `defineBenchmarkAdapter`, and
+  `defineScorerAdapter`. Thin factories that validate required keys
+  (`id`, `version`) at construction time and return the adapter
+  unchanged. Consumers can now write
+  `defineProviderAdapter({ id, version, executeCase })` for early
+  validation of adapter definitions.
+- **Testing barrel** (`src/testing/index.mjs`): `makeFixtureCase`,
+  `makeFixtureAdapter`, `createTestRegistry`, plus re-exports of
+  `createRegistry` and `defaultRegistry`. Downstream test suites can
+  build fixtures without reaching into internal core modules.
+- **Core helpers ported to public** as reference implementations:
+  - `src/core/scheduler.mjs` — `normalizeScheduler`, `applyShard`,
+    `mapWithConcurrency`, `positiveInteger`, `nonNegativeInteger`.
+  - `src/core/hash.mjs` — `stableJson`, `hashObject`, `hashFile`
+    (plus a re-export of `sha256Text` from `fs.mjs`).
+  - `src/core/config.mjs` — `loadConfig`, `normalizeProviderSlug`,
+    `effectiveRunId`.
+  - `src/core/git.mjs` — `gitRevision`.
+- **`.github/workflows/release.yml`** — on a `v*.*.*` tag push, runs
+  `pnpm test` + `pnpm verify:results` and publishes a GitHub release
+  with auto-generated notes. No npm publish yet.
+
 ## [0.5.0] - 2026-07-04
 
 ### Added
