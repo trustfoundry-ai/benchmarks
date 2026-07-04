@@ -55,12 +55,21 @@ function chooseWinner(existing, candidate, policy) {
   return candidateRank >= existingRank ? candidate : existing;
 }
 
-async function scoreFromDisk({ scorerAdapter, manifest, cases, providerResultsPath }) {
+async function scoreMerged({ scorerAdapter, manifest, cases, providerResults, outputRoot }) {
+  if (typeof scorerAdapter.score === 'function') {
+    return scorerAdapter.score({
+      manifest,
+      cases,
+      providerResults,
+      outputRoot,
+      config: {}
+    });
+  }
   const casesById = new Map(
     cases.map((benchmarkCase) => [benchmarkCase.caseId, benchmarkCase])
   );
   async function* pairs() {
-    for await (const providerResult of readJsonlStream(providerResultsPath)) {
+    for (const providerResult of providerResults) {
       const benchmarkCase = casesById.get(providerResult.caseId);
       if (!benchmarkCase) {
         throw new Error(`Provider result references unknown case: ${providerResult.caseId}`);
@@ -72,16 +81,19 @@ async function scoreFromDisk({ scorerAdapter, manifest, cases, providerResultsPa
 }
 
 export async function mergeRuns({
-  repoRoot,
+  repoRoot = process.cwd(),
   runDirs,
-  outDir,
+  outDir = null,
+  outputRoot = null,
   prefer = 'explicit-run-order',
   force = false
 }) {
   if (!Array.isArray(runDirs) || runDirs.length === 0) {
     throw new Error('mergeRuns requires at least one input run directory');
   }
-  const resolvedOut = path.resolve(repoRoot, outDir);
+  const targetDir = outputRoot ?? outDir;
+  if (!targetDir) throw new Error('mergeRuns requires --out (or outputRoot/outDir)');
+  const resolvedOut = path.resolve(repoRoot, targetDir);
   if ((await exists(resolvedOut)) && !force) {
     throw new Error(
       `Output directory already exists: ${resolvedOut}. Use --force to overwrite.`
@@ -215,17 +227,20 @@ export async function mergeRuns({
   }
 
   const scorerAdapter = getAdapter('scorers', mergedManifest.scorer?.id ?? DEFAULT_SCORER_ID);
-  const scores = await scoreFromDisk({
+  const scores = await scoreMerged({
     scorerAdapter,
     manifest: mergedManifest,
     cases: mergedCases,
-    providerResultsPath
+    providerResults: mergedResults,
+    outputRoot: resolvedOut
   });
   await writeJson(path.join(resolvedOut, 'scores.json'), scores);
 
   return {
     outDir: resolvedOut,
     manifest: mergedManifest,
+    cases: mergedCases,
+    providerResults: mergedResults,
     scores,
     caseCount: mergedCases.length,
     chunkCount: chunks.length

@@ -1,6 +1,6 @@
 {
   "name": "@trustfoundry-ai/benchmarks-harness",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": false,
   "license": "Apache-2.0",
   "type": "module",
@@ -12,6 +12,8 @@
     "./adapters/providers/*": "./src/adapters/providers/*.mjs",
     "./adapters/scorers/*": "./src/adapters/scorers/*.mjs",
     "./adapters/benchmarks/*": "./src/adapters/benchmarks/*.mjs",
+    "./core": "./src/core/index.mjs",
+    "./core/*": "./src/core/*.mjs",
     "./artifacts": "./src/core/artifacts.mjs",
     "./testing": "./src/testing/index.mjs",
     "./cli": "./src/cli.mjs",

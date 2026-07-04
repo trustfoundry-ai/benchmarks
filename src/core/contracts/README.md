@@ -52,15 +52,21 @@ these patterns or import them directly from `@trustfoundry-ai/benchmarks/core`
 - **`RateLimiter`** ([`../rate-limit.mjs`](../rate-limit.mjs)) —
   persistent, per-provider request throttling backed by disk state. Use
   when your provider imposes per-minute / per-day request caps.
-- **`retryFailed`** ([`../retry.mjs`](../retry.mjs)) — reissue misses from
-  a completed run into a new run directory. Preserves manifest
-  fingerprints so results can be merged with the source run.
+- **`retryFailedRun`** ([`../retry-failed.mjs`](../retry-failed.mjs)) —
+  reissue misses from a completed run into a new run directory. Supports
+  either a caller-supplied filter or the built-in `'failed'` / `'misses'`
+  selection policies. Preserves manifest fingerprints so results can be
+  merged with the source run.
 - **`TokenUsageAggregator`** ([`../token-usage.mjs`](../token-usage.mjs)) —
   aggregate per-case token counts into per-run totals. Feed from
   `providerResult.tokenUsage`.
-- **`CheckpointStore`** ([`../checkpoint.mjs`](../checkpoint.mjs)) —
-  per-case atomic checkpointing so a crashed run can resume without
-  reissuing already-completed cases.
+- **`writeCaseCheckpoint`** / **`loadCaseCheckpoints`** /
+  **`writeCaseProgressCheckpoint`** / **`clearCheckpoints`**
+  ([`../checkpoints.mjs`](../checkpoints.mjs)) — per-case atomic
+  checkpointing so a crashed run can resume without reissuing
+  already-completed cases. Checkpoints carry the manifest resume
+  fingerprint so an accidental resume against a different run's
+  directory is caught before any work is duplicated.
 - **`mergeRuns`** ([`../merge.mjs`](../merge.mjs)) — merge N chunk runs
   into one canonical run directory, refusing to mix runs whose
   benchmark / provider / scorer configs disagree. Emits

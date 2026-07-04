@@ -4,6 +4,59 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-07-04
+
+### Changed
+
+- **Runner unified.** `executeRun` now materializes provider results in
+  memory, writes per-case checkpoints under
+  `<outDir>/checkpoints/cases/*.json`, supports `--resume` against a
+  compatible source manifest, and emits `preflight.json`,
+  `report.json`, `token-usage.json`, and `<parent>/latest.json`
+  alongside `manifest.json` / `provider-results.jsonl` /
+  `scores.json`. The pre-refactor streaming-to-disk model is retired
+  along with the per-case artifact behaviour it duplicated. Artifact
+  materialization (with path-traversal rejection) is preserved.
+  `runOpenEvaluation` is exported as an alias of `executeRun` for
+  callers migrating from the private runner.
+- **Manifest schema** now emits three fingerprints
+  (`compatibility` / `resume` / `manifest`) instead of one. Identity
+  inputs additively include `benchmark.sourceCommit`,
+  `benchmark.promptVersion`, `benchmark.materializationVersion`,
+  `provider.subject`, `provider.model`, and
+  `scorer.extractionVersion`. Field names (`configSha256`,
+  `sourceFiles`) are unchanged so `publishResultBundle` /
+  `verifyResultBundle` continue to write and verify bundles
+  byte-for-byte. Old bundles' frozen `manifest.json` files still
+  verify green under `pnpm verify:results`.
+- **Retry unified.** `retryFailedRun` supersedes `retryFailed`
+  (retained as an alias) and adds a `selection` mode (`'failed'` or
+  `'misses'`) alongside the existing `filter` callback.
+  `retry-misses` CLI subcommand added. Retries reuse the runner's
+  per-case checkpoints so an interrupted retry can resume.
+- **Checkpoints** moved from `src/core/checkpoint.mjs` (class-based
+  `CheckpointStore`) to `src/core/checkpoints.mjs` (functional
+  `writeCaseCheckpoint` / `loadCaseCheckpoints` /
+  `writeCaseProgressCheckpoint` / `clearCheckpoints`). Checkpoints
+  now carry the resume fingerprint from the manifest so a resume
+  against a different run's directory is caught before any work is
+  duplicated.
+- **CLI**: `pnpm benchmark run` learns `--benchmark`, `--provider`,
+  `--scorer`, `--resume`, `--shard-index`, `--shard-count`, and
+  `--retries`. `score` learns `--scorer` / `--scorer-config` to
+  rescore an existing run with a different scorer. New `retry-misses`
+  and `report` subcommands. `merge` accepted as an alias for
+  `merge-runs`.
+
+### Added
+
+- **`./core` and `./core/*` sub-path exports** on the harness package
+  so consumers can import specific core modules by name (e.g.
+  `import { runOpenEvaluation } from '@trustfoundry-ai/benchmarks-harness/core/runner'`).
+- **`buildReport`** and **`executeProviderCaseWithRetry`** exported
+  from the runner barrel for consumers that want to compose their
+  own run loop.
+
 ## [0.6.0] - 2026-07-04
 
 ### Changed

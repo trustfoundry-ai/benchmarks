@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { defaultRetryFilter } from '../src/core/retry.mjs';
+import { defaultRetryFilter } from '../src/core/retry-failed.mjs';
 
 test('defaultRetryFilter reissues cases with non-completed status', () => {
   const shouldRetry = defaultRetryFilter({
