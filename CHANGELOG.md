@@ -4,6 +4,56 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-07-04
+
+### Added
+
+- **Framework helpers** as reference implementations for anyone building
+  a benchmark harness against `api.trustfoundry.ai`:
+  - `FileBackedRateLimiter` / `createProviderRateLimiter` /
+    `rateLimitedProviderResult` (`src/core/rate-limit.mjs`) — persistent
+    per-provider request throttling backed by JSON state on disk.
+  - `retryFailed` / `defaultRetryFilter` (`src/core/retry.mjs`) — reissue
+    misses from a completed run into a new run directory, using the
+    source run's provider + scorer configs and asserting manifest
+    compatibility fingerprints match.
+  - `summarizeTokenUsage` / `normalizeTokenUsage`
+    (`src/core/token-usage.mjs`) — per-task token accounting summaries.
+  - `CheckpointStore` (`src/core/checkpoint.mjs`) — per-case atomic
+    checkpointing so a crashed run can resume without reissuing
+    already-completed cases.
+  - `buildManifest` / `computeFingerprints` / `assertCompatibleManifest`
+    (`src/core/manifest.mjs`) — run manifest builder + fingerprint
+    helpers used by retry and merge to refuse operations across
+    incompatible runs.
+- **Barrel export**: `src/core/index.mjs` re-exports the new modules
+  alongside the pre-existing runner / registry / artifacts helpers so
+  external consumers can import from a single entry point.
+- **CLI**: `pnpm benchmark retry-failed --run DIR --out DIR [--parallel N]
+  [--force]` reissues misses from a completed run.
+- **CLI**: `merge-runs` learns `--prefer <policy>` for duplicate-caseId
+  resolution (`explicit-run-order` default, `latest`, `first`,
+  `completed`). Every merge now emits a `merge-report.json` file
+  alongside the merged bundle with input runs, prefer policy, and any
+  conflicts observed.
+- **Manifests** additively carry `runKind`, `harness.version`, and a
+  `fingerprints.compatibility` hash over benchmark / provider / scorer
+  identity fields. Existing scoring, reporting, and bundle verification
+  behavior is unchanged.
+
+### Changed
+
+- **Runner**: manifest construction extracted from `runner.mjs` into
+  `src/core/manifest.mjs`. `runner.mjs::executeRun` now calls
+  `buildManifest` from the new module. Output shape gains the additive
+  fields above; existing consumers ignoring unknown fields see no
+  behavioral change.
+- **Runner**: `mergeRuns` extracted from `runner.mjs` into
+  `src/core/merge.mjs`. `runner.mjs` still re-exports `mergeRuns` so
+  `import { mergeRuns } from '.../core/runner.mjs'` keeps working.
+
+## [0.4.0] - 2026-07-04
+
 ### Added
 
 - **New suite: `citation-lookup`.** Four public datasets under

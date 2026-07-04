@@ -41,12 +41,39 @@ any of them bumps the schema version and the package's minor version.
   package's minor version. Add a `CHANGELOG.md` entry that names the old
   and new field.
 
-## Runtime helpers (coming in Phase 3)
+## Reference implementations
+
+The harness ships reference implementations of common adapter concerns.
+These are optional — adapters that don't need them ignore them. If you're
+building your own harness against `api.trustfoundry.ai`, you can copy
+these patterns or import them directly from `@trustfoundry-ai/benchmarks/core`
+(barrel at [`../index.mjs`](../index.mjs)):
+
+- **`RateLimiter`** ([`../rate-limit.mjs`](../rate-limit.mjs)) —
+  persistent, per-provider request throttling backed by disk state. Use
+  when your provider imposes per-minute / per-day request caps.
+- **`retryFailed`** ([`../retry.mjs`](../retry.mjs)) — reissue misses from
+  a completed run into a new run directory. Preserves manifest
+  fingerprints so results can be merged with the source run.
+- **`TokenUsageAggregator`** ([`../token-usage.mjs`](../token-usage.mjs)) —
+  aggregate per-case token counts into per-run totals. Feed from
+  `providerResult.tokenUsage`.
+- **`CheckpointStore`** ([`../checkpoint.mjs`](../checkpoint.mjs)) —
+  per-case atomic checkpointing so a crashed run can resume without
+  reissuing already-completed cases.
+- **`mergeRuns`** ([`../merge.mjs`](../merge.mjs)) — merge N chunk runs
+  into one canonical run directory, refusing to mix runs whose
+  benchmark / provider / scorer configs disagree. Emits
+  `merge-report.json` with the input runs and any conflicts.
+- **`buildManifest`** / **`assertCompatibleManifest`** /
+  **`computeFingerprints`** ([`../manifest.mjs`](../manifest.mjs)) — the
+  run-manifest builder plus fingerprint helpers used by retry and merge
+  to refuse operations across incompatible runs.
+
+## Adapter factories (coming in Phase 3)
 
 Phase 3 of the refactor introduces `defineProviderAdapter`,
-`defineBenchmarkAdapter`, and `defineScorerAdapter` factory helpers exported
-from [`index.mjs`](./index.mjs). Consumers will register adapters via these
-helpers to pick up any future validation / defaulting the framework wants
-to add without breaking their adapter code.
-
-For Phase 0 the barrel is empty — the type declarations are the contract.
+`defineBenchmarkAdapter`, and `defineScorerAdapter` factory helpers
+exported from [`index.mjs`](./index.mjs). Consumers will register adapters
+via these helpers to pick up any future validation / defaulting the
+framework wants to add without breaking their adapter code.

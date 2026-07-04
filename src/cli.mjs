@@ -1,6 +1,7 @@
 import path from 'node:path';
 
 import { publishResultBundle, verifyResultBundle } from './core/artifacts.mjs';
+import { retryFailed } from './core/retry.mjs';
 import { defaultPaths, executeRun, mergeRuns, scoreRun } from './core/runner.mjs';
 import { registry } from './core/registry.mjs';
 
@@ -13,7 +14,8 @@ Commands:
   score --run DIR
   publish-result --run DIR --out DIR [--force]
   verify-result DIR
-  merge-runs --runs DIR[,DIR,...] --out DIR [--force]
+  merge-runs --runs DIR[,DIR,...] --out DIR [--prefer POLICY] [--force]
+  retry-failed --run DIR --out DIR [--parallel N] [--force]
 
 Defaults:
   benchmark-config ${defaultPaths().benchmarkConfig}
@@ -146,6 +148,7 @@ async function mergeRunsCommand(options) {
     repoRoot: repoRoot(),
     runDirs,
     outDir: options.out,
+    prefer: typeof options.prefer === 'string' ? options.prefer : undefined,
     force: Boolean(options.force)
   });
   console.log(`merged: ${path.relative(repoRoot(), result.outDir)}`);
@@ -199,5 +202,28 @@ export async function main(args) {
     await mergeRunsCommand(options);
     return;
   }
+  if (command === 'retry-failed') {
+    await retryFailedCommand(options);
+    return;
+  }
   throw new Error(`Unknown command: ${command}`);
+}
+
+async function retryFailedCommand(options) {
+  if (!options.run || options.run === true) throw new Error('retry-failed requires --run DIR');
+  if (!options.out || options.out === true) throw new Error('retry-failed requires --out DIR');
+  const result = await retryFailed({
+    repoRoot: repoRoot(),
+    runDir: options.run,
+    outDir: options.out,
+    parallel: numberOption(options.parallel, 4),
+    force: Boolean(options.force)
+  });
+  console.log(`retried: ${path.relative(repoRoot(), result.outDir)}`);
+  console.log(JSON.stringify({
+    caseCount: result.caseCount,
+    total: result.scores.summary.total,
+    scored: result.scores.summary.scored,
+    providerFailures: result.scores.summary.providerFailures
+  }, null, 2));
 }
