@@ -4,6 +4,22 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+### Documentation
+
+- New `docs/adapter-contracts.md` — long-form guide to the three
+  adapter kinds, the four artifact schemas, and the versioning rules.
+  Referenced from `src/core/contracts/README.md`.
+
+### Governance
+
+- `.github/CODEOWNERS` now routes `src/core/**`, `src/core/contracts/**`,
+  `data/**`, `results/**`, `suites/**`, `docs/adapter-contracts.md`,
+  and `.github/**` to the core maintainers so contract-affecting
+  changes cannot merge without a maintainer review.
+- New `.github/pull_request_template.md` — checklist covering local
+  `pnpm test` / `pnpm verify:results`, schema-version bumps,
+  `CHANGELOG.md` entries, and documentation updates.
+
 ## [0.7.1] - 2026-07-04
 
 ### Added

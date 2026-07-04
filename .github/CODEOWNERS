@@ -1,1 +1,13 @@
-* @iamgroot2285 @Sad-King-Billy
+# Ownership routes for benchmarks (public).
+# Two core maintainers own all reviewable surface.
+
+*                                        @iamgroot2285 @Sad-King-Billy
+/src/core/                               @iamgroot2285 @Sad-King-Billy
+/src/core/contracts/                     @iamgroot2285 @Sad-King-Billy
+/data/                                   @iamgroot2285 @Sad-King-Billy
+/results/                                @iamgroot2285 @Sad-King-Billy
+/suites/                                 @iamgroot2285 @Sad-King-Billy
+/docs/adapter-contracts.md               @iamgroot2285 @Sad-King-Billy
+/.github/                                @iamgroot2285 @Sad-King-Billy
+/CHANGELOG.md                            @iamgroot2285 @Sad-King-Billy
+/package.json                            @iamgroot2285 @Sad-King-Billy

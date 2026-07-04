@@ -1,6 +1,8 @@
 # Adapter Contracts
 
 Public contract surface for the `@trustfoundry-ai/benchmarks` harness.
+See [`../../../docs/adapter-contracts.md`](../../../docs/adapter-contracts.md)
+for the long-form guide with implementation notes and reference walkthroughs.
 
 ## The three adapter kinds
 
