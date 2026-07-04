@@ -245,6 +245,114 @@ test('scoreCase reads cl_cluster_id from expected and reports it on the case sco
   assert.equal(scores.caseScores[0].hitAt5, true);
 });
 
+test('scoreStream honors manifest.scorer.settings.cutoffs and headline_cutoff', async () => {
+  const cases = [
+    {
+      caseId: 'a',
+      split: 'test',
+      metadata: {
+        datasetIndex: 0,
+        datasetName: 'case_questions',
+        doc_type: 'case',
+        field: 'questions',
+        model_type: 'case_question',
+        state: 'MI',
+        expected: { canonical_citation: '1 Test 1', alternates: [] }
+      }
+    },
+    {
+      caseId: 'b',
+      split: 'test',
+      metadata: {
+        datasetIndex: 1,
+        datasetName: 'case_questions',
+        doc_type: 'case',
+        field: 'questions',
+        model_type: 'case_question',
+        state: 'MI',
+        expected: { canonical_citation: '2 Test 2', alternates: [] }
+      }
+    }
+  ];
+  const providerResults = [
+    {
+      caseId: 'a',
+      status: 'completed',
+      finalOutputText: JSON.stringify({
+        results: [
+          ...Array.from({ length: 39 }, (_, i) => ({ rank: i + 1, citation: `filler ${i}` })),
+          { rank: 40, citation: '1 Test 1' }
+        ]
+      }),
+      timing: { durationMs: 100 }
+    },
+    {
+      caseId: 'b',
+      status: 'completed',
+      finalOutputText: JSON.stringify({
+        results: [{ rank: 1, citation: '2 Test 2' }]
+      }),
+      timing: { durationMs: 100 }
+    }
+  ];
+  const manifest = {
+    run_id: 'cutoff-parameterization-test',
+    scorer: {
+      settings: {
+        cutoffs: [1, 10, 50, 100],
+        headline_cutoff: 50
+      }
+    }
+  };
+  const scores = await searchRecallScorerAdapter.score({ manifest, cases, providerResults });
+  assert.deepEqual(scores.summary.execution.scorer.cutoffs, [1, 10, 50, 100]);
+  assert.equal(scores.summary.execution.scorer.headlineCutoff, 50);
+  assert.equal(scores.caseScores[0].hitAt50, true);
+  assert.equal(scores.caseScores[0].hitAt10, false);
+  assert.equal(scores.caseScores[0].hitAt100, true);
+  assert.equal(scores.summary.hitAt100, 1);
+  assert.equal(scores.summary.hitAt50, 1);
+  assert.equal(scores.summary.hitAt10, 0.5);
+  // hitAt5, hitAt25 not requested → not present
+  assert.equal('hitAt5' in scores.summary, false);
+  assert.equal('hitAt25' in scores.summary, false);
+});
+
+test('config argument overrides manifest.scorer.settings (private-runner path)', async () => {
+  const manifest = {
+    run_id: 'config-arg-test',
+    scorer: { settings: { cutoffs: [1, 5, 10, 25] } }
+  };
+  const scores = await searchRecallScorerAdapter.score({
+    manifest,
+    cases: [
+      {
+        caseId: 'a',
+        split: 'test',
+        metadata: {
+          datasetIndex: 0,
+          datasetName: 'case_questions',
+          doc_type: 'case',
+          field: 'questions',
+          model_type: 'case_question',
+          state: 'MI',
+          expected: { canonical_citation: '1 Test 1', alternates: [] }
+        }
+      }
+    ],
+    providerResults: [
+      {
+        caseId: 'a',
+        status: 'completed',
+        finalOutputText: JSON.stringify({ results: [{ rank: 1, citation: '1 Test 1' }] }),
+        timing: { durationMs: 10 }
+      }
+    ],
+    config: { cutoffs: [1, 100] }
+  });
+  assert.deepEqual(scores.summary.execution.scorer.cutoffs, [1, 100]);
+});
+
 test('latency summary excludes provider failures and reports failure latency separately', async () => {
   const cases = [
     {

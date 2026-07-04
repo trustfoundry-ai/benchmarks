@@ -358,3 +358,111 @@ test('_internals expose cutoff constants', () => {
   assert.deepEqual(_internals.CUTOFFS, [1, 5, 10, 25]);
   assert.equal(_internals.HEADLINE_CUTOFF, 1);
 });
+
+test('scoreStream honors manifest.scorer.settings.cutoffs and headline_cutoff', async () => {
+  const cases = [
+    {
+      caseId: 'p-1',
+      benchmarkId: 'citation-lookup',
+      split: 'test',
+      metadata: {
+        datasetIndex: 0,
+        datasetName: 'citation-lookup-cases',
+        document_type: 'case',
+        difficulty: 'easy',
+        authority_identifier: 'test',
+        datasource_id: 'test',
+        geo_level_2: 'FED',
+        expected: { canonical_citation: '1 Test 1', alternates: [] }
+      }
+    }
+  ];
+  const providerResults = [
+    {
+      caseId: 'p-1',
+      status: 'completed',
+      finalOutputText: JSON.stringify({
+        results: [
+          ...Array.from({ length: 74 }, (_, i) => ({ rank: i + 1, citation: `filler ${i}` })),
+          { rank: 75, citation: '1 Test 1' }
+        ]
+      }),
+      timing: { durationMs: 10 }
+    }
+  ];
+  const scored = await citationLookupScorerAdapter.score({
+    manifest: {
+      run_id: 'cl-cutoff-test',
+      scorer: { settings: { cutoffs: [1, 100], headline_cutoff: 100 } }
+    },
+    cases,
+    providerResults
+  });
+  assert.deepEqual(scored.summary.execution.scorer.cutoffs, [1, 100]);
+  assert.equal(scored.summary.execution.scorer.headline_cutoff, 100);
+  assert.equal(scored.caseScores[0].hitAt100, true);
+  assert.equal(scored.caseScores[0].hitAt1, false);
+  assert.equal(scored.summary.overallScore, 1);
+});
+
+test('surfaces envelope.provider_ambiguous and reports ambiguous_rate', async () => {
+  const cases = [
+    {
+      caseId: 'a-1',
+      benchmarkId: 'citation-lookup',
+      split: 'test',
+      metadata: {
+        datasetIndex: 0,
+        datasetName: 'citation-lookup-cases',
+        expected: { canonical_citation: '1 Test 1', alternates: [] }
+      }
+    },
+    {
+      caseId: 'a-2',
+      benchmarkId: 'citation-lookup',
+      split: 'test',
+      metadata: {
+        datasetIndex: 1,
+        datasetName: 'citation-lookup-cases',
+        expected: { canonical_citation: '2 Test 2', alternates: [] }
+      }
+    }
+  ];
+  const providerResults = [
+    {
+      caseId: 'a-1',
+      status: 'completed',
+      finalOutputText: JSON.stringify({
+        provider_ambiguous: true,
+        results: [{ rank: 1, citation: '1 Test 1' }]
+      }),
+      timing: { durationMs: 10 }
+    },
+    {
+      caseId: 'a-2',
+      status: 'completed',
+      finalOutputText: JSON.stringify({
+        provider_ambiguous: false,
+        results: [{ rank: 1, citation: '2 Test 2' }]
+      }),
+      timing: { durationMs: 10 }
+    }
+  ];
+  const scored = await citationLookupScorerAdapter.score({
+    manifest: null,
+    cases,
+    providerResults
+  });
+  assert.equal(scored.caseScores[0].providerAmbiguous, true);
+  assert.equal(scored.caseScores[1].providerAmbiguous, false);
+  assert.equal(scored.summary.headline.ambiguous_rate, 0.5);
+});
+
+test('ambiguous_rate is null when no positive cases exist to compute the fraction over', async () => {
+  const scored = await citationLookupScorerAdapter.score({
+    manifest: null,
+    cases: [],
+    providerResults: []
+  });
+  assert.equal(scored.summary.headline.ambiguous_rate, null);
+});

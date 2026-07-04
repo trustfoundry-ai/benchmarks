@@ -5,8 +5,8 @@ import {
 } from '../../core/citations.mjs';
 
 const VERSION = 'search-recall-v1';
-const CUTOFFS = [1, 5, 10, 25];
-const HEADLINE_CUTOFF = 25;
+const DEFAULT_CUTOFFS = [1, 5, 10, 25];
+const DEFAULT_HEADLINE_CUTOFF = 25;
 const MRR_DECIMAL_PLACES = 4;
 
 function safeParse(text) {
@@ -160,7 +160,15 @@ function truncateDecimal(value, decimalPlaces) {
   return Math.trunc(value * factor) / factor;
 }
 
-function scoreCase({ benchmarkCase, providerResult }) {
+function hitAtFields(hitRank, cutoffs) {
+  const out = {};
+  for (const k of cutoffs) {
+    out[`hitAt${k}`] = hitRank !== null && hitRank <= k;
+  }
+  return out;
+}
+
+function scoreCase({ benchmarkCase, providerResult, cutoffs, headlineCutoff }) {
   const expected = benchmarkCase.metadata?.expected ?? null;
   const expectedDocumentUuid = benchmarkCase.metadata?.document_uuid ?? null;
   const expectedClusterId = expected?.cl_cluster_id ?? null;
@@ -196,10 +204,7 @@ function scoreCase({ benchmarkCase, providerResult }) {
       status: 'provider_failure',
       score: 0,
       hitRank: null,
-      hitAt1: false,
-      hitAt5: false,
-      hitAt10: false,
-      hitAt25: false,
+      ...hitAtFields(null, cutoffs),
       reciprocalRank: 0,
       resultCount: 0,
       latencyMs: latencyMs(providerResult),
@@ -214,12 +219,9 @@ function scoreCase({ benchmarkCase, providerResult }) {
   return {
     ...base,
     status: 'scored',
-    score: hitRank !== null && hitRank <= HEADLINE_CUTOFF ? 1 : 0,
+    score: hitRank !== null && hitRank <= headlineCutoff ? 1 : 0,
     hitRank,
-    hitAt1: hitRank !== null && hitRank <= 1,
-    hitAt5: hitRank !== null && hitRank <= 5,
-    hitAt10: hitRank !== null && hitRank <= 10,
-    hitAt25: hitRank !== null && hitRank <= 25,
+    ...hitAtFields(hitRank, cutoffs),
     reciprocalRank: hitRank ? 1 / hitRank : 0,
     resultCount,
     latencyMs: latencyMs(providerResult),
@@ -245,10 +247,10 @@ function percentile(values, pct) {
   return sorted[lower] + (sorted[upper] - sorted[lower]) * fraction;
 }
 
-function aggregate(caseScores) {
+function aggregate(caseScores, cutoffs) {
   const n = caseScores.length;
   const hitAt = {};
-  for (const cutoff of CUTOFFS) {
+  for (const cutoff of cutoffs) {
     hitAt[`hit@${cutoff}`] = n
       ? caseScores.filter((item) => item.hitRank !== null && item.hitRank <= cutoff).length / n
       : 0;
@@ -265,23 +267,23 @@ function aggregate(caseScores) {
   };
 }
 
-function legacyAggregate(caseScores) {
+function legacyAggregate(caseScores, cutoffs, headlineCutoff) {
   const validSuccess = caseScores.filter((item) => item.status === 'scored' && item.validGold);
-  const overall = aggregate(validSuccess);
+  const overall = aggregate(validSuccess, cutoffs);
   const providerFailures = caseScores.filter((item) => item.status !== 'scored').length;
   const summary = {
     total: caseScores.length,
     scored: validSuccess.length,
     providerFailures,
-    hitAt1: overall.hit_at['hit@1'],
-    hitAt5: overall.hit_at['hit@5'],
-    hitAt10: overall.hit_at['hit@10'],
-    hitAt25: overall.hit_at['hit@25'],
     mrr: overall.mrr,
     meanResultCount: mean(validSuccess.map((item) => item.resultCount))
   };
-  summary.overallScore = summary.hitAt25;
-  summary.supportedScore = summary.hitAt25;
+  for (const k of cutoffs) {
+    summary[`hitAt${k}`] = overall.hit_at[`hit@${k}`];
+  }
+  const headlineScore = overall.hit_at[`hit@${headlineCutoff}`] ?? 0;
+  summary.overallScore = headlineScore;
+  summary.supportedScore = headlineScore;
   return summary;
 }
 
@@ -412,29 +414,29 @@ function groupRaw(caseScores, key) {
   return groups;
 }
 
-function aggregateByState(caseScores) {
+function aggregateByState(caseScores, cutoffs) {
   const out = {};
   for (const [state, bucket] of Object.entries(groupRaw(caseScores, 'state'))) {
-    out[state] = aggregate(bucket);
+    out[state] = aggregate(bucket, cutoffs);
   }
   return out;
 }
 
-function grouped(caseScores, key) {
+function grouped(caseScores, key, cutoffs, headlineCutoff) {
   const out = {};
   for (const [value, bucket] of Object.entries(groupRaw(caseScores, key))) {
-    out[value] = legacyAggregate(bucket);
+    out[value] = legacyAggregate(bucket, cutoffs, headlineCutoff);
   }
   return out;
 }
 
-function buildSummary(caseScores, { manifest = null } = {}) {
+function buildSummary(caseScores, { manifest = null, cutoffs, headlineCutoff } = {}) {
   const validSuccess = caseScores.filter((item) => item.status === 'scored' && item.validGold);
   const strict = caseScores.filter((item) => item.validGold);
   const successfulScores = caseScores.filter((item) => item.status === 'scored');
   const failedScores = caseScores.filter((item) => item.status !== 'scored');
   const summary = {
-    ...legacyAggregate(caseScores),
+    ...legacyAggregate(caseScores, cutoffs, headlineCutoff),
     execution: {
       runId: manifest?.runId ?? manifest?.run_id ?? null,
       benchmark: manifest?.benchmark ?? null,
@@ -443,24 +445,24 @@ function buildSummary(caseScores, { manifest = null } = {}) {
       scorer: {
         id: 'search-recall',
         version: VERSION,
-        cutoffs: CUTOFFS,
-        headlineCutoff: HEADLINE_CUTOFF,
+        cutoffs,
+        headlineCutoff,
         mrrDecimalPlaces: MRR_DECIMAL_PLACES
       },
       caseCount: caseScores.length
     },
     quality: qualityCounts(caseScores),
     latency_ms: latencySummary(successfulScores),
-    overall: aggregate(validSuccess),
-    strict_overall: aggregate(strict),
-    per_state: aggregateByState(validSuccess),
-    strict_per_state: aggregateByState(strict),
-    bySplit: grouped(caseScores, 'split'),
-    byDataset: grouped(caseScores, 'datasetName'),
-    byDocType: grouped(caseScores, 'docType'),
-    byField: grouped(caseScores, 'field'),
-    byModelType: grouped(caseScores, 'modelType'),
-    byState: grouped(caseScores, 'state')
+    overall: aggregate(validSuccess, cutoffs),
+    strict_overall: aggregate(strict, cutoffs),
+    per_state: aggregateByState(validSuccess, cutoffs),
+    strict_per_state: aggregateByState(strict, cutoffs),
+    bySplit: grouped(caseScores, 'split', cutoffs, headlineCutoff),
+    byDataset: grouped(caseScores, 'datasetName', cutoffs, headlineCutoff),
+    byDocType: grouped(caseScores, 'docType', cutoffs, headlineCutoff),
+    byField: grouped(caseScores, 'field', cutoffs, headlineCutoff),
+    byModelType: grouped(caseScores, 'modelType', cutoffs, headlineCutoff),
+    byState: grouped(caseScores, 'state', cutoffs, headlineCutoff)
   };
   if (failedScores.some((item) => Number.isFinite(item.latencyMs))) {
     summary.provider_failure_latency_ms = latencySummary(failedScores);
@@ -480,26 +482,66 @@ function buildSummary(caseScores, { manifest = null } = {}) {
   return summary;
 }
 
+// Resolve cutoffs from (in order): direct `config` arg, `manifest.scorer.settings`,
+// `manifest.scorer.config`, then defaults. This layered lookup lets the scorer
+// be driven by callers that pass config either as a `score()` argument (some
+// runners) or embedded on the manifest (others).
+function resolveSettings({ manifest, config } = {}) {
+  const source =
+    config ??
+    manifest?.scorer?.settings ??
+    manifest?.scorer?.config ??
+    {};
+  const rawCutoffs = source?.cutoffs;
+  const cutoffs = Array.isArray(rawCutoffs) && rawCutoffs.length > 0
+    ? Array.from(new Set(rawCutoffs.map(Number).filter((n) => Number.isFinite(n) && n > 0)))
+        .sort((a, b) => a - b)
+    : DEFAULT_CUTOFFS;
+  const rawHeadline = source?.headline_cutoff ?? source?.headlineCutoff;
+  const headlineParsed = Number.parseInt(String(rawHeadline ?? ''), 10);
+  const headlineCutoff = Number.isFinite(headlineParsed) && headlineParsed > 0
+    ? headlineParsed
+    : DEFAULT_HEADLINE_CUTOFF;
+  return { cutoffs, headlineCutoff };
+}
+
 export const searchRecallScorerAdapter = {
   id: 'search-recall',
   version: VERSION,
-  SUPPORTED_CUTOFFS: CUTOFFS,
-  SUPPORTED_HEADLINE_CUTOFF: HEADLINE_CUTOFF,
+  SUPPORTED_CUTOFFS: DEFAULT_CUTOFFS,
+  SUPPORTED_HEADLINE_CUTOFF: DEFAULT_HEADLINE_CUTOFF,
 
   async describe() {
     return {
       id: this.id,
       version: this.version,
-      notes: 'Deterministic public search recall scoring using expected document UUIDs or citations.'
+      notes:
+        'Deterministic public search recall scoring using expected document UUIDs, ' +
+        'cl_cluster_id, or citations. Cutoffs and headline cutoff read from the ' +
+        'scorer config (via `config` argument, `manifest.scorer.settings`, or ' +
+        '`manifest.scorer.config`); defaults to hits@1/5/10/25 with headline 25.'
     };
   },
 
-  async score({ manifest, cases, providerResults }) {
+  async score({ manifest, cases, providerResults, config }) {
+    const { cutoffs, headlineCutoff } = resolveSettings({ manifest, config });
     const byCaseId = new Map(providerResults.map((result) => [result.caseId, result]));
     const caseScores = cases.map((benchmarkCase) =>
-      scoreCase({ benchmarkCase, providerResult: byCaseId.get(benchmarkCase.caseId) })
+      scoreCase({
+        benchmarkCase,
+        providerResult: byCaseId.get(benchmarkCase.caseId),
+        cutoffs,
+        headlineCutoff
+      })
     );
-    return finalize({ manifest, caseScores, scorerId: this.id, version: this.version });
+    return finalize({
+      manifest,
+      caseScores,
+      scorerId: this.id,
+      version: this.version,
+      cutoffs,
+      headlineCutoff
+    });
   },
 
   // Streaming variant. `pairs` is an async iterable yielding either
@@ -508,41 +550,57 @@ export const searchRecallScorerAdapter = {
   // bounded) is retained. The optional `onCaseScored({ benchmarkCase, providerResult, caseScore })`
   // hook lets the caller pipe each scored case to disk (e.g. into a raw.jsonl
   // writer) without a second pass over the inputs.
-  async scoreStream({ manifest, pairs, onCaseScored }) {
+  async scoreStream({ manifest, pairs, onCaseScored, config }) {
+    const { cutoffs, headlineCutoff } = resolveSettings({ manifest, config });
     const caseScores = [];
     for await (const pair of pairs) {
       const benchmarkCase = pair.benchmarkCase ?? pair[0];
       const providerResult = pair.providerResult ?? pair[1];
-      const caseScore = scoreCase({ benchmarkCase, providerResult });
+      const caseScore = scoreCase({
+        benchmarkCase,
+        providerResult,
+        cutoffs,
+        headlineCutoff
+      });
       caseScores.push(caseScore);
       if (onCaseScored) {
         await onCaseScored({ benchmarkCase, providerResult, caseScore });
       }
     }
-    return finalize({ manifest, caseScores, scorerId: this.id, version: this.version });
+    return finalize({
+      manifest,
+      caseScores,
+      scorerId: this.id,
+      version: this.version,
+      cutoffs,
+      headlineCutoff
+    });
   }
 };
 
-function finalize({ manifest, caseScores, scorerId, version }) {
+function finalize({ manifest, caseScores, scorerId, version, cutoffs, headlineCutoff }) {
   return {
     scorerId,
     status: 'completed',
     caseScores,
-    summary: buildSummary(caseScores, { manifest }),
+    summary: buildSummary(caseScores, { manifest, cutoffs, headlineCutoff }),
     metadata: {
       scorer: scorerId,
       version,
-      cutoffs: CUTOFFS,
+      cutoffs,
+      headlineCutoff,
       mrrDecimalPlaces: MRR_DECIMAL_PLACES
     }
   };
 }
 
-// Exposed for runner-side config validation. If you change CUTOFFS or
-// HEADLINE_CUTOFF above, update configs/scorers/search-recall.json to match -
-// the runner refuses to start when these diverge.
-export const SUPPORTED_CUTOFFS = CUTOFFS;
-export const SUPPORTED_HEADLINE_CUTOFF = HEADLINE_CUTOFF;
+// Advisory defaults. `SUPPORTED_CUTOFFS` is exported for backward compat
+// with runner-side validators that pin the expected cutoff set; callers
+// that use the config-driven cutoffs path may exceed these safely.
+export const SUPPORTED_CUTOFFS = DEFAULT_CUTOFFS;
+export const SUPPORTED_HEADLINE_CUTOFF = DEFAULT_HEADLINE_CUTOFF;
+export const DEFAULT_SEARCH_RECALL_CUTOFFS = DEFAULT_CUTOFFS;
+export const DEFAULT_SEARCH_RECALL_HEADLINE_CUTOFF = DEFAULT_HEADLINE_CUTOFF;
 
 export const _internals = {
   resultCitations,
@@ -559,5 +617,6 @@ export const _internals = {
   tokenUsageSummary,
   tokenCostSummary,
   pricingSnapshotFromManifest,
-  buildSummary
+  buildSummary,
+  resolveSettings
 };

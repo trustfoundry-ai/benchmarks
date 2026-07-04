@@ -7,8 +7,8 @@ import {
 const SCORER_ID = 'citation-lookup';
 const BENCHMARK_ID = 'citation-lookup';
 const VERSION = 'citation-lookup-v1';
-const CUTOFFS = [1, 5, 10, 25];
-const HEADLINE_CUTOFF = 1;
+const DEFAULT_CUTOFFS = [1, 5, 10, 25];
+const DEFAULT_HEADLINE_CUTOFF = 1;
 
 function safeParse(text) {
   if (typeof text !== 'string') return null;
@@ -81,6 +81,18 @@ function envelopeResultCount(envelope) {
   return Array.isArray(envelope?.results) ? envelope.results.length : 0;
 }
 
+// Vendor-neutral ambiguity signal on the envelope. Providers whose native
+// response format includes an ambiguity indicator (e.g. a status code
+// meaning "multiple candidates matched") should normalize it to
+// `envelope.provider_ambiguous: true`. The scorer surfaces it per case
+// and reports the population fraction as `ambiguous_rate` in the headline
+// summary. Left null when no provider populates the flag.
+function envelopeProviderAmbiguous(envelope) {
+  const raw = envelope?.provider_ambiguous ?? envelope?.providerAmbiguous;
+  if (raw === undefined || raw === null) return false;
+  return Boolean(raw);
+}
+
 function isNegativeCase(expected) {
   return expected?.kind === 'negative';
 }
@@ -99,7 +111,15 @@ function latencyMs(providerResult) {
   return Number.isFinite(duration) ? duration : null;
 }
 
-function scoreCase({ benchmarkCase, providerResult }) {
+function hitAtFields(hitRank, cutoffs) {
+  const out = {};
+  for (const k of cutoffs) {
+    out[`hitAt${k}`] = hitRank !== null && hitRank <= k;
+  }
+  return out;
+}
+
+function scoreCase({ benchmarkCase, providerResult, cutoffs, headlineCutoff }) {
   const expected = benchmarkCase.metadata?.expected ?? null;
   const expectedClusterId = expected?.cl_cluster_id ?? null;
   const negative = isNegativeCase(expected);
@@ -126,13 +146,11 @@ function scoreCase({ benchmarkCase, providerResult }) {
       status: 'provider_failure',
       hitRank: null,
       matchedBy: null,
-      hitAt1: false,
-      hitAt5: false,
-      hitAt10: false,
-      hitAt25: false,
+      ...hitAtFields(null, cutoffs),
       score: 0,
       reciprocalRank: 0,
       resultCount: 0,
+      providerAmbiguous: false,
       negative,
       negativeCorrect: null,
       falsePositive: null,
@@ -146,6 +164,7 @@ function scoreCase({ benchmarkCase, providerResult }) {
 
   const envelope = safeParse(providerResult.finalOutputText) ?? {};
   const resultCount = envelopeResultCount(envelope);
+  const providerAmbiguous = envelopeProviderAmbiguous(envelope);
 
   if (negative) {
     const negativeCorrect = resultCount === 0;
@@ -154,13 +173,11 @@ function scoreCase({ benchmarkCase, providerResult }) {
       status: 'scored',
       hitRank: null,
       matchedBy: null,
-      hitAt1: false,
-      hitAt5: false,
-      hitAt10: false,
-      hitAt25: false,
+      ...hitAtFields(null, cutoffs),
       score: negativeCorrect ? 1 : 0,
       reciprocalRank: 0,
       resultCount,
+      providerAmbiguous,
       negative: true,
       negativeCorrect,
       falsePositive: !negativeCorrect,
@@ -176,24 +193,18 @@ function scoreCase({ benchmarkCase, providerResult }) {
   const hit = firstHitRank(envelope, expected, expectedClusterId);
   const hitRank = hit.rank;
   const matchedBy = hit.matchedBy;
-
-  const hitAt1 = hitRank !== null && hitRank <= 1;
-  const hitAt5 = hitRank !== null && hitRank <= 5;
-  const hitAt10 = hitRank !== null && hitRank <= 10;
-  const hitAt25 = hitRank !== null && hitRank <= 25;
+  const headlineHit = hitRank !== null && hitRank <= headlineCutoff;
 
   return {
     ...base,
     status: 'scored',
     hitRank,
     matchedBy,
-    hitAt1,
-    hitAt5,
-    hitAt10,
-    hitAt25,
-    score: hitAt1 ? 1 : 0,
+    ...hitAtFields(hitRank, cutoffs),
+    score: headlineHit ? 1 : 0,
     reciprocalRank: hitRank ? 1 / hitRank : 0,
     resultCount,
+    providerAmbiguous,
     negative: false,
     negativeCorrect: null,
     falsePositive: null,
@@ -239,23 +250,25 @@ function latencySummary(caseScores) {
   };
 }
 
-function aggregatePositives(caseScores) {
+function aggregatePositives(caseScores, cutoffs) {
   const scored = caseScores.filter(
     (item) => item.status === 'scored' && !item.negative && item.validGold
   );
   const n = scored.length;
   const hitAt = {};
-  for (const cutoff of CUTOFFS) {
+  for (const cutoff of cutoffs) {
     hitAt[cutoff] = n
       ? scored.filter((item) => item.hitRank !== null && item.hitRank <= cutoff).length / n
       : 0;
   }
   const mrr = n ? scored.reduce((sum, item) => sum + item.reciprocalRank, 0) / n : 0;
+  const hitAtOne = hitAt[1] ?? 0;
+  const hitAtFive = hitAt[5] ?? 0;
   return {
     n,
-    hit_at: Object.fromEntries(CUTOFFS.map((cutoff) => [`hit@${cutoff}`, hitAt[cutoff]])),
+    hit_at: Object.fromEntries(cutoffs.map((cutoff) => [`hit@${cutoff}`, hitAt[cutoff]])),
     mrr,
-    ambiguous_match_rate: hitAt[5] - hitAt[1]
+    ambiguous_match_rate: hitAtFive - hitAtOne
   };
 }
 
@@ -273,10 +286,10 @@ function negativeSummary(caseScores) {
 // Fraction of positive hits earned via native cluster_id rather than by
 // citation match. Denominator: positive scored cases with a valid gold
 // citation, a non-null `expected.cl_cluster_id`, and hitRank !== null.
-// Returns null when the denominator is zero (e.g. TF-only runs whose
-// providers never expose a cluster_id on results). A high value signals
-// that the provider's citation formats diverge from the accepted set —
-// most hits are recovered only by the fallback path.
+// Returns null when the denominator is zero (e.g. runs whose providers
+// never expose a cluster_id on results). A high value signals that the
+// provider's citation formats diverge from the accepted set — most hits
+// are recovered only by the fallback path.
 function clusterIdFallbackRate(caseScores) {
   const eligible = caseScores.filter(
     (item) =>
@@ -290,6 +303,18 @@ function clusterIdFallbackRate(caseScores) {
   if (!eligible.length) return null;
   const fallback = eligible.filter((item) => item.matchedBy === 'cluster_id').length;
   return fallback / eligible.length;
+}
+
+// Fraction of scored positive cases where the provider flagged the response
+// as ambiguous. Null when no such cases exist, so consumers can distinguish
+// "provider never reports ambiguity" from "provider reports 0% ambiguous".
+function ambiguousRate(caseScores) {
+  const positives = caseScores.filter(
+    (item) => item.status === 'scored' && !item.negative && item.validGold
+  );
+  if (!positives.length) return null;
+  const ambiguous = positives.filter((item) => item.providerAmbiguous).length;
+  return ambiguous / positives.length;
 }
 
 function qualityCounts(caseScores) {
@@ -322,12 +347,12 @@ function groupBy(caseScores, key) {
   return groups;
 }
 
-function stratify(caseScores, key, { includeNegatives = false } = {}) {
+function stratify(caseScores, key, cutoffs, { includeNegatives = false } = {}) {
   const groups = groupBy(caseScores, key);
   const out = {};
   for (const [value, bucket] of groups.entries()) {
     if (!includeNegatives && bucket.every((item) => item.negative)) continue;
-    const positives = aggregatePositives(bucket);
+    const positives = aggregatePositives(bucket, cutoffs);
     const negatives = negativeSummary(bucket);
     out[value] = {
       total: bucket.length,
@@ -358,7 +383,7 @@ function publicUrl(value) {
   }
 }
 
-function buildExecutionSummary({ manifest, caseScores }) {
+function buildExecutionSummary({ manifest, caseScores, cutoffs, headlineCutoff }) {
   return {
     runId: manifest?.runId ?? manifest?.run_id ?? null,
     generatedAt: new Date().toISOString(),
@@ -381,17 +406,17 @@ function buildExecutionSummary({ manifest, caseScores }) {
       id: manifest?.scorer?.id ?? SCORER_ID,
       version: manifest?.scorer?.version ?? VERSION,
       configPath: manifest?.scorer?.configPath ?? null,
-      cutoffs: CUTOFFS,
-      headline_cutoff: HEADLINE_CUTOFF
+      cutoffs,
+      headline_cutoff: headlineCutoff
     },
     caseCount: caseScores.length
   };
 }
 
-function buildSummary(caseScores, { manifest = null } = {}) {
-  const positives = aggregatePositives(caseScores);
+function buildSummary(caseScores, { manifest = null, cutoffs, headlineCutoff } = {}) {
+  const positives = aggregatePositives(caseScores, cutoffs);
   const negatives = negativeSummary(caseScores);
-  const overallScore = positives.hit_at[`hit@${HEADLINE_CUTOFF}`] ?? 0;
+  const overallScore = positives.hit_at[`hit@${headlineCutoff}`] ?? 0;
   return {
     headline: {
       hit_at_1: positives.hit_at['hit@1'],
@@ -401,70 +426,104 @@ function buildSummary(caseScores, { manifest = null } = {}) {
       mrr: positives.mrr,
       ambiguous_match_rate: positives.ambiguous_match_rate,
       fp_rate: negatives.n ? negatives.fp_rate : null,
+      ambiguous_rate: ambiguousRate(caseScores),
       cluster_id_fallback_rate: clusterIdFallbackRate(caseScores)
     },
     overallScore,
     supportedScore: overallScore,
-    execution: buildExecutionSummary({ manifest, caseScores }),
+    execution: buildExecutionSummary({ manifest, caseScores, cutoffs, headlineCutoff }),
     quality: qualityCounts(caseScores),
     latency_ms: latencySummary(caseScores),
     positives,
     negatives: negatives.n ? negatives : null,
-    byDocumentType: stratify(caseScores, 'documentType', { includeNegatives: true }),
-    byDifficulty: stratify(caseScores, 'difficulty'),
-    byAuthority: stratify(caseScores, 'authority'),
-    byDatasource: stratify(caseScores, 'datasource'),
-    byGeo: stratify(caseScores, 'geo'),
+    byDocumentType: stratify(caseScores, 'documentType', cutoffs, { includeNegatives: true }),
+    byDifficulty: stratify(caseScores, 'difficulty', cutoffs),
+    byAuthority: stratify(caseScores, 'authority', cutoffs),
+    byDatasource: stratify(caseScores, 'datasource', cutoffs),
+    byGeo: stratify(caseScores, 'geo', cutoffs),
     byNegativeCategory: stratifyNegatives(caseScores, 'negativeCategory')
   };
 }
 
-function finalize({ manifest, caseScores, scorerId, version }) {
+function finalize({ manifest, caseScores, scorerId, version, cutoffs, headlineCutoff }) {
   return {
     scorerId,
     status: 'completed',
     caseScores,
-    summary: buildSummary(caseScores, { manifest }),
+    summary: buildSummary(caseScores, { manifest, cutoffs, headlineCutoff }),
     metadata: {
       scorer: scorerId,
       version,
-      cutoffs: CUTOFFS,
-      headline_cutoff: HEADLINE_CUTOFF
+      cutoffs,
+      headline_cutoff: headlineCutoff
     }
   };
+}
+
+// Resolve cutoffs from (in order): direct `config` arg, `manifest.scorer.settings`,
+// `manifest.scorer.config`, then defaults. Same layered lookup as search-recall.
+function resolveSettings({ manifest, config } = {}) {
+  const source =
+    config ??
+    manifest?.scorer?.settings ??
+    manifest?.scorer?.config ??
+    {};
+  const rawCutoffs = source?.cutoffs;
+  const cutoffs = Array.isArray(rawCutoffs) && rawCutoffs.length > 0
+    ? Array.from(new Set(rawCutoffs.map(Number).filter((n) => Number.isFinite(n) && n > 0)))
+        .sort((a, b) => a - b)
+    : DEFAULT_CUTOFFS;
+  const rawHeadline = source?.headline_cutoff ?? source?.headlineCutoff;
+  const headlineParsed = Number.parseInt(String(rawHeadline ?? ''), 10);
+  const headlineCutoff = Number.isFinite(headlineParsed) && headlineParsed > 0
+    ? headlineParsed
+    : DEFAULT_HEADLINE_CUTOFF;
+  return { cutoffs, headlineCutoff };
 }
 
 export const citationLookupScorerAdapter = {
   id: SCORER_ID,
   version: VERSION,
-  SUPPORTED_CUTOFFS: CUTOFFS,
-  SUPPORTED_HEADLINE_CUTOFF: HEADLINE_CUTOFF,
+  SUPPORTED_CUTOFFS: DEFAULT_CUTOFFS,
+  SUPPORTED_HEADLINE_CUTOFF: DEFAULT_HEADLINE_CUTOFF,
 
   async describe() {
     return {
       id: this.id,
       version: this.version,
       notes:
-        'Citation-lookup recall scoring. Positives are hit@K on the ranked results; matches are ' +
-        'sought by normalized citation string first, then by native cluster_id on results that ' +
-        'expose one. Reports headline hit@1, plus hit@5/10/25, MRR, ambiguous_match_rate ' +
-        '(hit@5 − hit@1), fp_rate on negatives (non-empty response is a false positive), and ' +
-        'cluster_id_fallback_rate (fraction of positive hits earned via cluster_id rather than ' +
-        'citation match — null when no result rows carry a cluster_id).'
+        'Citation-lookup recall scoring. Positives are hit@K on the ranked results; ' +
+        'matches are sought by normalized citation string first, then by native ' +
+        'cluster_id on results that expose one. Reports headline hit@1, plus ' +
+        'hit@5/10/25, MRR, ambiguous_match_rate (hit@5 − hit@1), fp_rate on ' +
+        'negatives (non-empty response is a false positive), ambiguous_rate ' +
+        '(fraction of scored positives whose provider flagged provider_ambiguous), ' +
+        'and cluster_id_fallback_rate (fraction of positive hits earned via ' +
+        'cluster_id rather than citation match).'
     };
   },
 
-  async score({ manifest, cases, providerResults }) {
+  async score({ manifest, cases, providerResults, config }) {
+    const { cutoffs, headlineCutoff } = resolveSettings({ manifest, config });
     const byCaseId = new Map(providerResults.map((result) => [result.caseId, result]));
     const caseScores = cases
       .filter((item) => item.benchmarkId === BENCHMARK_ID)
       .map((benchmarkCase) =>
         scoreCase({
           benchmarkCase,
-          providerResult: byCaseId.get(benchmarkCase.caseId)
+          providerResult: byCaseId.get(benchmarkCase.caseId),
+          cutoffs,
+          headlineCutoff
         })
       );
-    return finalize({ manifest, caseScores, scorerId: this.id, version: this.version });
+    return finalize({
+      manifest,
+      caseScores,
+      scorerId: this.id,
+      version: this.version,
+      cutoffs,
+      headlineCutoff
+    });
   },
 
   // Streaming variant. Matches the shape used by search-recall — the runner
@@ -472,32 +531,51 @@ export const citationLookupScorerAdapter = {
   // don't have to be materialized twice in memory. Only cases whose
   // benchmarkId matches this scorer are consumed; others are skipped
   // silently so multi-benchmark harnesses can share a raw-row stream.
-  async scoreStream({ manifest, pairs, onCaseScored }) {
+  async scoreStream({ manifest, pairs, onCaseScored, config }) {
+    const { cutoffs, headlineCutoff } = resolveSettings({ manifest, config });
     const caseScores = [];
     for await (const pair of pairs) {
       const benchmarkCase = pair.benchmarkCase ?? pair[0];
       const providerResult = pair.providerResult ?? pair[1];
       if (benchmarkCase?.benchmarkId !== BENCHMARK_ID) continue;
-      const caseScore = scoreCase({ benchmarkCase, providerResult });
+      const caseScore = scoreCase({
+        benchmarkCase,
+        providerResult,
+        cutoffs,
+        headlineCutoff
+      });
       caseScores.push(caseScore);
       if (onCaseScored) {
         await onCaseScored({ benchmarkCase, providerResult, caseScore });
       }
     }
-    return finalize({ manifest, caseScores, scorerId: this.id, version: this.version });
+    return finalize({
+      manifest,
+      caseScores,
+      scorerId: this.id,
+      version: this.version,
+      cutoffs,
+      headlineCutoff
+    });
   }
 };
 
-export const SUPPORTED_CUTOFFS = CUTOFFS;
-export const SUPPORTED_HEADLINE_CUTOFF = HEADLINE_CUTOFF;
+export const SUPPORTED_CUTOFFS = DEFAULT_CUTOFFS;
+export const SUPPORTED_HEADLINE_CUTOFF = DEFAULT_HEADLINE_CUTOFF;
+export const DEFAULT_CITATION_LOOKUP_CUTOFFS = DEFAULT_CUTOFFS;
+export const DEFAULT_CITATION_LOOKUP_HEADLINE_CUTOFF = DEFAULT_HEADLINE_CUTOFF;
 
 export const _internals = {
   scoreCase,
   firstHitRank,
   aggregatePositives,
   negativeSummary,
+  ambiguousRate,
   clusterIdFallbackRate,
   buildSummary,
-  CUTOFFS,
-  HEADLINE_CUTOFF
+  resolveSettings,
+  DEFAULT_CUTOFFS,
+  DEFAULT_HEADLINE_CUTOFF,
+  CUTOFFS: DEFAULT_CUTOFFS,
+  HEADLINE_CUTOFF: DEFAULT_HEADLINE_CUTOFF
 };
