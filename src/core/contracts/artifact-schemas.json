@@ -114,9 +114,9 @@
             "document_uuid": { "type": ["string", "null"] },
             "canonical_citation": { "type": ["string", "null"] },
             "alternates": { "type": "array", "items": { "type": "string" } },
-            "native_opinion_cluster_id": {
+            "cl_cluster_id": {
               "type": ["string", "null"],
-              "$comment": "Renamed from cl_cluster_id in the v2 dataset schema; see suites/citation-lookup/README.md."
+              "$comment": "CourtListener opinion-cluster identifier, populated from CourtListener bulk data. Preserved verbatim so consumers with CL-mapped internal ID spaces can join against it."
             },
             "document_title": { "type": ["string", "null"] },
             "state": { "type": ["string", "null"] },

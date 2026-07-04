@@ -1,6 +1,6 @@
 // Benchmark adapter contract.
 //
-// A benchmark adapter reads a dataset (JSONL on disk, HuggingFace pull,
+// A benchmark adapter reads a dataset (JSONL on disk, remote catalog pull,
 // synthetic generator, etc.) and returns a normalized array of
 // `benchmarkCase` records the runner feeds into a provider.
 
