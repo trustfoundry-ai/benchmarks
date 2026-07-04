@@ -1,9 +1,9 @@
 {
-  "total_rows": 3152,
+  "total_rows": 3120,
   "unique_citations": 1080,
-  "resolved_rows": 2752,
+  "resolved_rows": 2720,
   "unresolved_rows": 400,
-  "coverage_pct_rows": 87.31,
+  "coverage_pct_rows": 87.18,
   "resolved_citations": 680,
   "coverage_pct_citations": 62.96,
   "collision_count": 0,
@@ -259,13 +259,13 @@
       "pct": 100
     },
     "bap10": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "bap2": {
-      "total": 8,
-      "resolved": 8,
+      "total": 6,
+      "resolved": 6,
       "pct": 100
     },
     "bap6": {
@@ -399,8 +399,8 @@
       "pct": 0
     },
     "ca1": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "ca10": {
@@ -429,8 +429,8 @@
       "pct": 100
     },
     "ca4": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "ca5": {
@@ -594,8 +594,8 @@
       "pct": 0
     },
     "circtdal": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "circtdar": {
@@ -644,8 +644,8 @@
       "pct": 100
     },
     "circtdil": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "circtdin": {
@@ -659,8 +659,8 @@
       "pct": 100
     },
     "circtdky": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "circtdla": {
@@ -1019,8 +1019,8 @@
       "pct": 100
     },
     "circtwdnc": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "circtwdny": {
@@ -1104,8 +1104,8 @@
       "pct": 0
     },
     "cob": {
-      "total": 8,
-      "resolved": 8,
+      "total": 6,
+      "resolved": 6,
       "pct": 100
     },
     "cod": {
@@ -1214,8 +1214,8 @@
       "pct": 100
     },
     "ctd": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "Curt.": {
@@ -1564,8 +1564,8 @@
       "pct": 100
     },
     "ganb": {
-      "total": 8,
-      "resolved": 8,
+      "total": 6,
+      "resolved": 6,
       "pct": 100
     },
     "gand": {
@@ -1574,8 +1574,8 @@
       "pct": 100
     },
     "gasb": {
-      "total": 8,
-      "resolved": 8,
+      "total": 5,
+      "resolved": 5,
       "pct": 100
     },
     "gasd": {
@@ -1729,8 +1729,8 @@
       "pct": 100
     },
     "iasb": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "iasd": {
@@ -1829,8 +1829,8 @@
       "pct": 100
     },
     "ilsb": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "ilsd": {
@@ -1899,8 +1899,8 @@
       "pct": 0
     },
     "insb": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "insd": {
@@ -2384,8 +2384,8 @@
       "pct": 100
     },
     "moeb": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "moed": {
@@ -2424,8 +2424,8 @@
       "pct": 100
     },
     "msnd": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "mspb": {
@@ -2584,8 +2584,8 @@
       "pct": 100
     },
     "nced": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "ncmb": {
@@ -2619,8 +2619,8 @@
       "pct": 100
     },
     "ndd": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "Neb. (Unof.)": {
@@ -2659,8 +2659,8 @@
       "pct": 100
     },
     "nhd": {
-      "total": 4,
-      "resolved": 4,
+      "total": 3,
+      "resolved": 3,
       "pct": 100
     },
     "njb": {
@@ -2674,8 +2674,8 @@
       "pct": 100
     },
     "nmb": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "nmd": {
@@ -2799,8 +2799,8 @@
       "pct": 100
     },
     "ohnb": {
-      "total": 8,
-      "resolved": 8,
+      "total": 6,
+      "resolved": 6,
       "pct": 100
     },
     "ohnd": {
@@ -2814,18 +2814,18 @@
       "pct": 100
     },
     "ohsd": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "okd": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "okeb": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "oked": {
@@ -2849,8 +2849,8 @@
       "pct": 100
     },
     "okwb": {
-      "total": 8,
-      "resolved": 8,
+      "total": 7,
+      "resolved": 7,
       "pct": 100
     },
     "okwd": {
@@ -3827,7 +3827,7 @@
     "Ala."
   ],
   "collision_sample": [],
-  "generated_at": "2026-07-02T21:30:21.797Z",
+  "generated_at": "2026-07-04T00:05:01.583Z",
   "cache_hits": 1080,
   "spanner_queries_issued": 0,
   "refresh_used": false
