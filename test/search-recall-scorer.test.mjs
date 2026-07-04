@@ -13,9 +13,9 @@ test('scores by expected document UUID or citation and reports hit@k/MRR', async
       provider: {
         settings: {
           pricing: {
-            model: 'claude-opus-4-8',
-            pricing_level: 'Claude API standard pricing',
-            source: 'https://platform.claude.com/docs/en/about-claude/models/overview',
+            model: 'fixture-llm-a',
+            pricing_level: 'fixture provider standard pricing',
+            source: 'https://example.com/pricing/fixture-llm-a',
             source_accessed_at: '2026-07-02',
             currency: 'USD',
             unit: 'per_1m_tokens',
@@ -144,9 +144,9 @@ test('scores by expected document UUID or citation and reports hit@k/MRR', async
   });
   assert.deepEqual(scores.summary.token_cost, {
     currency: 'USD',
-    model: 'claude-opus-4-8',
-    pricing_level: 'Claude API standard pricing',
-    source: 'https://platform.claude.com/docs/en/about-claude/models/overview',
+    model: 'fixture-llm-a',
+    pricing_level: 'fixture provider standard pricing',
+    source: 'https://example.com/pricing/fixture-llm-a',
     source_accessed_at: '2026-07-02',
     unit: 'per_1m_tokens',
     input_per_million_tokens: 5,
