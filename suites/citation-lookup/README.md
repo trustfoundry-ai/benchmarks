@@ -12,7 +12,7 @@ with each row's `model_type` set to `citation_search`.
 
 ## Setup
 
-Create an API key at `dashboard.trustfoundry.ai` and export it as `TF_API_KEY`:
+Create an API key from your TrustFoundry account dashboard and export it as `TF_API_KEY`:
 
 ```bash
 export TF_API_KEY=your_key_here

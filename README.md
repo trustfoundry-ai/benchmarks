@@ -88,7 +88,7 @@ Install dependencies:
 pnpm install
 ```
 
-Set an API key from the [TrustFoundry dashboard](https://dashboard.trustfoundry.ai):
+Set an API key from your TrustFoundry account dashboard:
 
 ```bash
 cp .env.example .env
