@@ -124,29 +124,23 @@ for cfg in "${CONFIGS_TO_RUN[@]}"; do
     exit 2
   fi
 
-  # Pattern: trustfoundry-legal-search/<model-type>-<size>
-  # where size is "200" or "5k". The `results/` directory keeps the
-  # legacy flat layout (`trustfoundry-legal-search-<model-type>/`) so
-  # new bundles land next to the historical ones.
+  # Pattern: trustfoundry-legal-search/<type>-<size>
+  # where <type> is case-questions|key-facts|laws|regs and
+  # <size> is 200|5k.
   if [[ "$cfg" =~ ^trustfoundry-legal-search/(.+)-(200|5k)$ ]]; then
-    model_type="${BASH_REMATCH[1]}"
+    type_slug="${BASH_REMATCH[1]}"
     size="${BASH_REMATCH[2]}"
-    suite="trustfoundry-legal-search-${model_type}"
   else
-    echo "Cannot parse config name '$cfg' (expected trustfoundry-legal-search/<model-type>-<size>)" >&2
+    echo "Cannot parse config name '$cfg' (expected trustfoundry-legal-search/<type>-<size>)" >&2
     exit 2
   fi
 
-  # Bundle path layout: results/<suite>/<date>/<run-leaf>/
-  # where <run-leaf> encodes the label, size, and model type. The date
-  # lives at level 2 so all bundles from one day cluster together;
-  # provider identity lives in the bundle's manifest, not the path.
-  run_leaf="${RUN_LABEL}-${size}-${model_type}"
-  # runs/ subdirectory is flat; strip the suite prefix from the config
-  # path so a run dir doesn't have two path segments.
+  # Bundle path layout: results/<benchmark>/<date>/<type>/<size>/
+  # Provider identity lives inside the bundle's manifest, not the
+  # path.
   run_dir_leaf="${cfg#trustfoundry-legal-search/}"
   run_dir="runs/trustfoundry-legal-search-${run_dir_leaf}"
-  bundle_dir="results/${suite}/${DATE}/${run_leaf}"
+  bundle_dir="results/trustfoundry-legal-search/${DATE}/${type_slug}/${size}"
 
   echo
   echo "=== ${cfg} ==="
@@ -169,7 +163,7 @@ for cfg in "${CONFIGS_TO_RUN[@]}"; do
     # Encode the model type into the leaf dir so multiple sibling bundles
     # from one all-200/all-5k run cluster under <benchmark-family>/<sha7>/
     # without colliding.
-    upload_leaf="${DATE}-${RUN_LABEL}-${size}-${model_type}"
+    upload_leaf="${DATE}-${RUN_LABEL}-${size}-${type_slug}"
     dest="${OUTPUT_BUNDLE_URI%/}/${BENCHMARK_FAMILY}/${SHA7}/${upload_leaf}/"
     echo "uploading ${bundle_dir}/ -> ${dest}"
     upload_bundle "$bundle_dir" "$dest"

@@ -32,14 +32,20 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
   references the new adapter ids. Bundle SHAs, `checksums.txt`, and
   the surface metrics in `result.json` all reflect the fresh
   2026-07-05 runs against the same live public search API.
-- **Result bundle path layout simplified.** Bundles now live at
-  `results/<suite-id>/<yyyy-mm-dd>/<run-leaf>/` (previously
-  `results/<suite-id>/<provider-id>/<yyyy-mm-dd>-<run-leaf>/`). The
-  provider that produced the bundle is recorded inside the bundle's
-  `manifest.json` (`manifest.provider.id`) instead of in the path.
-  Verification is location-independent — `checksums.txt` and
-  `manifest.artifacts.*.path` reference file names only, so relocating
-  a bundle within `results/` doesn't affect `pnpm verify:results`.
+- **Result bundle path layout restructured** so bundles group by
+  suite and by date. New layout:
+  `results/<benchmark>/<yyyy-mm-dd>/<type>/<size>/` (e.g.
+  `results/trustfoundry-legal-search/2026-07-05/case-questions/5k/`).
+  Previous layouts (`<suite-id>/<provider-id>/<yyyy-mm-dd>-<run-leaf>`
+  and later `<suite-id>/<yyyy-mm-dd>/<run-leaf>`) collapsed the
+  per-subject dirs into one benchmark family and separated `<type>`
+  from `<size>` at their own levels so directory listings sort
+  cleanly. The provider that produced the bundle is recorded inside
+  the bundle's `manifest.json` (`manifest.provider.id`); it doesn't
+  live in the path. Verification is location-independent —
+  `checksums.txt` and `manifest.artifacts.*.path` reference file
+  names only, so relocating a bundle within `results/` doesn't affect
+  `pnpm verify:results`.
 - Dropped `configs/benchmarks/trustfoundry-legal-search/case-questions-20.json`
   — a 200-row config is fast enough for smoke and keeps the config
   set tighter.
