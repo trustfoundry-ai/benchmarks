@@ -21,7 +21,7 @@ import {
 import { getAdapter } from './registry.mjs';
 
 const LARGE_RAW_GZIP_THRESHOLD_BYTES = 95 * 1024 * 1024;
-const DEFAULT_SCORER_ID = 'search-recall';
+const DEFAULT_SCORER_ID = 'trustfoundry-legal-search';
 const gunzipAsync = promisify(gunzip);
 
 function safeParseJson(text) {
@@ -203,7 +203,7 @@ export function buildRawRows({ cases, providerResults, caseScores }) {
 //
 // Populates optional benchmark-specific fields (document_type, difficulty,
 // kind, negative_category, geo_level_2) when the raw row has them; older
-// bundles missing those fields get null defaults so search-recall's scoring
+// bundles missing those fields get null defaults so trustfoundry-legal-search's scoring
 // path continues to work unchanged.
 export function reconstructPairFromRawRow(row) {
   const expectedKind = row.expected?.kind ?? 'exact';
@@ -455,7 +455,7 @@ export async function verifyResultBundle({ repoRoot, bundleDir, verifyInputs = t
   }
   // Prefer the scorer id recorded on the bundled result. Existing bundles
   // published pre-refactor omit `result.run.scorer` — fall back to
-  // search-recall so those bundles still verify byte-for-byte.
+  // trustfoundry-legal-search so those bundles still verify byte-for-byte.
   const scorerIdForVerify =
     result.run?.scorer?.id ?? result.summary?.execution?.scorer?.id ?? DEFAULT_SCORER_ID;
   const recomputed = await scoreRawRowsStream({

@@ -1,7 +1,0 @@
-{
-  "_comment": "Local-dev variant of trustfoundry-public-search-citation-search.json. Points at localhost for pre-prod validation. Uncommitted; do not publish bundles produced against this endpoint.",
-  "endpoint": "https://localhost:3002/public/v1/search",
-  "api_key_env": "LOCAL_TTF_EVAL_API_KEY",
-  "request_timeout_ms": 60000,
-  "state_filter_enabled": false
-}

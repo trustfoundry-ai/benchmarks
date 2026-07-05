@@ -17,11 +17,11 @@
  * (string, unique within its kind) and `version` (string). See the
  * factories in `src/core/contracts/index.mjs` for the full contract.
  */
-import { citationLookupBenchmarkAdapter } from '../adapters/benchmarks/citation-lookup.mjs';
+import { trustfoundryCitationLookupBenchmarkAdapter } from '../adapters/benchmarks/trustfoundry-citation-lookup.mjs';
 import { trustfoundryLegalSearchBenchmarkAdapter } from '../adapters/benchmarks/trustfoundry-legal-search.mjs';
-import { trustfoundryPublicSearchProviderAdapter } from '../adapters/providers/trustfoundry-public-search.mjs';
-import { citationLookupScorerAdapter } from '../adapters/scorers/citation-lookup.mjs';
-import { searchRecallScorerAdapter } from '../adapters/scorers/search-recall.mjs';
+import { trustfoundryLegalSearchProviderAdapter } from '../adapters/providers/trustfoundry-legal-search.mjs';
+import { trustfoundryCitationLookupScorerAdapter } from '../adapters/scorers/trustfoundry-citation-lookup.mjs';
+import { trustfoundryLegalSearchScorerAdapter } from '../adapters/scorers/trustfoundry-legal-search.mjs';
 
 export function createRegistry() {
   const registry = {
@@ -44,10 +44,10 @@ export function createRegistry() {
 
 export const defaultRegistry = createRegistry();
 defaultRegistry.register('benchmarks', trustfoundryLegalSearchBenchmarkAdapter);
-defaultRegistry.register('benchmarks', citationLookupBenchmarkAdapter);
-defaultRegistry.register('providers', trustfoundryPublicSearchProviderAdapter);
-defaultRegistry.register('scorers', searchRecallScorerAdapter);
-defaultRegistry.register('scorers', citationLookupScorerAdapter);
+defaultRegistry.register('benchmarks', trustfoundryCitationLookupBenchmarkAdapter);
+defaultRegistry.register('providers', trustfoundryLegalSearchProviderAdapter);
+defaultRegistry.register('scorers', trustfoundryLegalSearchScorerAdapter);
+defaultRegistry.register('scorers', trustfoundryCitationLookupScorerAdapter);
 
 // Backwards-compat alias — existing public callers import `registry`.
 export const registry = defaultRegistry;

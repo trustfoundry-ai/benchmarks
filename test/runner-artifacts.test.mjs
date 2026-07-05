@@ -46,7 +46,7 @@ async function withFixture(fn) {
                 state: 'MI',
                 expected: { kind: 'exact', canonical_citation: '1 Mich. 1', alternates: [] }
               },
-              scoringHints: { kind: 'search-recall', outputMode: 'json' }
+              scoringHints: { kind: 'trustfoundry-legal-search', outputMode: 'json' }
             }
           ]
         };

@@ -142,7 +142,7 @@ for cfg in "${CONFIGS_TO_RUN[@]}"; do
   # path so a run dir doesn't have two path segments.
   run_leaf="${cfg#trustfoundry-legal-search/}"
   run_dir="runs/trustfoundry-legal-search-${run_leaf}"
-  bundle_dir="results/${suite}/trustfoundry-public-search/${run_id}"
+  bundle_dir="results/${suite}/trustfoundry-legal-search/${run_id}"
 
   echo
   echo "=== ${cfg} ==="

@@ -158,7 +158,7 @@ export async function buildManifest({
       paths.scorerConfigFile ? sha256File(paths.scorerConfigFile) : null
     ]);
   const scorer = {
-    id: scorerId ?? scorerDescription?.id ?? 'search-recall',
+    id: scorerId ?? scorerDescription?.id ?? 'trustfoundry-legal-search',
     ...(scorerDescription ?? {}),
     configPath: paths.scorerConfigPath,
     configSha256: scorerConfigSha256

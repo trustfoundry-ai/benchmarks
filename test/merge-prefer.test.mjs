@@ -57,8 +57,8 @@ function makeManifest(startedAt, completedAt, caseCount) {
     run_id: `run-${startedAt}`,
     harness: { name: '@trustfoundry-ai/benchmarks', commit: 'abcdef1' },
     benchmark: { id: 'trustfoundry-legal-search', version: 'v1', configPath: 'x.json', configSha256: 'aaa' },
-    provider: { id: 'trustfoundry-public-search', configPath: 'y.json', configSha256: 'bbb' },
-    scorer: { id: 'search-recall', configPath: 'z.json', configSha256: 'ccc' },
+    provider: { id: 'trustfoundry-legal-search', configPath: 'y.json', configSha256: 'bbb' },
+    scorer: { id: 'trustfoundry-legal-search', configPath: 'z.json', configSha256: 'ccc' },
     scheduler: { parallel: 1, caseCount },
     startedAt,
     completedAt

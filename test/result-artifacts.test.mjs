@@ -13,7 +13,7 @@ import {
   verifyResultBundle
 } from '../src/core/artifacts.mjs';
 import { sha256File, writeJson, writeJsonl, readJson } from '../src/core/fs.mjs';
-import { searchRecallScorerAdapter } from '../src/adapters/scorers/search-recall.mjs';
+import { trustfoundryLegalSearchScorerAdapter } from '../src/adapters/scorers/trustfoundry-legal-search.mjs';
 
 const gzipAsync = promisify(gzip);
 
@@ -66,8 +66,8 @@ async function makeRun(repoRoot, root) {
       configSha256: await sha256File(path.join(repoRoot, 'configs/benchmarks/trustfoundry-legal-search/case-questions-200.json')),
       sourceFiles: [
         {
-          path: 'data/trustfoundry-legal-search-5k/case_questions.jsonl',
-          sha256: await sha256File(path.join(repoRoot, 'data/trustfoundry-legal-search-5k/case_questions.jsonl'))
+          path: 'data/trustfoundry-legal-search/case_questions.jsonl',
+          sha256: await sha256File(path.join(repoRoot, 'data/trustfoundry-legal-search/case_questions.jsonl'))
         }
       ]
     },
@@ -81,7 +81,7 @@ async function makeRun(repoRoot, root) {
     },
     scheduler: { parallel: 1, caseCount: 1 }
   };
-  const scores = await searchRecallScorerAdapter.score({ manifest, cases, providerResults });
+  const scores = await trustfoundryLegalSearchScorerAdapter.score({ manifest, cases, providerResults });
   await writeJson(path.join(runDir, 'manifest.json'), manifest);
   await writeJsonl(path.join(runDir, 'cases.jsonl'), cases);
   await writeJsonl(path.join(runDir, 'provider-results.jsonl'), providerResults);

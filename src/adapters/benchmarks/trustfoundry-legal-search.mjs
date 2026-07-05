@@ -4,7 +4,7 @@ import path from 'node:path';
 import { readJsonl } from '../../core/fs.mjs';
 import { applyQueryTransform } from '../../core/query-transforms.mjs';
 
-const DEFAULT_DATA_DIR = 'data/trustfoundry-legal-search-5k';
+const DEFAULT_DATA_DIR = 'data/trustfoundry-legal-search';
 const DEFAULT_FILES = [
   'case_questions.jsonl',
   'case_key_facts.jsonl',
@@ -151,7 +151,7 @@ function buildCase(row, { datasetName, index, datasetSize, queryTransformId }) {
         cl_cluster_id: expected.cl_cluster_id ?? null
       }
     },
-    scoringHints: { kind: 'search-recall', outputMode: 'json' }
+    scoringHints: { kind: 'trustfoundry-legal-search', outputMode: 'json' }
   };
 }
 

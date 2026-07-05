@@ -1,11 +1,11 @@
 {
-  "adapter": "citation-lookup",
-  "benchmarkId": "citation-lookup",
+  "adapter": "trustfoundry-citation-lookup",
+  "benchmarkId": "trustfoundry-citation-lookup",
   "datasetPaths": [
-    "data/citation-lookup-cases/dataset.jsonl",
-    "data/citation-lookup-statutes/dataset.jsonl",
-    "data/citation-lookup-regulations/dataset.jsonl",
-    "data/citation-lookup-negatives/dataset.jsonl"
+    "data/trustfoundry-citation-lookup/cases/dataset.jsonl",
+    "data/trustfoundry-citation-lookup/statutes/dataset.jsonl",
+    "data/trustfoundry-citation-lookup/regulations/dataset.jsonl",
+    "data/trustfoundry-citation-lookup/negatives/dataset.jsonl"
   ],
-  "scorer": "citation-lookup"
+  "scorer": "trustfoundry-citation-lookup"
 }

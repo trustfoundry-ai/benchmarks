@@ -25,15 +25,15 @@ import { getAdapter } from './registry.mjs';
 import { applyShard, mapWithConcurrency, normalizeScheduler } from './scheduler.mjs';
 import { summarizeTokenUsage } from './token-usage.mjs';
 import {
-  SUPPORTED_CUTOFFS as SEARCH_RECALL_SUPPORTED_CUTOFFS,
-  SUPPORTED_HEADLINE_CUTOFF as SEARCH_RECALL_SUPPORTED_HEADLINE_CUTOFF
-} from '../adapters/scorers/search-recall.mjs';
+  SUPPORTED_CUTOFFS as TRUSTFOUNDRY_LEGAL_SEARCH_SUPPORTED_CUTOFFS,
+  SUPPORTED_HEADLINE_CUTOFF as TRUSTFOUNDRY_LEGAL_SEARCH_SUPPORTED_HEADLINE_CUTOFF
+} from '../adapters/scorers/trustfoundry-legal-search.mjs';
 
 const DEFAULT_BENCHMARK_CONFIG = 'configs/benchmarks/trustfoundry-legal-search/case-questions-200.json';
 const DEFAULT_PROVIDER_CONFIG = 'configs/providers/trustfoundry-legal-search.json';
 const DEFAULT_SCORER_CONFIG = 'configs/scorers/trustfoundry-legal-search.json';
 const DEFAULT_BENCHMARK_ADAPTER = 'trustfoundry-legal-search';
-const DEFAULT_SCORER_ID = 'search-recall';
+const DEFAULT_SCORER_ID = 'trustfoundry-legal-search';
 
 function nowCompact() {
   return new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
@@ -76,8 +76,8 @@ function sameIntegerSet(a, b) {
 export function validateScorerCutoffsMatchImplementation(
   scorerConfig = {},
   {
-    supportedCutoffs = SEARCH_RECALL_SUPPORTED_CUTOFFS,
-    supportedHeadlineCutoff = SEARCH_RECALL_SUPPORTED_HEADLINE_CUTOFF,
+    supportedCutoffs = TRUSTFOUNDRY_LEGAL_SEARCH_SUPPORTED_CUTOFFS,
+    supportedHeadlineCutoff = TRUSTFOUNDRY_LEGAL_SEARCH_SUPPORTED_HEADLINE_CUTOFF,
     scorerId = DEFAULT_SCORER_ID
   } = {}
 ) {
@@ -142,8 +142,8 @@ export function benchmarkAdapterId(config = {}) {
 
 // Resolves the scorer adapter id from the benchmark + scorer configs.
 // Precedence: benchmarkConfig.scorer (or aliases) > scorerConfig.scorer (or
-// aliases) > 'search-recall' (default). Existing configs that omit the
-// scorer field continue to select search-recall unchanged.
+// aliases) > 'trustfoundry-legal-search' (default). Existing configs that omit the
+// scorer field continue to select trustfoundry-legal-search unchanged.
 export function scorerAdapterId(benchmarkConfig = {}, scorerConfig = {}) {
   return (
     benchmarkConfig.scorer ??
@@ -160,15 +160,15 @@ export function providerAdapterId(providerConfig = {}) {
   return (
     providerConfig.provider ??
     providerConfig.providerId ??
-    'trustfoundry-public-search'
+    'trustfoundry-legal-search'
   );
 }
 
 function scorerConstants(scorerAdapter) {
   return {
-    supportedCutoffs: scorerAdapter?.SUPPORTED_CUTOFFS ?? SEARCH_RECALL_SUPPORTED_CUTOFFS,
+    supportedCutoffs: scorerAdapter?.SUPPORTED_CUTOFFS ?? TRUSTFOUNDRY_LEGAL_SEARCH_SUPPORTED_CUTOFFS,
     supportedHeadlineCutoff:
-      scorerAdapter?.SUPPORTED_HEADLINE_CUTOFF ?? SEARCH_RECALL_SUPPORTED_HEADLINE_CUTOFF
+      scorerAdapter?.SUPPORTED_HEADLINE_CUTOFF ?? TRUSTFOUNDRY_LEGAL_SEARCH_SUPPORTED_HEADLINE_CUTOFF
   };
 }
 

@@ -36,7 +36,7 @@ import { getAdapter } from './registry.mjs';
 import { buildReport, executeProviderCaseWithRetry } from './runner.mjs';
 import { mapWithConcurrency, normalizeScheduler } from './scheduler.mjs';
 
-const DEFAULT_SCORER_ID = 'search-recall';
+const DEFAULT_SCORER_ID = 'trustfoundry-legal-search';
 
 const RETRYABLE_STATUSES = new Set([
   'provider_error',

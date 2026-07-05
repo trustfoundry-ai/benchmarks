@@ -1,7 +1,7 @@
 {
   "_comment": "First 200 deterministic law-question search rows from the public Legal Search 5k subset.",
   "benchmarkId": "trustfoundry-legal-search",
-  "dataDir": "data/trustfoundry-legal-search-5k",
+  "dataDir": "data/trustfoundry-legal-search",
   "files": ["laws.jsonl"],
   "datasetSize": "trustfoundry-legal-search-laws-200",
   "datasetNames": ["laws"],

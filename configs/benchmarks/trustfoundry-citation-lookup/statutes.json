@@ -1,6 +1,6 @@
 {
-  "adapter": "citation-lookup",
-  "benchmarkId": "citation-lookup",
-  "datasetPath": "data/citation-lookup-statutes/dataset.jsonl",
-  "scorer": "citation-lookup"
+  "adapter": "trustfoundry-citation-lookup",
+  "benchmarkId": "trustfoundry-citation-lookup",
+  "datasetPath": "data/trustfoundry-citation-lookup/statutes/dataset.jsonl",
+  "scorer": "trustfoundry-citation-lookup"
 }

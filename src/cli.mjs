@@ -152,7 +152,7 @@ async function scoreCommand(options) {
   const providerResults = await readJsonl(
     path.join(resolvedRun, 'provider-results.jsonl')
   );
-  const scorerId = overrideScorerId ?? manifest.scorer?.id ?? 'search-recall';
+  const scorerId = overrideScorerId ?? manifest.scorer?.id ?? 'trustfoundry-legal-search';
   const scorerAdapter = defaultRegistry.scorers.get(scorerId);
   if (!scorerAdapter) throw new Error(`Unknown scorer '${scorerId}'`);
   const scorerConfig = overrideScorerConfigPath

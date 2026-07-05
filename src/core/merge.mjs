@@ -32,7 +32,7 @@ import {
 import { computeFingerprints } from './manifest.mjs';
 import { getAdapter } from './registry.mjs';
 
-const DEFAULT_SCORER_ID = 'search-recall';
+const DEFAULT_SCORER_ID = 'trustfoundry-legal-search';
 
 function nowCompact() {
   return new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');

@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { createReadStream, createWriteStream } from 'node:fs';
 import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { createInterface } from 'node:readline';
+import { StringDecoder } from 'node:string_decoder';
 
 export async function readJson(file) {
   return JSON.parse(await readFile(file, 'utf8'));
@@ -24,28 +24,58 @@ export async function readJsonl(file) {
 
 export async function writeJsonl(file, rows) {
   await ensureDir(path.dirname(file));
-  await writeFile(
-    file,
-    `${rows.map((row) => JSON.stringify(row)).join('\n')}\n`,
-    'utf8'
-  );
+  // Stream lines to disk one at a time so 5k+ row runs with rich provider
+  // responses don't materialize the full concatenated string in memory (V8
+  // caps individual strings at ~512MB).
+  const stream = createWriteStream(file, { encoding: 'utf8' });
+  try {
+    for (const row of rows) {
+      const line = `${JSON.stringify(row)}\n`;
+      if (!stream.write(line)) {
+        await new Promise((resolve) => stream.once('drain', resolve));
+      }
+    }
+  } finally {
+    await new Promise((resolve, reject) => {
+      stream.end((error) => (error ? reject(error) : resolve()));
+    });
+  }
 }
 
 // Streams JSON objects from a JSONL file one at a time. Use this instead of
 // readJsonl when row count is large enough that the full array would press on
 // the JS heap (5k+ rows with rich provider responses). Throws with file:line
 // context on malformed JSON.
+//
+// Uses a manual byte-chunk reader + StringDecoder rather than
+// readline.createInterface because Node's readline truncates individual
+// lines above ~64KB / with certain multi-byte chunk-boundary alignments,
+// which surfaces as spurious "Unterminated string" errors on ~100KB rows.
 export async function* readJsonlStream(file) {
-  const rl = createInterface({
-    input: createReadStream(file, { encoding: 'utf8' }),
-    crlfDelay: Infinity
-  });
+  const decoder = new StringDecoder('utf8');
+  const stream = createReadStream(file);
+  let buffer = '';
   let lineNumber = 0;
-  for await (const line of rl) {
+  for await (const chunk of stream) {
+    buffer += decoder.write(chunk);
+    let newlineIdx;
+    while ((newlineIdx = buffer.indexOf('\n')) !== -1) {
+      const line = buffer.slice(0, newlineIdx);
+      buffer = buffer.slice(newlineIdx + 1);
+      lineNumber += 1;
+      if (!line.trim()) continue;
+      try {
+        yield JSON.parse(line);
+      } catch (error) {
+        throw new Error(`Invalid JSONL at ${file}:${lineNumber}: ${error.message}`);
+      }
+    }
+  }
+  buffer += decoder.end();
+  if (buffer.trim()) {
     lineNumber += 1;
-    if (!line.trim()) continue;
     try {
-      yield JSON.parse(line);
+      yield JSON.parse(buffer);
     } catch (error) {
       throw new Error(`Invalid JSONL at ${file}:${lineNumber}: ${error.message}`);
     }

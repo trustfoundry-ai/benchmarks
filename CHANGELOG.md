@@ -6,20 +6,38 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ### Changed
 
-- **Config file layout restructured to group by suite.** Benchmark
-  configs move into per-suite subdirectories:
-  `configs/benchmarks/trustfoundry-legal-search/<variant>.json` and
-  `configs/benchmarks/trustfoundry-citation-lookup/<variant>.json`.
-  Provider configs rename from `trustfoundry-public-search*.json` to
-  `trustfoundry-{legal-search,citation-lookup}*.json`. Scorer configs
-  rename from `search-recall.json` / `citation-lookup.json` to
-  `trustfoundry-legal-search.json` / `trustfoundry-citation-lookup.json`
-  so all three config folders can be read by suite name. Historical
-  result bundles under `results/` are unchanged (their frozen
-  manifests reference the pre-rename paths and continue to verify
-  byte-for-byte). Callers who reference config paths directly need
-  the new locations; the `entrypoint.sh` `BENCHMARK_CONFIG` env var
-  now takes the subpath form (e.g. `trustfoundry-legal-search/case-questions-200`).
+- **Repository layout restructured to group by suite.** Every
+  suite-specific artifact now lives under a `trustfoundry-<suite>/`
+  path so `configs/`, `data/`, `src/adapters/`, `suites/`, and `test/`
+  all read the same way:
+  - `configs/benchmarks/trustfoundry-legal-search/<variant>.json` and
+    `configs/benchmarks/trustfoundry-citation-lookup/<variant>.json`.
+  - `configs/providers/trustfoundry-{legal-search,citation-lookup}.json`.
+  - `configs/scorers/trustfoundry-{legal-search,citation-lookup}.json`.
+  - `data/trustfoundry-legal-search/{case_questions,case_key_facts,laws,regs}.jsonl`
+    (renamed from `data/trustfoundry-legal-search-5k/`) and
+    `data/trustfoundry-citation-lookup/{cases,statutes,regulations,negatives}/dataset.jsonl`.
+  - `suites/trustfoundry-{legal-search,citation-lookup}/README.md`.
+  - `test/adapters/{benchmarks,providers,scorers}/*.test.mjs` mirrors
+    the `src/` layout; framework tests stay flat at `test/` root.
+  - `entrypoint.sh` `BENCHMARK_CONFIG` env var takes the subpath form
+    (e.g. `trustfoundry-legal-search/case-questions-200`).
+- **Adapter renames** (file + id):
+  - Provider `trustfoundry-public-search` → `trustfoundry-legal-search`.
+  - Scorer `search-recall` → `trustfoundry-legal-search`.
+  - Scorer `citation-lookup` → `trustfoundry-citation-lookup`.
+  - Benchmark `citation-lookup` → `trustfoundry-citation-lookup`.
+- **Published result bundles regenerated** against the renamed
+  adapters so every `manifest.json` and `result.json` under `results/`
+  references the new adapter ids. Bundle SHAs, `checksums.txt`, and
+  the surface metrics in `result.json` all reflect the fresh
+  2026-07-05 runs against the same live public search API.
+- Dropped `configs/benchmarks/trustfoundry-legal-search/case-questions-20.json`
+  — a 200-row config is fast enough for smoke and keeps the config
+  set tighter.
+- Dropped `configs/providers/trustfoundry-citation-lookup-local.json`
+  — was an internal-only localhost variant that shouldn't have shipped
+  publicly.
 
 ### Documentation
 
@@ -29,7 +47,7 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 - `README.md` gains a pre-1.0 status banner and a per-suite status
   table so readers can see at a glance which suites have published
   evaluation numbers (`trustfoundry-legal-search`) vs. which are in
-  development (`citation-lookup`). `docs/adapter-contracts.md` gains a
+  development (`trustfoundry-citation-lookup`). `docs/adapter-contracts.md` gains a
   matching pre-1.0 notice about contract stability.
 
 ### Governance
@@ -212,13 +230,13 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ### Added
 
-- **New suite: `citation-lookup`.** Four public datasets under
+- **New suite: `trustfoundry-citation-lookup`.** Four public datasets under
   `data/citation-lookup-{cases,statutes,regulations,negatives}/` totaling
   4,618 rows. Measures rank-1 citation-lookup accuracy on clean, sloppy,
   and reporter-variation citation surfaces (positives) plus false-positive
   rate on held-out non-citation strings (negatives). New benchmark loader
-  (`src/adapters/benchmarks/citation-lookup.mjs`) and per-benchmark scorer
-  (`src/adapters/scorers/citation-lookup.mjs`) with citation-first matching
+  (`src/adapters/benchmarks/trustfoundry-citation-lookup.mjs`) and per-benchmark scorer
+  (`src/adapters/scorers/trustfoundry-citation-lookup.mjs`) with citation-first matching
   and a generic native-`cluster_id` fallback. Five benchmark configs plus
   a scorer config live under `configs/`. See
   [`suites/citation-lookup/README.md`](suites/citation-lookup/README.md).
@@ -236,17 +254,17 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 - **Runner**: scorer selection is now dynamic. The scorer id is read from
   the benchmark config's `scorer` field (or the scorer config's `id`
-  field), defaulting to `search-recall` when both are omitted. The cutoffs
+  field), defaulting to `trustfoundry-legal-search` when both are omitted. The cutoffs
   validator now consults the selected scorer's exported
   `SUPPORTED_CUTOFFS` / `SUPPORTED_HEADLINE_CUTOFF`, so scorers with
-  different K values (e.g. `citation-lookup` with headline `hit@1`) can
+  different K values (e.g. `trustfoundry-citation-lookup` with headline `hit@1`) can
   register without a runner change. Existing configs and result bundles
   continue to work unchanged.
 - **Artifacts**: `publishResultBundle` and `verifyResultBundle` also read
   the scorer id dynamically (from `manifest.scorer.id` and
   `result.run.scorer.id` respectively). Existing bundles without those
-  fields fall back to `search-recall` and continue to verify.
-- **Scorer** (`search-recall`): matches native IDs first (`document_uuid`,
+  fields fall back to `trustfoundry-legal-search` and continue to verify.
+- **Scorer** (`trustfoundry-legal-search`): matches native IDs first (`document_uuid`,
   then `cluster_id`), falls back to citation matching. The hit@K math
   is unchanged — any match at rank K still counts — but the code path
   makes the priority explicit and immune to citation-normalization drift.
@@ -259,7 +277,7 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 - **Result envelope** (`trustfoundry.benchmarks.result.v1`): additively
   records `run.scorer` so `verify-result` can pick the correct scorer
   when recomputing summaries. Existing bundles without `run.scorer` fall
-  back to `search-recall`.
+  back to `trustfoundry-legal-search`.
 
 ### Notes for auditors and downstream consumers
 
@@ -277,7 +295,7 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
   (unchanged) and do not populate a `cluster_id` on returned rows. The
   new `cl_cluster_id` field is consulted only when a result exposes one.
 - The manifest `scorer.id` string was already recorded on every existing
-  bundle as `"search-recall"`; the runner and artifacts pipeline changes
+  bundle as `"trustfoundry-legal-search"`; the runner and artifacts pipeline changes
   keep writing that value for legal-search runs. Only new suites with a
   different `scorer` field in their benchmark config will produce
   bundles with a different `scorer.id`.
