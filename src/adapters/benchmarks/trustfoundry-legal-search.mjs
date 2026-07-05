@@ -4,7 +4,7 @@ import path from 'node:path';
 import { readJsonl } from '../../core/fs.mjs';
 import { applyQueryTransform } from '../../core/query-transforms.mjs';
 
-const DEFAULT_DATA_DIR = 'data/trustfoundry-legal-search-5k';
+const DEFAULT_DATA_DIR = 'data/trustfoundry-legal-search';
 const DEFAULT_FILES = [
   'case_questions.jsonl',
   'case_key_facts.jsonl',
@@ -147,10 +147,11 @@ function buildCase(row, { datasetName, index, datasetSize, queryTransformId }) {
       expected: {
         kind: 'exact',
         canonical_citation: canonical,
-        alternates
+        alternates,
+        cl_cluster_id: expected.cl_cluster_id ?? null
       }
     },
-    scoringHints: { kind: 'search-recall', outputMode: 'json' }
+    scoringHints: { kind: 'trustfoundry-legal-search', outputMode: 'json' }
   };
 }
 
@@ -223,7 +224,10 @@ export const trustfoundryLegalSearchBenchmarkAdapter = {
     }
     const selected = allCases.filter((benchmarkCase) => includeCase(benchmarkCase, filters));
     const limit = Number.isInteger(config.limit) ? config.limit : null;
-    const cases = limit === null ? selected : selected.slice(0, limit);
+    const offset = Number.isInteger(config.offset) && config.offset > 0 ? config.offset : 0;
+    const cases = limit === null
+      ? selected.slice(offset)
+      : selected.slice(offset, offset + limit);
 
     return {
       benchmark: {

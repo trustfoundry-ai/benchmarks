@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TrustFoundry Benchmarks — artifact schemas",
+  "description": "JSON Schema definitions for the four versioned artifacts emitted by every run. See ./README.md for versioning policy.",
+  "$defs": {
+    "run.v1": {
+      "type": "object",
+      "$comment": "trustfoundry.benchmarks.run.v1 — the run manifest written to manifest.json at run start and updated at run end.",
+      "required": ["schema_version", "runId", "harness", "benchmark", "provider", "scorer", "startedAt"],
+      "properties": {
+        "schema_version": { "const": "trustfoundry.benchmarks.run.v1" },
+        "runId": { "type": "string" },
+        "run_id": { "type": "string" },
+        "harness": {
+          "type": "object",
+          "required": ["name"],
+          "properties": {
+            "name": { "type": "string" },
+            "commit": { "type": ["string", "null"] },
+            "packageVersion": { "type": ["string", "null"] },
+            "originUrl": { "type": ["string", "null"] }
+          }
+        },
+        "benchmark": {
+          "type": "object",
+          "required": ["id", "version", "configPath", "configSha256", "sourceRoot"],
+          "properties": {
+            "id": { "type": "string" },
+            "version": { "type": "string" },
+            "configPath": { "type": "string" },
+            "configSha256": { "type": "string" },
+            "sourceRoot": { "type": "string" },
+            "sourceFiles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["path", "sha256"],
+                "properties": {
+                  "path": { "type": "string" },
+                  "sha256": { "type": "string" }
+                }
+              }
+            },
+            "datasetSize": { "type": ["string", "null"] },
+            "datasetNames": { "type": ["array", "null"], "items": { "type": "string" } },
+            "splits": { "type": ["array", "null"], "items": { "type": "string" } },
+            "queryTransformId": { "type": ["string", "null"] }
+          }
+        },
+        "provider": {
+          "type": "object",
+          "required": ["id", "version", "configPath", "configSha256"],
+          "properties": {
+            "id": { "type": "string" },
+            "version": { "type": "string" },
+            "configPath": { "type": "string" },
+            "configSha256": { "type": "string" }
+          },
+          "additionalProperties": true
+        },
+        "scorer": {
+          "type": "object",
+          "required": ["id", "configPath", "configSha256"],
+          "properties": {
+            "id": { "type": "string" },
+            "configPath": { "type": "string" },
+            "configSha256": { "type": "string" }
+          }
+        },
+        "scheduler": {
+          "type": "object",
+          "properties": {
+            "parallel": { "type": "integer" },
+            "caseCount": { "type": "integer" }
+          }
+        },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "completedAt": { "type": ["string", "null"], "format": "date-time" },
+        "providerFailures": { "type": ["integer", "null"] }
+      }
+    },
+    "raw-row.v1": {
+      "type": "object",
+      "$comment": "trustfoundry.benchmarks.raw-row.v1 — one line of raw.jsonl. Additive fields carry benchmark-specific stratifications without a schema bump.",
+      "required": ["schema_version", "case_id", "prompt", "metadata", "expected", "response", "timing", "score"],
+      "properties": {
+        "schema_version": { "const": "trustfoundry.benchmarks.raw-row.v1" },
+        "case_id": { "type": "string" },
+        "benchmark_id": { "type": ["string", "null"] },
+        "row_index": { "type": ["integer", "null"] },
+        "split": { "type": ["string", "null"] },
+        "dataset_name": { "type": ["string", "null"] },
+        "prompt": { "type": "string" },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "doc_type": { "type": ["string", "null"] },
+            "field": { "type": ["string", "null"] },
+            "model_type": { "type": ["string", "null"] },
+            "datasource_id": { "type": ["string", "null"] },
+            "authority_identifier": { "type": ["string", "null"] },
+            "jurisdiction_id": { "type": ["string", "null"] },
+            "document_type": { "type": ["string", "null"] },
+            "difficulty": { "type": ["string", "null"] },
+            "kind": { "type": ["string", "null"] },
+            "negative_category": { "type": ["string", "null"] },
+            "geo_level_2": { "type": ["string", "null"] }
+          },
+          "additionalProperties": true
+        },
+        "expected": {
+          "type": "object",
+          "properties": {
+            "document_uuid": { "type": ["string", "null"] },
+            "canonical_citation": { "type": ["string", "null"] },
+            "alternates": { "type": "array", "items": { "type": "string" } },
+            "cl_cluster_id": {
+              "type": ["string", "null"],
+              "$comment": "CourtListener opinion-cluster identifier, populated from CourtListener bulk data. Preserved verbatim so consumers with CL-mapped internal ID spaces can join against it."
+            },
+            "document_title": { "type": ["string", "null"] },
+            "state": { "type": ["string", "null"] },
+            "kind": { "type": ["string", "null"] },
+            "negative_category": { "type": ["string", "null"] }
+          },
+          "additionalProperties": true
+        },
+        "request": { "type": ["object", "null"] },
+        "response": {
+          "type": "object",
+          "properties": {
+            "provider_status": { "type": "string" },
+            "http_status": { "type": ["integer", "null"] },
+            "error": { "type": ["object", "null"] },
+            "result_count": { "type": "integer" },
+            "total_available": { "type": ["integer", "null"] },
+            "set_uuid": { "type": ["string", "null"] },
+            "results": { "type": "array" }
+          }
+        },
+        "timing": {
+          "type": "object",
+          "properties": {
+            "duration_ms": { "type": ["number", "null"] },
+            "ttfb_ms": { "type": ["number", "null"] },
+            "stream_duration_ms": { "type": ["number", "null"] },
+            "server_response_duration_ms": { "type": ["number", "null"] },
+            "started_at": { "type": ["string", "null"] },
+            "completed_at": { "type": ["string", "null"] }
+          }
+        },
+        "token_usage": { "type": ["object", "null"] },
+        "score": {
+          "type": "object",
+          "properties": {
+            "status": { "type": ["string", "null"] },
+            "hit_rank": { "type": ["integer", "null"] },
+            "hit_at_1": { "type": "boolean" },
+            "hit_at_5": { "type": "boolean" },
+            "hit_at_10": { "type": "boolean" },
+            "hit_at_25": { "type": "boolean" },
+            "reciprocal_rank": { "type": "number" }
+          }
+        }
+      }
+    },
+    "result.v1": {
+      "type": "object",
+      "$comment": "trustfoundry.benchmarks.result.v1 — the scored result envelope written after all cases score.",
+      "required": ["schema_version", "scorerId", "status", "caseScores", "summary", "metadata"],
+      "properties": {
+        "schema_version": { "const": "trustfoundry.benchmarks.result.v1" },
+        "scorerId": { "type": "string" },
+        "status": { "type": "string" },
+        "caseScores": { "type": "array" },
+        "taskScores": { "type": "array" },
+        "summary": { "type": "object" },
+        "metadata": {
+          "type": "object",
+          "required": ["scorer", "version"],
+          "properties": {
+            "scorer": { "type": "string" },
+            "version": { "type": "string" },
+            "cutoffs": { "type": ["array", "null"], "items": { "type": "integer" } },
+            "headline_cutoff": { "type": ["integer", "null"] }
+          },
+          "additionalProperties": true
+        },
+        "run": { "type": ["object", "null"] }
+      }
+    },
+    "result-manifest.v1": {
+      "type": "object",
+      "$comment": "trustfoundry.benchmarks.result-manifest.v1 — bundle manifest written by publishResultBundle.",
+      "required": ["schema_version", "bundleId", "createdAt", "artifacts"],
+      "properties": {
+        "schema_version": { "const": "trustfoundry.benchmarks.result-manifest.v1" },
+        "bundleId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "harness": { "type": ["object", "null"] },
+        "benchmark": { "type": ["object", "null"] },
+        "provider": { "type": ["object", "null"] },
+        "scorer": { "type": ["object", "null"] },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "sha256"],
+            "properties": {
+              "name": { "type": "string" },
+              "sha256": { "type": "string" },
+              "size": { "type": ["integer", "null"] }
+            }
+          }
+        }
+      }
+    }
+  }
+}
