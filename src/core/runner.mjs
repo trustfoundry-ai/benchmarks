@@ -29,9 +29,9 @@ import {
   SUPPORTED_HEADLINE_CUTOFF as SEARCH_RECALL_SUPPORTED_HEADLINE_CUTOFF
 } from '../adapters/scorers/search-recall.mjs';
 
-const DEFAULT_BENCHMARK_CONFIG = 'configs/benchmarks/trustfoundry-legal-search-case-questions-200.json';
-const DEFAULT_PROVIDER_CONFIG = 'configs/providers/trustfoundry-public-search.json';
-const DEFAULT_SCORER_CONFIG = 'configs/scorers/search-recall.json';
+const DEFAULT_BENCHMARK_CONFIG = 'configs/benchmarks/trustfoundry-legal-search/case-questions-200.json';
+const DEFAULT_PROVIDER_CONFIG = 'configs/providers/trustfoundry-legal-search.json';
+const DEFAULT_SCORER_CONFIG = 'configs/scorers/trustfoundry-legal-search.json';
 const DEFAULT_BENCHMARK_ADAPTER = 'trustfoundry-legal-search';
 const DEFAULT_SCORER_ID = 'search-recall';
 

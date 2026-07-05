@@ -4,10 +4,10 @@
 #
 # Inputs (all via env):
 #   TF_API_KEY         required — TrustFoundry public-search API key
-#   BENCHMARK_CONFIG   optional — a config name from configs/benchmarks/
-#                                 (filename without .json), or one of the
+#   BENCHMARK_CONFIG   optional — a config path from configs/benchmarks/
+#                                 (relative path without .json), or one of the
 #                                 convenience aliases below.
-#                                 (default: trustfoundry-legal-search-case-questions-5k)
+#                                 (default: trustfoundry-legal-search/case-questions-5k)
 #                                 Aliases:
 #                                   all-200 — run every *-200 config in sequence
 #                                   all-5k  — run every *-5k config in sequence
@@ -29,7 +29,7 @@
 set -euo pipefail
 
 : "${TF_API_KEY:?TF_API_KEY is required}"
-: "${BENCHMARK_CONFIG:=trustfoundry-legal-search-case-questions-5k}"
+: "${BENCHMARK_CONFIG:=trustfoundry-legal-search/case-questions-5k}"
 : "${RUN_LABEL:=manual}"
 : "${OUTPUT_BUNDLE_URI:=}"
 : "${HARNESS_COMMIT_SHA:=unknown}"
@@ -41,20 +41,20 @@ DATE=$(date -u +%Y-%m-%d)
 # Benchmark family hardcoded for this suite. Future suites (legal-judgment,
 # etc.) ship as separate Dockerfiles + entrypoints with their own family.
 BENCHMARK_FAMILY=trustfoundry-legal-search
-PROVIDER_CFG=configs/providers/trustfoundry-public-search.json
+PROVIDER_CFG=configs/providers/trustfoundry-legal-search.json
 
 # Canonical list of configs this suite knows how to run. Drives validation
 # and the all-200 / all-5k aliases. Keep in sync with the GHA dropdown in
 # Trust-Foundry/benchmarks-lab/.github/workflows/tf-legal-search-run.yml.
 ALL_CONFIGS=(
-  trustfoundry-legal-search-case-questions-200
-  trustfoundry-legal-search-case-questions-5k
-  trustfoundry-legal-search-key-facts-200
-  trustfoundry-legal-search-key-facts-5k
-  trustfoundry-legal-search-laws-200
-  trustfoundry-legal-search-laws-5k
-  trustfoundry-legal-search-regs-200
-  trustfoundry-legal-search-regs-5k
+  trustfoundry-legal-search/case-questions-200
+  trustfoundry-legal-search/case-questions-5k
+  trustfoundry-legal-search/key-facts-200
+  trustfoundry-legal-search/key-facts-5k
+  trustfoundry-legal-search/laws-200
+  trustfoundry-legal-search/laws-5k
+  trustfoundry-legal-search/regs-200
+  trustfoundry-legal-search/regs-5k
 )
 
 declare -a CONFIGS_TO_RUN=()
@@ -124,19 +124,24 @@ for cfg in "${CONFIGS_TO_RUN[@]}"; do
     exit 2
   fi
 
-  # Pattern: trustfoundry-legal-search-<model-type>-<size>
-  # where size is "200" or "5k". Suite = config minus the size suffix.
-  if [[ "$cfg" =~ ^(trustfoundry-legal-search-(.+))-(200|5k)$ ]]; then
-    suite="${BASH_REMATCH[1]}"
-    model_type="${BASH_REMATCH[2]}"
-    size="${BASH_REMATCH[3]}"
+  # Pattern: trustfoundry-legal-search/<model-type>-<size>
+  # where size is "200" or "5k". The `results/` directory keeps the
+  # legacy flat layout (`trustfoundry-legal-search-<model-type>/`) so
+  # new bundles land next to the historical ones.
+  if [[ "$cfg" =~ ^trustfoundry-legal-search/(.+)-(200|5k)$ ]]; then
+    model_type="${BASH_REMATCH[1]}"
+    size="${BASH_REMATCH[2]}"
+    suite="trustfoundry-legal-search-${model_type}"
   else
-    echo "Cannot parse config name '$cfg' (expected trustfoundry-legal-search-<model-type>-<size>)" >&2
+    echo "Cannot parse config name '$cfg' (expected trustfoundry-legal-search/<model-type>-<size>)" >&2
     exit 2
   fi
 
   run_id="${DATE}-production-${RUN_LABEL}-c${PARALLEL_C}-${size}"
-  run_dir="runs/${cfg}"
+  # runs/ subdirectory is flat; strip the suite prefix from the config
+  # path so a run dir doesn't have two path segments.
+  run_leaf="${cfg#trustfoundry-legal-search/}"
+  run_dir="runs/trustfoundry-legal-search-${run_leaf}"
   bundle_dir="results/${suite}/trustfoundry-public-search/${run_id}"
 
   echo

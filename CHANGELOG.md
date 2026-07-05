@@ -4,6 +4,23 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+### Changed
+
+- **Config file layout restructured to group by suite.** Benchmark
+  configs move into per-suite subdirectories:
+  `configs/benchmarks/trustfoundry-legal-search/<variant>.json` and
+  `configs/benchmarks/trustfoundry-citation-lookup/<variant>.json`.
+  Provider configs rename from `trustfoundry-public-search*.json` to
+  `trustfoundry-{legal-search,citation-lookup}*.json`. Scorer configs
+  rename from `search-recall.json` / `citation-lookup.json` to
+  `trustfoundry-legal-search.json` / `trustfoundry-citation-lookup.json`
+  so all three config folders can be read by suite name. Historical
+  result bundles under `results/` are unchanged (their frozen
+  manifests reference the pre-rename paths and continue to verify
+  byte-for-byte). Callers who reference config paths directly need
+  the new locations; the `entrypoint.sh` `BENCHMARK_CONFIG` env var
+  now takes the subpath form (e.g. `trustfoundry-legal-search/case-questions-200`).
+
 ### Documentation
 
 - New `docs/adapter-contracts.md` — long-form guide to the three

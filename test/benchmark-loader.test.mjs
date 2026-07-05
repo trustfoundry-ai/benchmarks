@@ -5,7 +5,7 @@ import { readJson } from '../src/core/fs.mjs';
 import { trustfoundryLegalSearchBenchmarkAdapter } from '../src/adapters/benchmarks/trustfoundry-legal-search.mjs';
 
 test('loads the first 200 legal-search case-question rows deterministically', async () => {
-  const config = await readJson('configs/benchmarks/trustfoundry-legal-search-case-questions-200.json');
+  const config = await readJson('configs/benchmarks/trustfoundry-legal-search/case-questions-200.json');
   const loaded = await trustfoundryLegalSearchBenchmarkAdapter.loadCases({
     config,
     repoRoot: process.cwd()

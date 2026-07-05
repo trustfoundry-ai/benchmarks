@@ -13,7 +13,7 @@ async function load(configPath) {
 }
 
 test('loads the first 200 key-fact rows deterministically', async () => {
-  const loaded = await load('configs/benchmarks/trustfoundry-legal-search-key-facts-200.json');
+  const loaded = await load('configs/benchmarks/trustfoundry-legal-search/key-facts-200.json');
   assert.equal(loaded.cases.length, 200);
   assert.equal(loaded.benchmark.id, 'trustfoundry-legal-search');
   assert.equal(loaded.cases[0].caseId, 'synthetic-search-recall:case_key_facts:test:77159fbcef36');
@@ -30,7 +30,7 @@ test('loads the first 200 key-fact rows deterministically', async () => {
 });
 
 test('case-question rows carry a cl_cluster_id in expected', async () => {
-  const loaded = await load('configs/benchmarks/trustfoundry-legal-search-case-questions-200.json');
+  const loaded = await load('configs/benchmarks/trustfoundry-legal-search/case-questions-200.json');
   const first = loaded.cases[0];
   // Locked-in value verified against the enriched dataset for this case;
   // see CHANGELOG for enrichment provenance.
@@ -43,12 +43,12 @@ test('case-question rows carry a cl_cluster_id in expected', async () => {
 });
 
 test('laws/regs rows have null cl_cluster_id (they aren\'t case-law)', async () => {
-  const loaded = await load('configs/benchmarks/trustfoundry-legal-search-laws-200.json');
+  const loaded = await load('configs/benchmarks/trustfoundry-legal-search/laws-200.json');
   assert.equal(loaded.cases[0].metadata.expected.cl_cluster_id, null);
 });
 
 test('loads law rows with law model metadata', async () => {
-  const loaded = await load('configs/benchmarks/trustfoundry-legal-search-laws-200.json');
+  const loaded = await load('configs/benchmarks/trustfoundry-legal-search/laws-200.json');
   assert.equal(loaded.cases.length, 200);
   assert.equal(loaded.cases[0].caseId, 'synthetic-search-recall:laws:test:bac913255273');
   assert.equal(loaded.cases[0].metadata.document_uuid, '3007f525-9be6-fd4a-bd10-6e134719503a');
@@ -59,7 +59,7 @@ test('loads law rows with law model metadata', async () => {
 });
 
 test('loads regulation rows with regulation model metadata', async () => {
-  const loaded = await load('configs/benchmarks/trustfoundry-legal-search-regs-200.json');
+  const loaded = await load('configs/benchmarks/trustfoundry-legal-search/regs-200.json');
   assert.equal(loaded.cases.length, 200);
   assert.equal(loaded.cases[0].caseId, 'synthetic-search-recall:regs:test:7f343deabf23');
   assert.equal(loaded.cases[0].metadata.document_uuid, '9cee5479-ca39-796b-50c6-ac72f921e8c4');
@@ -71,9 +71,9 @@ test('loads regulation rows with regulation model metadata', async () => {
 
 test('legal search full datasets contain 5000 non-empty prompts each', async () => {
   for (const config of [
-    'configs/benchmarks/trustfoundry-legal-search-key-facts-5k.json',
-    'configs/benchmarks/trustfoundry-legal-search-laws-5k.json',
-    'configs/benchmarks/trustfoundry-legal-search-regs-5k.json'
+    'configs/benchmarks/trustfoundry-legal-search/key-facts-5k.json',
+    'configs/benchmarks/trustfoundry-legal-search/laws-5k.json',
+    'configs/benchmarks/trustfoundry-legal-search/regs-5k.json'
   ]) {
     const loaded = await load(config);
     assert.equal(loaded.cases.length, 5000, config);

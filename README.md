@@ -127,7 +127,7 @@ Run a 200-row case-questions smoke locally (results stay inside the container; c
 ```bash
 docker run --rm \
   -e TF_API_KEY=$TF_API_KEY \
-  -e BENCHMARK_CONFIG=trustfoundry-legal-search-case-questions-200 \
+  -e BENCHMARK_CONFIG=trustfoundry-legal-search/case-questions-200 \
   ttf-benchmarks
 ```
 
@@ -145,14 +145,14 @@ docker run --rm \
 # Local filesystem (bind-mount the destination)
 docker run --rm \
   -e TF_API_KEY=$TF_API_KEY \
-  -e BENCHMARK_CONFIG=trustfoundry-legal-search-laws-5k \
+  -e BENCHMARK_CONFIG=trustfoundry-legal-search/laws-5k \
   -e OUTPUT_BUNDLE_URI=file:///out \
   -v $PWD/out:/out \
   ttf-benchmarks
 ```
 
 The entrypoint reads:
-- `BENCHMARK_CONFIG` — a config filename in `configs/benchmarks/` without the `.json` extension (e.g. `trustfoundry-legal-search-key-facts-5k`), or one of the convenience aliases `all-200` / `all-5k` which expand to every matching config in sequence. Default: `trustfoundry-legal-search-case-questions-5k`.
+- `BENCHMARK_CONFIG` — a config path under `configs/benchmarks/` without the `.json` extension (e.g. `trustfoundry-legal-search/key-facts-5k`), or one of the convenience aliases `all-200` / `all-5k` which expand to every matching config in sequence. Default: `trustfoundry-legal-search/case-questions-5k`.
 - `RUN_LABEL` — short tag baked into the run ID. Default `manual`.
 - `OUTPUT_BUNDLE_URI` — if unset, bundles stay on the container filesystem only. Supported schemes: `gs://` (via the bundled `gcloud` SDK), `file://` or an absolute path (local `cp`). To add another cloud, extend the `upload_bundle` dispatch in `entrypoint.sh`.
 

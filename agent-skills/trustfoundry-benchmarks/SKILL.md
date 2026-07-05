@@ -11,14 +11,14 @@ Use this skill when a user wants to run or inspect the public TrustFoundry bench
 
 ```bash
 pnpm benchmark run \
-  --benchmark-config configs/benchmarks/trustfoundry-legal-search-case-questions-200.json \
-  --provider-config configs/providers/trustfoundry-public-search.json \
+  --benchmark-config configs/benchmarks/trustfoundry-legal-search/case-questions-200.json \
+  --provider-config configs/providers/trustfoundry-legal-search.json \
   --out runs/trustfoundry-legal-search-case-questions-200 \
   --parallel 8 \
   --force
 ```
 
-5. For the full case-question suite, switch the benchmark config to `configs/benchmarks/trustfoundry-legal-search-case-questions-5k.json` and write to `runs/trustfoundry-legal-search-case-questions-5k`. For other targets, use the matching `key-facts`, `laws`, or `regs` config.
+5. For the full case-question suite, switch the benchmark config to `configs/benchmarks/trustfoundry-legal-search/case-questions-5k.json` and write to `runs/trustfoundry-legal-search-case-questions-5k`. For other targets, use the matching `key-facts`, `laws`, or `regs` config.
 6. To package results:
 
 ```bash

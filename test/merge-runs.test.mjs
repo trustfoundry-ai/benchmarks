@@ -76,12 +76,12 @@ function makeManifest({ benchmarkSha, providerSha, scorerSha, caseCount, started
     },
     provider: {
       id: 'trustfoundry-public-search',
-      configPath: 'configs/providers/trustfoundry-public-search.json',
+      configPath: 'configs/providers/trustfoundry-legal-search.json',
       configSha256: providerSha
     },
     scorer: {
       id: 'search-recall',
-      configPath: 'configs/scorers/search-recall.json',
+      configPath: 'configs/scorers/trustfoundry-legal-search.json',
       configSha256: scorerSha
     },
     scheduler: { parallel: 1, caseCount },

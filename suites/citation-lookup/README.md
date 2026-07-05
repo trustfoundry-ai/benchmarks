@@ -30,12 +30,12 @@ The suite has four datasets. Each row is a single-line JSON object; see [Row sch
 
 | Kind | Config | Rows | Description |
 | --- | --- | --- | --- |
-| `citation-lookup-cases` | [`citation-lookup-cases.json`](../../configs/benchmarks/citation-lookup-cases.json) | 3,152 | Case-law citations. 688 clean bluebook canonicals + 2,064 sloppy per-canonical variants + 400 reporter-alias variation surfaces. Covers 400 unique reporters. |
-| `citation-lookup-statutes` | [`citation-lookup-statutes.json`](../../configs/benchmarks/citation-lookup-statutes.json) | 756 | State + federal statute citations across 68 jurisdictions/authorities. |
-| `citation-lookup-regulations` | [`citation-lookup-regulations.json`](../../configs/benchmarks/citation-lookup-regulations.json) | 660 | State administrative codes + C.F.R. across 58 authorities. |
-| `citation-lookup-negatives` | [`citation-lookup-negatives.json`](../../configs/benchmarks/citation-lookup-negatives.json) | 50 | Held-out non-citation strings across 11 categories (bare dates, incomplete references, decontextualized volume numbers, etc.). The correct behavior is to return zero results. |
+| `citation-lookup-cases` | [`citation-lookup-cases.json`](../../configs/benchmarks/trustfoundry-citation-lookup/cases.json) | 3,152 | Case-law citations. 688 clean bluebook canonicals + 2,064 sloppy per-canonical variants + 400 reporter-alias variation surfaces. Covers 400 unique reporters. |
+| `citation-lookup-statutes` | [`citation-lookup-statutes.json`](../../configs/benchmarks/trustfoundry-citation-lookup/statutes.json) | 756 | State + federal statute citations across 68 jurisdictions/authorities. |
+| `citation-lookup-regulations` | [`citation-lookup-regulations.json`](../../configs/benchmarks/trustfoundry-citation-lookup/regulations.json) | 660 | State administrative codes + C.F.R. across 58 authorities. |
+| `citation-lookup-negatives` | [`citation-lookup-negatives.json`](../../configs/benchmarks/trustfoundry-citation-lookup/negatives.json) | 50 | Held-out non-citation strings across 11 categories (bare dates, incomplete references, decontextualized volume numbers, etc.). The correct behavior is to return zero results. |
 
-A combined config, [`citation-lookup-all.json`](../../configs/benchmarks/citation-lookup-all.json), loads all four datasets at once (4,618 rows total).
+A combined config, [`all.json`](../../configs/benchmarks/trustfoundry-citation-lookup/all.json), loads all four datasets at once (4,618 rows total).
 
 **Difficulty tiers.** Positive rows carry an `expected.difficulty` label:
 
@@ -47,7 +47,7 @@ A combined config, [`citation-lookup-all.json`](../../configs/benchmarks/citatio
 
 ## Providers
 
-- **[`trustfoundry-public-search`](../../configs/providers/trustfoundry-public-search.json)** — supported for all four datasets. The provider config omits `model_type` so each row's `model_type: 'citation_search'` (set by the benchmark loader) flows through unchanged.
+- **[`trustfoundry-citation-lookup`](../../configs/providers/trustfoundry-citation-lookup.json)** — provider config for all four datasets. Omits `model_type` so each row's `model_type: 'citation_search'` (set by the benchmark loader) flows through unchanged, and disables the state filter because citations are jurisdictionally unambiguous.
 
 Additional adapters can be registered by dropping a module under `src/adapters/providers/` and referencing it in a provider config's `"provider"` field. Adapters that populate a top-level `cluster_id` on their result rows can be scored against `expected.cl_cluster_id` when the dataset supplies one (see [Metrics](#metrics)).
 
@@ -59,9 +59,9 @@ Cases dataset, first 50 rows (smoke):
 
 ```bash
 pnpm benchmark run \
-  --benchmark-config configs/benchmarks/citation-lookup-cases.json \
-  --provider-config configs/providers/trustfoundry-public-search.json \
-  --scorer-config configs/scorers/citation-lookup.json \
+  --benchmark-config configs/benchmarks/trustfoundry-citation-lookup/cases.json \
+  --provider-config configs/providers/trustfoundry-citation-lookup.json \
+  --scorer-config configs/scorers/trustfoundry-citation-lookup.json \
   --out runs/citation-lookup-cases-smoke \
   --limit 50 --parallel 4 --force
 ```
@@ -70,9 +70,9 @@ Full 3,152-row cases run:
 
 ```bash
 pnpm benchmark run \
-  --benchmark-config configs/benchmarks/citation-lookup-cases.json \
-  --provider-config configs/providers/trustfoundry-public-search.json \
-  --scorer-config configs/scorers/citation-lookup.json \
+  --benchmark-config configs/benchmarks/trustfoundry-citation-lookup/cases.json \
+  --provider-config configs/providers/trustfoundry-citation-lookup.json \
+  --scorer-config configs/scorers/trustfoundry-citation-lookup.json \
   --out runs/citation-lookup-cases \
   --parallel 8 --force
 ```
@@ -125,7 +125,7 @@ Each line in a dataset JSONL file is one JSON object. The main fields are:
 
 ## Request limit and scorer cutoffs
 
-Both knobs live in one place: [`configs/scorers/citation-lookup.json`](../../configs/scorers/citation-lookup.json).
+Both knobs live in one place: [`configs/scorers/trustfoundry-citation-lookup.json`](../../configs/scorers/trustfoundry-citation-lookup.json).
 
 | Field | Purpose |
 | --- | --- |

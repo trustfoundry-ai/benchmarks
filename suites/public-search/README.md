@@ -32,22 +32,22 @@ All targets use the same public search endpoint and `search-recall` scorer.
 
 - `case_question` - Case questions
   - Data: [`case_questions.jsonl`](../../data/trustfoundry-legal-search-5k/case_questions.jsonl)
-  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search-case-questions-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search-case-questions-5k.json)
+  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search/case-questions-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search/case-questions-5k.json)
   - Published bundles: [`200`](../../results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-200-case-question/), [`5k`](../../results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-5k-case-question/)
 - `case_key_fact` - Case key facts
   - Data: [`case_key_facts.jsonl`](../../data/trustfoundry-legal-search-5k/case_key_facts.jsonl)
-  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search-key-facts-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search-key-facts-5k.json)
+  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search/key-facts-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search/key-facts-5k.json)
   - Published bundles: [`200`](../../results/trustfoundry-legal-search-key-facts/trustfoundry-public-search/2026-06-29-production-200-case-key-fact/), [`5k`](../../results/trustfoundry-legal-search-key-facts/trustfoundry-public-search/2026-06-29-production-5k-case-key-fact/)
 - `law_question` - Law questions
   - Data: [`laws.jsonl`](../../data/trustfoundry-legal-search-5k/laws.jsonl)
-  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search-laws-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search-laws-5k.json)
+  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search/laws-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search/laws-5k.json)
   - Published bundles: [`200`](../../results/trustfoundry-legal-search-laws/trustfoundry-public-search/2026-06-29-production-200-law-question/), [`5k`](../../results/trustfoundry-legal-search-laws/trustfoundry-public-search/2026-06-29-production-5k-law-question/)
 - `reg_question` - Regulation questions
   - Data: [`regs.jsonl`](../../data/trustfoundry-legal-search-5k/regs.jsonl)
-  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search-regs-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search-regs-5k.json)
+  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search/regs-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search/regs-5k.json)
   - Published bundles: [`200`](../../results/trustfoundry-legal-search-regs/trustfoundry-public-search/2026-06-29-production-200-reg-question/), [`5k`](../../results/trustfoundry-legal-search-regs/trustfoundry-public-search/2026-06-29-production-5k-reg-question/)
 
-The generic provider config [`trustfoundry-public-search.json`](../../configs/providers/trustfoundry-public-search.json) omits `model_type` and sends each row's `model_type`, so the same provider config works for all four targets.
+The generic provider config [`trustfoundry-public-search.json`](../../configs/providers/trustfoundry-legal-search.json) omits `model_type` and sends each row's `model_type`, so the same provider config works for all four targets.
 
 ### Test Data Schema
 
@@ -79,8 +79,8 @@ Smoke run, first deterministic 200 rows:
 
 ```bash
 pnpm benchmark run \
-  --benchmark-config configs/benchmarks/trustfoundry-legal-search-case-questions-200.json \
-  --provider-config configs/providers/trustfoundry-public-search.json \
+  --benchmark-config configs/benchmarks/trustfoundry-legal-search/case-questions-200.json \
+  --provider-config configs/providers/trustfoundry-legal-search.json \
   --out runs/trustfoundry-legal-search-case-questions-200 \
   --parallel 8 \
   --force
@@ -90,20 +90,20 @@ Full public 5k run:
 
 ```bash
 pnpm benchmark run \
-  --benchmark-config configs/benchmarks/trustfoundry-legal-search-case-questions-5k.json \
-  --provider-config configs/providers/trustfoundry-public-search.json \
+  --benchmark-config configs/benchmarks/trustfoundry-legal-search/case-questions-5k.json \
+  --provider-config configs/providers/trustfoundry-legal-search.json \
   --out runs/trustfoundry-legal-search-case-questions-5k \
   --parallel 8 \
   --force
 ```
 
-Use the matching config and run directory names for other targets: `trustfoundry-legal-search-key-facts-*`, `trustfoundry-legal-search-laws-*`, or `trustfoundry-legal-search-regs-*`.
+Use the matching config for other targets — `configs/benchmarks/trustfoundry-legal-search/{key-facts,laws,regs}-{200,5k}.json` — and a run directory name that mirrors the target.
 
 The TrustFoundry public-search provider makes one retry for transient provider failures: fetch errors, streamed provider error events, missing result events, or HTTP 5xx responses. It does not retry validation errors or HTTP 4xx responses. If the retry succeeds, the row is scored from the successful response and latency includes the full elapsed time across both attempts; if it still fails, it is reported as a provider failure.
 
 ### Request limit and scorer cutoffs
 
-Both knobs live in one place: [`configs/scorers/search-recall.json`](../../configs/scorers/search-recall.json).
+Both knobs live in one place: [`configs/scorers/trustfoundry-legal-search.json`](../../configs/scorers/trustfoundry-legal-search.json).
 
 | Field | Purpose |
 | --- | --- |
