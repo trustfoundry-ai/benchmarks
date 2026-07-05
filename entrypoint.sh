@@ -34,7 +34,7 @@ set -euo pipefail
 : "${OUTPUT_BUNDLE_URI:=}"
 : "${HARNESS_COMMIT_SHA:=unknown}"
 
-PARALLEL_C=8
+PARALLEL_C=4
 SHA7=${HARNESS_COMMIT_SHA:0:7}
 DATE=$(date -u +%Y-%m-%d)
 
@@ -137,12 +137,16 @@ for cfg in "${CONFIGS_TO_RUN[@]}"; do
     exit 2
   fi
 
-  run_id="${DATE}-production-${RUN_LABEL}-c${PARALLEL_C}-${size}"
+  # Bundle path layout: results/<suite>/<date>/<run-leaf>/
+  # where <run-leaf> encodes the label, size, and model type. The date
+  # lives at level 2 so all bundles from one day cluster together;
+  # provider identity lives in the bundle's manifest, not the path.
+  run_leaf="${RUN_LABEL}-${size}-${model_type}"
   # runs/ subdirectory is flat; strip the suite prefix from the config
   # path so a run dir doesn't have two path segments.
-  run_leaf="${cfg#trustfoundry-legal-search/}"
-  run_dir="runs/trustfoundry-legal-search-${run_leaf}"
-  bundle_dir="results/${suite}/trustfoundry-legal-search/${run_id}"
+  run_dir_leaf="${cfg#trustfoundry-legal-search/}"
+  run_dir="runs/trustfoundry-legal-search-${run_dir_leaf}"
+  bundle_dir="results/${suite}/${DATE}/${run_leaf}"
 
   echo
   echo "=== ${cfg} ==="
@@ -165,8 +169,8 @@ for cfg in "${CONFIGS_TO_RUN[@]}"; do
     # Encode the model type into the leaf dir so multiple sibling bundles
     # from one all-200/all-5k run cluster under <benchmark-family>/<sha7>/
     # without colliding.
-    leaf="${DATE}-production-${RUN_LABEL}-${model_type}-c${PARALLEL_C}-${size}"
-    dest="${OUTPUT_BUNDLE_URI%/}/${BENCHMARK_FAMILY}/${SHA7}/${leaf}/"
+    upload_leaf="${DATE}-${RUN_LABEL}-${size}-${model_type}"
+    dest="${OUTPUT_BUNDLE_URI%/}/${BENCHMARK_FAMILY}/${SHA7}/${upload_leaf}/"
     echo "uploading ${bundle_dir}/ -> ${dest}"
     upload_bundle "$bundle_dir" "$dest"
   fi

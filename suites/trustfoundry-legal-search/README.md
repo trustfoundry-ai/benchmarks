@@ -33,21 +33,21 @@ All targets use the same public search endpoint and `trustfoundry-legal-search` 
 - `case_question` - Case questions
   - Data: [`case_questions.jsonl`](../../data/trustfoundry-legal-search/case_questions.jsonl)
   - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search/case-questions-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search/case-questions-5k.json)
-  - Published bundles: [`200`](../../results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-200-case-question/), [`5k`](../../results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-5k-case-question/)
+  - Published bundles: [`200`](../../results/trustfoundry-legal-search-case-questions/2026-07-05/production-200-case-question/), [`5k`](../../results/trustfoundry-legal-search-case-questions/2026-07-05/production-5k-case-question/)
 - `case_key_fact` - Case key facts
   - Data: [`case_key_facts.jsonl`](../../data/trustfoundry-legal-search/case_key_facts.jsonl)
   - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search/key-facts-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search/key-facts-5k.json)
-  - Published bundles: [`200`](../../results/trustfoundry-legal-search-key-facts/trustfoundry-public-search/2026-06-29-production-200-case-key-fact/), [`5k`](../../results/trustfoundry-legal-search-key-facts/trustfoundry-public-search/2026-06-29-production-5k-case-key-fact/)
+  - Published bundles: [`200`](../../results/trustfoundry-legal-search-key-facts/2026-07-05/production-200-case-key-fact/), [`5k`](../../results/trustfoundry-legal-search-key-facts/2026-07-05/production-5k-case-key-fact/)
 - `law_question` - Law questions
   - Data: [`laws.jsonl`](../../data/trustfoundry-legal-search/laws.jsonl)
   - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search/laws-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search/laws-5k.json)
-  - Published bundles: [`200`](../../results/trustfoundry-legal-search-laws/trustfoundry-public-search/2026-06-29-production-200-law-question/), [`5k`](../../results/trustfoundry-legal-search-laws/trustfoundry-public-search/2026-06-29-production-5k-law-question/)
+  - Published bundles: [`200`](../../results/trustfoundry-legal-search-laws/2026-07-05/production-200-law-question/), [`5k`](../../results/trustfoundry-legal-search-laws/2026-07-05/production-5k-law-question/)
 - `reg_question` - Regulation questions
   - Data: [`regs.jsonl`](../../data/trustfoundry-legal-search/regs.jsonl)
   - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search/regs-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search/regs-5k.json)
-  - Published bundles: [`200`](../../results/trustfoundry-legal-search-regs/trustfoundry-public-search/2026-06-29-production-200-reg-question/), [`5k`](../../results/trustfoundry-legal-search-regs/trustfoundry-public-search/2026-06-29-production-5k-reg-question/)
+  - Published bundles: [`200`](../../results/trustfoundry-legal-search-regs/2026-07-05/production-200-reg-question/), [`5k`](../../results/trustfoundry-legal-search-regs/2026-07-05/production-5k-reg-question/)
 
-The generic provider config [`trustfoundry-public-search.json`](../../configs/providers/trustfoundry-legal-search.json) omits `model_type` and sends each row's `model_type`, so the same provider config works for all four targets.
+The generic provider config [`trustfoundry-legal-search.json`](../../configs/providers/trustfoundry-legal-search.json) omits `model_type` and sends each row's `model_type`, so the same provider config works for all four targets.
 
 ### Test Data Schema
 
@@ -127,9 +127,9 @@ Create a shareable result bundle from a run:
 ```bash
 pnpm benchmark publish-result \
   --run runs/trustfoundry-legal-search-case-questions-200 \
-  --out results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-200-case-question \
+  --out results/trustfoundry-legal-search-case-questions/2026-07-05/production-200-case-question \
   --force
-pnpm benchmark verify-result results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-200-case-question
+pnpm benchmark verify-result results/trustfoundry-legal-search-case-questions/2026-07-05/production-200-case-question
 ```
 
 ## Metrics
@@ -150,4 +150,4 @@ Top-level `hit@k` and `MRR` are computed over successfully scored rows and repor
 
 ## Example Test Results
 
-For example output, inspect the scored summary at [`result.json`](../../results/trustfoundry-legal-search-case-questions/trustfoundry-public-search/2026-06-29-production-5k-case-question/result.json). The full checked-in bundle also includes the raw row evidence, manifest, and checksums.
+For example output, inspect the scored summary at [`result.json`](../../results/trustfoundry-legal-search-case-questions/2026-07-05/production-5k-case-question/result.json). The full checked-in bundle also includes the raw row evidence, manifest, and checksums.

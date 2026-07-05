@@ -148,19 +148,19 @@ Create a shareable result bundle from a run:
 
 ```bash
 pnpm benchmark publish-result \
-  --run runs/citation-lookup-cases \
-  --out results/citation-lookup/trustfoundry-public-search/<yyyy-mm-dd>-production-cases \
+  --run runs/trustfoundry-citation-lookup-cases \
+  --out results/trustfoundry-citation-lookup-cases/<yyyy-mm-dd>/production-cases \
   --force
 
 pnpm benchmark verify-result \
-  results/citation-lookup/trustfoundry-public-search/<yyyy-mm-dd>-production-cases
+  results/trustfoundry-citation-lookup-cases/<yyyy-mm-dd>/production-cases
 ```
 
 Result bundles carry the raw provider rows (`raw.jsonl`), the recomputable scored summary (`result.json`), a schema-versioned manifest, and per-file checksums. Verification recomputes the summary from raw rows and asserts byte-for-byte equality against `result.json` via canonical JSON.
 
 ## Result bundles
 
-Published bundles for this suite will land under [`results/citation-lookup/`](../../results/) as canonical runs are produced. The bundle path convention is `results/citation-lookup/<provider-id>/<yyyy-mm-dd>-<environment>-<label>/`.
+Published bundles for this suite will land under [`results/trustfoundry-citation-lookup-*/`](../../results/) as canonical runs are produced. The bundle path convention is `results/<suite-id>/<yyyy-mm-dd>/<run-leaf>/`.
 
 ## Dataset schema history
 
