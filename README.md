@@ -1,6 +1,21 @@
 # TrustFoundry Benchmarks
 
+> **Status: Under active development (pre-1.0).**
+> This harness is being iterated on in the open. Contracts,
+> artifact schemas, and adapters may change between minor
+> versions until v1.0. Individual benchmark suites carry
+> their own maturity status — see the [suite status](#suite-status) table below.
+
 This repository contains public benchmark harnesses for metrics TrustFoundry runs against its system. The goal is to make selected evaluations reproducible and extensible: you can rerun the same benchmark against TrustFoundry, inspect the row-level evidence behind the scores, or add another provider adapter for comparison.
+
+## Suite status
+
+| Suite | Status | Published numbers |
+|---|---|---|
+| `trustfoundry-legal-search` | Numbers published | 8 bundles under [`results/trustfoundry-legal-search-*/`](results/) (200-row and 5k-row × case-questions / key-facts / laws / regs, 2026-06-29) |
+| `citation-lookup` | In development | Not yet — dataset and scorer land in this release; evaluation numbers to follow. |
+
+"Numbers published" means a scored result bundle exists under [`results/`](results/) with checksummed row-level evidence and passes `pnpm verify:results`. Suites marked "In development" ship the dataset, adapter, and scorer so consumers can rerun them locally — but the harness maintainers have not yet published a canonical evaluation.
 
 ## Latest Benchmarks
 

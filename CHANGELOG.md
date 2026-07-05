@@ -9,6 +9,11 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 - New `docs/adapter-contracts.md` — long-form guide to the three
   adapter kinds, the four artifact schemas, and the versioning rules.
   Referenced from `src/core/contracts/README.md`.
+- `README.md` gains a pre-1.0 status banner and a per-suite status
+  table so readers can see at a glance which suites have published
+  evaluation numbers (`trustfoundry-legal-search`) vs. which are in
+  development (`citation-lookup`). `docs/adapter-contracts.md` gains a
+  matching pre-1.0 notice about contract stability.
 
 ### Governance
 

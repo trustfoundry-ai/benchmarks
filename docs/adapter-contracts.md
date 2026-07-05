@@ -1,5 +1,13 @@
 # Adapter contracts
 
+> **Pre-1.0 notice.** The harness is under active development. Adapter
+> contracts and artifact schemas may change between minor versions until
+> v1.0. Additive changes stay backward-compatible; renames or removals
+> trigger a schema-version bump (`v1` → `v2`) as documented under
+> [Schema versioning rules](#schema-versioning-rules). Pin by tag
+> (`@trustfoundry-ai/benchmarks-harness@vX.Y.Z`) and consult
+> [`CHANGELOG.md`](../CHANGELOG.md) before bumping.
+
 This document is the long-form counterpart to
 [`../src/core/contracts/README.md`](../src/core/contracts/README.md). The
 short README lists the three adapter kinds, the four artifact schemas, and
