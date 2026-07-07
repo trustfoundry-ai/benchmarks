@@ -1,162 +1,265 @@
 #!/usr/bin/env node
-// build-cl-jurisdictions — fetch the current CourtListener courts list from
-// CL's public REST API and write it as `data/courtlistener/court-jurisdictions.json`
-// in the shape the `courtlistener-search` adapter expects.
+// build-cl-jurisdictions — download CourtListener's bulk courts + courthouses
+// CSVs from CL's public S3 bucket, join them, and write a compact
+// `data/courtlistener/court-jurisdictions.json` in the shape the
+// `courtlistener-search` adapter expects.
+//
+// Two files land in `data/courtlistener/` (gitignored):
+//   - courts-YYYY-MM-DD.csv         (from CL's search_court table dump)
+//   - courthouses-YYYY-MM-DD.csv    (from CL's courthouses table dump)
+// Both are cached — reruns reuse them if present. The joined output
+// `court-jurisdictions.json` is refreshed on every run.
 //
 // Usage:
 //   node scripts/build-cl-jurisdictions.mjs
-//   node scripts/build-cl-jurisdictions.mjs --out data/courtlistener/court-jurisdictions.json
-//   node scripts/build-cl-jurisdictions.mjs --token "$COURTLISTENER_API_TOKEN"
+//   node scripts/build-cl-jurisdictions.mjs --refresh          # force re-download
+//   node scripts/build-cl-jurisdictions.mjs --data-dir <path>
 //
-// The output is derived entirely from CL's public /api/rest/v4/courts/
-// endpoint (paginated JSON). No credentials required — a token is only
-// used if provided, to unlock the higher authenticated rate limit.
-//
-// Why this exists: the `courtlistener-search` adapter can scope each row's
-// query to state supreme + appellate courts (or federal courts) using a
-// court-id -> jurisdiction letter mapping. That mapping isn't shipped
-// with the repo; you generate it locally with this script. If the mapping
-// file is absent, the adapter still runs — just without jurisdiction
-// filtering (broader net, slightly lower precision).
+// Requires `bunzip2` (or `bzip2`) on PATH — standard on macOS + Linux;
+// on Windows use WSL. No CL API rate limits apply — this hits public S3.
 
-import { mkdir, writeFile } from 'node:fs/promises';
+import { createWriteStream } from 'node:fs';
+import { mkdir, stat, writeFile, readFile, unlink } from 'node:fs/promises';
 import path from 'node:path';
+import { pipeline } from 'node:stream/promises';
+import { spawn } from 'node:child_process';
 
-import { CourtListenerRateLimiter } from '../src/adapters/providers/courtlistener-rate-limits.mjs';
+const S3_BASE = 'https://com-courtlistener-storage.s3-us-west-2.amazonaws.com/';
+const S3_LIST = `${S3_BASE}?prefix=bulk-data/`;
+const DEFAULT_DATA_DIR = 'data/courtlistener';
+const OUT_FILENAME = 'court-jurisdictions.json';
 
-const DEFAULT_OUT = 'data/courtlistener/court-jurisdictions.json';
-const CL_COURTS_ENDPOINT = 'https://www.courtlistener.com/api/rest/v4/courts/';
-const PAGE_SIZE = 100;
-const MAX_RETRIES = 6;
+// Sanity floors. CL's bulk dumps have ~3300 courts + ~3300 courthouses;
+// a hard drop below these bounds means the parser silently corrupted a
+// field (e.g. a new escape convention) and produced a nearly-empty output.
+// Better to fail loudly than to ship a broken jurisdictions file.
+const MIN_COURTS_ROWS = 500;
+const MIN_COURTHOUSES_ROWS = 500;
 
 const STATE_JURISDICTIONS = new Set(['S', 'SA', 'SS', 'ST', 'SAG']);
 const FEDERAL_JURISDICTIONS = new Set(['F', 'FD', 'FB', 'FS', 'MA']);
 
+// ---------------------------------------------------------------------------
+// CLI
+// ---------------------------------------------------------------------------
+
 function parseArgs(argv) {
-  const args = { out: DEFAULT_OUT, token: process.env.COURTLISTENER_API_TOKEN ?? null };
+  const args = { dataDir: DEFAULT_DATA_DIR, refresh: false, help: false };
   for (let i = 0; i < argv.length; i += 1) {
-    if (argv[i] === '--out') { args.out = argv[i + 1]; i += 1; }
-    else if (argv[i] === '--token') { args.token = argv[i + 1]; i += 1; }
+    if (argv[i] === '--data-dir') { args.dataDir = argv[i + 1]; i += 1; }
+    else if (argv[i] === '--refresh') args.refresh = true;
     else if (argv[i] === '--help' || argv[i] === '-h') args.help = true;
   }
   return args;
 }
 
 function usage() {
-  console.log(`Usage: node scripts/build-cl-jurisdictions.mjs [--out <path>] [--token <cl-token>]
+  console.log(`Usage: node scripts/build-cl-jurisdictions.mjs [--data-dir <path>] [--refresh]
 
-Downloads the CourtListener courts list via the public REST API and writes
-a court-jurisdictions.json compatible with the courtlistener-search adapter.
+Downloads CourtListener's bulk courts + courthouses CSVs from S3, joins them,
+and writes a court-jurisdictions.json compatible with courtlistener-search.
 
 Options:
-  --out <path>    Output path (default: ${DEFAULT_OUT})
-  --token <tok>   Optional CL API token for higher rate limits.
-                  Falls back to $COURTLISTENER_API_TOKEN.
+  --data-dir <path>   Directory for cached bz2/csv files + output JSON.
+                      Default: ${DEFAULT_DATA_DIR}
+  --refresh           Re-download the bulk files even if they're cached.
 `);
 }
 
-function sleep(ms) {
-  return ms > 0 ? new Promise((resolve) => setTimeout(resolve, ms)) : Promise.resolve();
-}
+// ---------------------------------------------------------------------------
+// S3 discovery
+// ---------------------------------------------------------------------------
 
-async function fetchPageWithRetry(url, headers, limiter) {
-  let lastError = null;
-  for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
-    // Honor sliding-window + Retry-After / X-RateLimit-Reset budgets before firing.
-    const sleepMs = limiter.computeSleepMs();
-    if (sleepMs > 0) {
-      process.stderr.write(`  waiting ${sleepMs}ms for CL rate limiter to open a slot\n`);
-      await sleep(sleepMs);
+async function listBulkKeys() {
+  const response = await fetch(S3_LIST, {
+    headers: {
+      'User-Agent': 'trustfoundry-ai/benchmarks (build-cl-jurisdictions.mjs)'
     }
-    if (limiter.isQuotaExhausted()) {
-      throw new Error(
-        `CourtListener quota exhausted (${limiter.exhaustedWindow()} window). ` +
-          `Wait for the window to reset, or rerun with --token to raise the limits.`
-      );
-    }
-    let response;
-    try {
-      response = await fetch(url, { headers });
-      limiter.recordCall(Date.now());
-      limiter.applyResponseHeaders(response.headers);
-    } catch (err) {
-      lastError = `fetch threw: ${err?.message ?? err}`;
-      continue;
-    }
-    if (response.ok) return await response.json();
-    if (response.status !== 429 && (response.status < 500 || response.status >= 600)) {
-      throw new Error(`CourtListener responded ${response.status} ${response.statusText} for ${url}`);
-    }
-    lastError = `HTTP ${response.status} ${response.statusText}`;
-    process.stderr.write(`  attempt ${attempt + 1}/${MAX_RETRIES + 1} — ${lastError} (rate limiter will schedule the next attempt)\n`);
-  }
-  throw new Error(`CourtListener request failed after ${MAX_RETRIES + 1} attempts: ${lastError} (${url})`);
-}
-
-async function fetchAllCourts(token) {
-  const headers = {
-    'User-Agent': 'trustfoundry-ai/benchmarks (build-cl-jurisdictions.mjs)',
-    Accept: 'application/json'
-  };
-  if (token) headers.Authorization = `Token ${token}`;
-
-  const limiter = await CourtListenerRateLimiter.bootstrap({
-    onLog: (msg) => process.stderr.write(`${msg}\n`)
   });
-
-  const all = [];
-  let nextUrl = `${CL_COURTS_ENDPOINT}?page_size=${PAGE_SIZE}`;
-  let page = 0;
-
-  while (nextUrl) {
-    page += 1;
-    process.stderr.write(`Fetching page ${page}: ${nextUrl}\n`);
-    const body = await fetchPageWithRetry(nextUrl, headers, limiter);
-    if (!Array.isArray(body?.results)) {
-      throw new Error(`Unexpected response shape from ${nextUrl}: no results array`);
-    }
-    all.push(...body.results);
-    nextUrl = body.next ?? null;
+  if (!response.ok) {
+    throw new Error(`S3 listing failed: HTTP ${response.status} ${response.statusText}`);
   }
-  return all;
+  const xml = await response.text();
+  const keys = [];
+  const keyRe = /<Key>([^<]+)<\/Key>/g;
+  let match;
+  while ((match = keyRe.exec(xml)) !== null) {
+    keys.push(match[1]);
+  }
+  return keys;
 }
 
-function normalizeCourt(court) {
-  const id = typeof court.id === 'string' ? court.id.trim() : null;
-  const jurisdiction = typeof court.jurisdiction === 'string' ? court.jurisdiction.trim().toUpperCase() : null;
-  const courtState = typeof court.court_state === 'string' ? court.court_state.trim().toUpperCase() : null;
-  if (!id || !jurisdiction) return null;
-  return {
-    id,
-    full_name: court.full_name || court.short_name || null,
-    jurisdiction,
-    court_state: courtState || null,
-    in_use: Boolean(court.in_use)
-  };
+function pickLatestKey(keys, prefix) {
+  // prefix like "bulk-data/courts-" — look for keys matching
+  // <prefix>YYYY-MM-DD.csv.bz2 and return the one with the newest date.
+  const pattern = new RegExp(`^${prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\d{4}-\\d{2}-\\d{2})\\.csv\\.bz2$`);
+  let best = null;
+  for (const key of keys) {
+    const m = pattern.exec(key);
+    if (!m) continue;
+    if (!best || m[1] > best.date) best = { key, date: m[1] };
+  }
+  if (!best) throw new Error(`No bulk file found matching ${prefix}<date>.csv.bz2`);
+  return best.key;
 }
 
-function group(courts) {
+// ---------------------------------------------------------------------------
+// Download + decompress
+// ---------------------------------------------------------------------------
+
+async function fileExists(filePath) {
+  try {
+    await stat(filePath);
+    return true;
+  } catch (err) {
+    if (err && err.code === 'ENOENT') return false;
+    throw err;
+  }
+}
+
+async function downloadIfMissing(url, destPath, refresh) {
+  if (!refresh && await fileExists(destPath)) {
+    process.stderr.write(`Cached: ${destPath}\n`);
+    return;
+  }
+  process.stderr.write(`Downloading ${url}\n  → ${destPath}\n`);
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Download failed: HTTP ${response.status} ${response.statusText} for ${url}`);
+  }
+  await pipeline(response.body, createWriteStream(destPath));
+}
+
+async function decompressBz2(bz2Path, csvPath, refresh) {
+  if (!refresh && await fileExists(csvPath)) {
+    process.stderr.write(`Cached: ${csvPath}\n`);
+    return;
+  }
+  process.stderr.write(`Decompressing ${bz2Path}\n  → ${csvPath}\n`);
+  const out = createWriteStream(csvPath);
+  await new Promise((resolve, reject) => {
+    const child = spawn('bunzip2', ['-ck', bz2Path], { stdio: ['ignore', 'pipe', 'inherit'] });
+    child.stdout.pipe(out);
+    child.on('error', reject);
+    child.on('close', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`bunzip2 exited with code ${code}`));
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
+// CSV parsing (RFC 4180 with quoted fields, embedded commas, and \r\n)
+// ---------------------------------------------------------------------------
+
+// Parses CSV supporting both RFC-4180 doubled-quote escapes (`""`) and the
+// Postgres COPY backslash-quote convention (`\"`) that CL's bulk dumps use.
+// Also handles embedded newlines inside quoted fields.
+function parseCsv(text) {
+  const rows = [];
+  let field = '';
+  let row = [];
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i += 1) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '\\' && text[i + 1] === '"') { field += '"'; i += 1; }
+      else if (c === '"' && text[i + 1] === '"') { field += '"'; i += 1; }
+      else if (c === '"') inQuotes = false;
+      else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+      else if (c === '\r') { /* skip */ }
+      else field += c;
+    }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+function rowsToRecords(rows) {
+  if (!rows.length) return [];
+  const header = rows[0];
+  return rows.slice(1).map((r) => {
+    const obj = {};
+    for (let i = 0; i < header.length; i += 1) obj[header[i]] = r[i] ?? '';
+    return obj;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Build the joined JSON
+// ---------------------------------------------------------------------------
+
+function normalizeBool(value) {
+  const s = String(value ?? '').trim().toLowerCase();
+  return s === 't' || s === 'true' || s === '1';
+}
+
+function buildStateMap(courthouseRecords) {
+  // court_id → first non-empty US state seen. A court can have multiple
+  // courthouses in different states (rare but possible for old federal
+  // circuits with multi-state seats); we take the first canonical entry.
+  const map = new Map();
+  for (const c of courthouseRecords) {
+    const courtId = c.court_id?.trim();
+    const state = c.state?.trim().toUpperCase();
+    const country = c.country_code?.trim().toUpperCase();
+    if (!courtId || !state || country !== 'US') continue;
+    if (!map.has(courtId)) map.set(courtId, state);
+  }
+  return map;
+}
+
+function buildJurisdictionsJson(courtRecords, stateByCourtId) {
   const states = {};
   const federalCourts = [];
-  for (const court of courts) {
-    if (STATE_JURISDICTIONS.has(court.jurisdiction) && court.court_state) {
-      const bucket = states[court.court_state] ??= { court_count: 0, courts: [] };
-      bucket.courts.push(court);
+  const stateCourtsWithoutState = [];
+
+  for (const court of courtRecords) {
+    const id = court.id?.trim();
+    const jurisdiction = court.jurisdiction?.trim().toUpperCase();
+    if (!id || !jurisdiction) continue;
+
+    const entry = {
+      id,
+      full_name: court.full_name?.trim() || court.short_name?.trim() || null,
+      jurisdiction,
+      in_use: normalizeBool(court.in_use)
+    };
+
+    if (STATE_JURISDICTIONS.has(jurisdiction)) {
+      const state = stateByCourtId.get(id);
+      if (!state) {
+        stateCourtsWithoutState.push(id);
+        continue;
+      }
+      entry.court_state = state;
+      const bucket = states[state] ??= { court_count: 0, courts: [] };
+      bucket.courts.push(entry);
       bucket.court_count += 1;
-    } else if (FEDERAL_JURISDICTIONS.has(court.jurisdiction)) {
-      federalCourts.push(court);
+    } else if (FEDERAL_JURISDICTIONS.has(jurisdiction)) {
+      entry.court_state = null;
+      federalCourts.push(entry);
     }
+    // Non-state, non-federal jurisdictions (e.g. tribal `T`, territory `TS`,
+    // committees `C`) are intentionally dropped — the adapter's filter modes
+    // don't reference them.
   }
-  // Deterministic sort so re-running the script produces a stable file.
+
+  // Deterministic sort so a fresh build produces byte-stable output.
   for (const bucket of Object.values(states)) {
     bucket.courts.sort((a, b) => a.id.localeCompare(b.id));
   }
   federalCourts.sort((a, b) => a.id.localeCompare(b.id));
+
   return {
     generated_at: new Date().toISOString(),
     source: {
-      endpoint: CL_COURTS_ENDPOINT,
-      note: 'Derived from CourtListener\'s public REST API by scripts/build-cl-jurisdictions.mjs. Rerun to refresh.'
+      bucket: S3_BASE,
+      note: 'Built by scripts/build-cl-jurisdictions.mjs from CourtListener\'s public bulk data (search_court + courthouses). Rerun with --refresh to pick up newer CL dumps.'
     },
     state_jurisdictions: [...STATE_JURISDICTIONS].sort(),
     federal_jurisdictions: [...FEDERAL_JURISDICTIONS].sort(),
@@ -166,31 +269,79 @@ function group(courts) {
     federal: {
       court_count: federalCourts.length,
       courts: federalCourts
-    }
+    },
+    unmapped_state_courts: stateCourtsWithoutState.sort()
   };
 }
+
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) { usage(); process.exit(0); }
 
-  const rawCourts = await fetchAllCourts(args.token);
-  process.stderr.write(`Fetched ${rawCourts.length} raw court records.\n`);
+  const dataDir = path.resolve(process.cwd(), args.dataDir);
+  await mkdir(dataDir, { recursive: true });
 
-  const normalized = rawCourts.map(normalizeCourt).filter(Boolean);
-  process.stderr.write(`Retained ${normalized.length} courts with id + jurisdiction.\n`);
+  process.stderr.write(`Listing bulk-data keys from ${S3_LIST}\n`);
+  const keys = await listBulkKeys();
+  const courtsKey = pickLatestKey(keys, 'bulk-data/courts-');
+  const courthousesKey = pickLatestKey(keys, 'bulk-data/courthouses-');
+  process.stderr.write(`Latest courts:      ${courtsKey}\n`);
+  process.stderr.write(`Latest courthouses: ${courthousesKey}\n`);
 
-  const output = group(normalized);
-  const outPath = path.resolve(process.cwd(), args.out);
-  await mkdir(path.dirname(outPath), { recursive: true });
-  await writeFile(outPath, JSON.stringify(output, null, 2) + '\n', 'utf8');
+  const courtsBz2 = path.join(dataDir, path.basename(courtsKey));
+  const courthousesBz2 = path.join(dataDir, path.basename(courthousesKey));
+  const courtsCsv = courtsBz2.replace(/\.bz2$/, '');
+  const courthousesCsv = courthousesBz2.replace(/\.bz2$/, '');
+
+  await downloadIfMissing(S3_BASE + courtsKey, courtsBz2, args.refresh);
+  await downloadIfMissing(S3_BASE + courthousesKey, courthousesBz2, args.refresh);
+  await decompressBz2(courtsBz2, courtsCsv, args.refresh);
+  await decompressBz2(courthousesBz2, courthousesCsv, args.refresh);
+
+  process.stderr.write('Parsing CSVs and joining ...\n');
+  const [courtsText, courthousesText] = await Promise.all([
+    readFile(courtsCsv, 'utf8'),
+    readFile(courthousesCsv, 'utf8')
+  ]);
+  const courtRecords = rowsToRecords(parseCsv(courtsText));
+  const courthouseRecords = rowsToRecords(parseCsv(courthousesText));
+
+  if (courtRecords.length < MIN_COURTS_ROWS) {
+    throw new Error(
+      `Parsed only ${courtRecords.length} courts from ${courtsCsv} (expected >= ${MIN_COURTS_ROWS}). ` +
+        `Likely a CSV parser bug — CL may have changed the dump format. Inspect the file directly ` +
+        `and adjust parseCsv() before rerunning.`
+    );
+  }
+  if (courthouseRecords.length < MIN_COURTHOUSES_ROWS) {
+    throw new Error(
+      `Parsed only ${courthouseRecords.length} courthouses from ${courthousesCsv} (expected >= ${MIN_COURTHOUSES_ROWS}). ` +
+        `Likely a CSV parser bug — inspect the file and adjust parseCsv() before rerunning.`
+    );
+  }
+
+  const stateByCourtId = buildStateMap(courthouseRecords);
+
+  const output = buildJurisdictionsJson(courtRecords, stateByCourtId);
+  const outPath = path.join(dataDir, OUT_FILENAME);
+  const tmpPath = `${outPath}.tmp`;
+  await writeFile(tmpPath, JSON.stringify(output, null, 2) + '\n', 'utf8');
+  await unlink(outPath).catch(() => {});
+  await (await import('node:fs/promises')).rename(tmpPath, outPath);
 
   const stateCourtCount = Object.values(output.states).reduce((n, s) => n + s.court_count, 0);
   process.stderr.write(
     `Wrote ${outPath}\n` +
-      `  states: ${Object.keys(output.states).length}\n` +
-      `  state courts: ${stateCourtCount}\n` +
-      `  federal courts: ${output.federal.court_count}\n`
+      `  courts.csv rows:     ${courtRecords.length}\n` +
+      `  courthouses.csv rows: ${courthouseRecords.length}\n` +
+      `  states covered:      ${Object.keys(output.states).length}\n` +
+      `  state courts:        ${stateCourtCount}\n` +
+      `  federal courts:      ${output.federal.court_count}\n` +
+      `  unmapped state courts: ${output.unmapped_state_courts.length}\n`
   );
 }
 
