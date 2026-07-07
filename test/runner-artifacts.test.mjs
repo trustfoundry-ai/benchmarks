@@ -201,3 +201,77 @@ test('runner rejects artifact paths containing .. (no path traversal)', async ()
     await fs.rm(tmp, { recursive: true, force: true });
   }
 });
+
+test('runner rejects absolute artifact paths (no path traversal)', async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'runner-artifacts-'));
+  const sentinel = path.join(tmp, 'ABS-ESCAPED.json');
+  try {
+    const benchmark = {
+      id: 'abs-traversal-bench',
+      version: 'v1',
+      materializationVersion: 'v1',
+      async loadCases() {
+        return {
+          benchmark: {
+            id: this.id, version: this.version, sourceRoot: tmp,
+            sourceFiles: [], materializationVersion: 'v1', queryTransformId: null
+          },
+          inventory: { benchmark: this.id, records: [], summary: {} },
+          cases: [{
+            caseId: 'c', benchmarkId: this.id, prompt: 'q', split: 'test',
+            metadata: {
+              datasetName: 'd', datasetIndex: 0, doc_type: 'case', field: 'q',
+              model_type: 'case_question', state: 'MI',
+              expected: { kind: 'exact', canonical_citation: '1 X 1', alternates: [] }
+            }
+          }]
+        };
+      }
+    };
+    const provider = {
+      id: 'abs-traversal-provider', version: 'v1',
+      async describe() { return { id: this.id, version: 'v1', target: 'x' }; },
+      async executeCase({ benchmarkCase }) {
+        return {
+          caseId: benchmarkCase.caseId, status: 'completed',
+          rawOutput: { httpStatus: 200 },
+          finalOutputText: JSON.stringify({ query: 'q', results: [{ rank: 1, citation: '1 X 1', citations: ['1 X 1'] }], result_count: 1, total_available: 1 }),
+          artifacts: [{ path: sentinel, content: 'nope' }],
+          providerMetadata: { httpStatus: 200 },
+          timing: { startedAt: null, completedAt: null, durationMs: 10 },
+          error: null
+        };
+      }
+    };
+    registry.benchmarks.set(benchmark.id, benchmark);
+    registry.providers.set(provider.id, provider);
+    const bcPath = path.join(tmp, 'b.json');
+    const pcPath = path.join(tmp, 'p.json');
+    await fs.writeFile(
+      bcPath,
+      JSON.stringify({ benchmarkId: benchmark.id, scorer: 'trustfoundry-legal-search' }),
+      'utf8'
+    );
+    await fs.writeFile(pcPath, JSON.stringify({ provider: provider.id }), 'utf8');
+    try {
+      const outDir = path.join(tmp, 'run');
+      await executeRun({
+        repoRoot: process.cwd(),
+        outDir,
+        benchmarkConfigPath: path.relative(process.cwd(), bcPath),
+        providerConfigPath: path.relative(process.cwd(), pcPath),
+        progress: false
+      });
+      assert.equal(
+        await fs.stat(sentinel).then(() => true, () => false),
+        false,
+        'absolute-path artifact should have been skipped'
+      );
+    } finally {
+      registry.benchmarks.delete(benchmark.id);
+      registry.providers.delete(provider.id);
+    }
+  } finally {
+    await fs.rm(tmp, { recursive: true, force: true });
+  }
+});
