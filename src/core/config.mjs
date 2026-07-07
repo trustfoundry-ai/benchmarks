@@ -34,11 +34,15 @@ export async function loadConfig(configPath, fallback = {}) {
 
 export function normalizeProviderSlug(providerId, config = {}) {
   const model = config.model ?? config.modelId ?? config.exactModelId;
+  // Split the anchored dash-trim into two separate replaces so neither
+  // regex has an alternation branch — avoids the polynomial-backtracking
+  // pattern CodeQL flags (js/polynomial-redos on `/^-+|-+$/g`).
   return [providerId, model]
     .filter(Boolean)
     .join('-')
     .replace(/[^A-Za-z0-9._-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '')
     .toLowerCase();
 }
 

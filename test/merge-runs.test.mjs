@@ -227,8 +227,11 @@ test('mergeRuns dedupes by caseId with last-wins (retry replaces failure)', asyn
 });
 
 test('mergeRuns throws when no run dirs are passed', async () => {
+  // outDir points at a path we never actually write to (mergeRuns rejects
+  // before touching the filesystem). Kept off `/tmp/` so CodeQL's insecure-
+  // temporary-file data flow doesn't chain from this literal.
   await assert.rejects(
-    () => mergeRuns({ repoRoot: process.cwd(), runDirs: [], outDir: '/tmp/nope' }),
+    () => mergeRuns({ repoRoot: process.cwd(), runDirs: [], outDir: './does-not-exist-merge-runs-empty' }),
     /at least one input run directory/
   );
 });
