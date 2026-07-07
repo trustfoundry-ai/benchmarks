@@ -60,9 +60,20 @@ const PROVIDER_VERSION = 'courtlistener-search-provider-v1';
 const JURISDICTION_FILTER_MODE = 'state_appellate_supreme';
 
 function jurisdictionInvariantConfig(config) {
+  // Force the mode to the invariant (`state_appellate_supreme`) but preserve
+  // any other jurisdiction_filter fields the caller passed (e.g. mapping_path,
+  // federal_court_ids). Callers can override the mapping location without
+  // disabling filtering.
+  const existing =
+    typeof config.jurisdiction_filter === 'object' && config.jurisdiction_filter
+      ? config.jurisdiction_filter
+      : {};
   return {
     ...config,
-    jurisdiction_filter: { mode: JURISDICTION_FILTER_MODE }
+    jurisdiction_filter: {
+      ...existing,
+      mode: JURISDICTION_FILTER_MODE
+    }
   };
 }
 

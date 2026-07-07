@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import {
   courtlistenerSearchProviderAdapter,
@@ -7,7 +9,17 @@ import {
 } from '../src/adapters/providers/courtlistener-search.mjs';
 const TOKEN_ENV = 'COURTLISTENER_API_TOKEN_TEST';
 
+// Point every test at a small fixture instead of the run-time-generated
+// `data/courtlistener/court-jurisdictions.json` (which is not shipped —
+// users generate it with scripts/build-cl-jurisdictions.mjs).
+const JURISDICTION_FIXTURE = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  'fixtures',
+  'cl-jurisdictions-fixture.json'
+);
+
 function baseConfig(overrides = {}) {
+  const { jurisdiction_filter: filterOverride, ...restOverrides } = overrides;
   const cfg = {
     endpoint: 'https://cl.example.test/api/rest/v4/search/',
     token_env: TOKEN_ENV,
@@ -16,10 +28,16 @@ function baseConfig(overrides = {}) {
     top_k: 25,
     rate_limits_docs_url: 'https://docs.example.test/rate-limits',
     rate_limits_fallback: { per_minute: 60, per_hour: 600, per_day: 6_000 },
+    // Deep-merge jurisdiction_filter so callers can tweak mode / etc.
+    // without losing the fixture mapping_path.
+    jurisdiction_filter: {
+      mapping_path: JURISDICTION_FIXTURE,
+      ...(typeof filterOverride === 'object' && filterOverride ? filterOverride : {})
+    },
     _rateLimitsSilent: true,
     _rateLimitsFetchFn: async () => ({ ok: false, status: 500, text: async () => '' }),
     _rateLimitsNow: () => 1_000_000,
-    ...overrides
+    ...restOverrides
   };
   return cfg;
 }

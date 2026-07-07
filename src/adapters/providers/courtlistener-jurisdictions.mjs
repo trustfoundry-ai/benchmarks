@@ -1,8 +1,15 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-async function readJson(file) {
-  return JSON.parse(await readFile(file, 'utf8'));
+async function readJsonIfPresent(file) {
+  try {
+    const text = await readFile(file, 'utf8');
+    const trimmed = text.trim();
+    return trimmed ? JSON.parse(trimmed) : null;
+  } catch (err) {
+    if (err && err.code === 'ENOENT') return null;
+    throw err;
+  }
 }
 
 const DEFAULT_MAPPING_PATH = 'data/courtlistener/court-jurisdictions.json';
@@ -142,7 +149,7 @@ export async function loadJurisdictionMap(mappingPath) {
     ? mappingPath
     : path.resolve(process.cwd(), mappingPath);
   if (!mappingCache.has(resolved)) {
-    mappingCache.set(resolved, readJson(resolved));
+    mappingCache.set(resolved, readJsonIfPresent(resolved));
   }
   return mappingCache.get(resolved);
 }
@@ -219,6 +226,16 @@ export async function prepareJurisdictionFilteredQuery(query, benchmarkCase, con
     return buildJurisdictionFilteredQuery(query, benchmarkCase, null, settings);
   }
   const mapping = await loadJurisdictionMap(settings.mappingPath);
+  if (!mapping) {
+    // No local court-jurisdictions.json — fall back to unfiltered search.
+    // Users can generate one with `node scripts/build-cl-jurisdictions.mjs`;
+    // see docs/adapters/courtlistener-search.md for setup.
+    return buildJurisdictionFilteredQuery(query, benchmarkCase, null, {
+      ...settings,
+      enabled: false,
+      mode: 'none'
+    });
+  }
   return buildJurisdictionFilteredQuery(query, benchmarkCase, mapping, settings);
 }
 
