@@ -27,8 +27,22 @@ Semantic web search is not built for legal retrieval, and the failure modes on t
 
 The 200-row aggregators-only run lands at ~5.5% Recall@25 and MRR ~0.02, versus TrustFoundry's ~72% and ~0.47 on the same rows — a ~15-25× gap. Latency and cost are not the constraints (Exa returns in ~1-2s at $5 per 1000 queries); quality is.
 
-## Configuration
+## Run
 
-- [`configs/providers/exa-legal-search-aggregators-only.json`](../../configs/providers/exa-legal-search-aggregators-only.json) — the shipped default, aggregators-only mode.
+**Prerequisites:** `EXA_API_KEY` in your environment.
 
-Set `EXA_API_KEY` in your environment. Benchmark configs at [`configs/benchmarks/exa-legal-search-aggregators-only/`](../../configs/benchmarks/exa-legal-search-aggregators-only/).
+**Command** (200 case-question rows, aggregators-only mode — the shipped default):
+
+```bash
+pnpm benchmark run \
+  --benchmark-config configs/benchmarks/trustfoundry-legal-search/case-questions-200.json \
+  --provider-config configs/providers/exa-legal-search-aggregators-only.json \
+  --scorer-config configs/scorers/trustfoundry-legal-search.json \
+  --out runs/exa-aggregators-case-questions-200 \
+  --parallel 4 \
+  --force
+```
+
+Full 200-row runs land around **~$1** (Exa charges $5 per 1000 search queries + $1 per 1000 content pages) with median request latency **~2s**. Use `--limit N` for smokes.
+
+Provider config: [`configs/providers/exa-legal-search-aggregators-only.json`](../../configs/providers/exa-legal-search-aggregators-only.json).

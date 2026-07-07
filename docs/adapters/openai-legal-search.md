@@ -25,8 +25,22 @@ Same qualitative failure modes as the Anthropic adapter, with an OpenAI-specific
 
 The MCP extension exists precisely because we suspected (and continue to explore) whether pointing the same LLM at a legal-specific MCP server might close the gap. So far, only the default `web_search` variant has been exercised at scale.
 
-## Configuration
+## Run
 
-- [`configs/providers/openai-legal-search-gpt-5-5.json`](../../configs/providers/openai-legal-search-gpt-5-5.json) — default variant, uses OpenAI's built-in `web_search` tool.
+**Prerequisites:** `OPENAI_API_KEY` in your environment.
 
-Set `OPENAI_API_KEY` in your environment. Benchmark configs at [`configs/benchmarks/openai-legal-search/`](../../configs/benchmarks/openai-legal-search/).
+**Command** (200 case-question rows via gpt-5.5 + built-in `web_search` tool):
+
+```bash
+pnpm benchmark run \
+  --benchmark-config configs/benchmarks/trustfoundry-legal-search/case-questions-200.json \
+  --provider-config configs/providers/openai-legal-search-gpt-5-5.json \
+  --scorer-config configs/scorers/trustfoundry-legal-search.json \
+  --out runs/openai-gpt5-5-case-questions-200 \
+  --parallel 4 \
+  --force
+```
+
+Prior full 200-row runs landed around **$92** total (unbounded `web_search` tool usage drives token cost) with median request latency **~158s**. Roughly 36% of prompts timed out at the 180-second request-timeout ceiling in past runs. Use `--limit N` for smokes; a 1-row smoke costs ~$0.70.
+
+Provider config: [`configs/providers/openai-legal-search-gpt-5-5.json`](../../configs/providers/openai-legal-search-gpt-5-5.json).

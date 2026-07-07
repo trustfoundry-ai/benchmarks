@@ -25,12 +25,25 @@ Every adapter in this file is a place where the "general LLM does web search" ap
 
 These aren't Anthropic-specific — they're properties of "general LLM + general web search + a JSON schema" applied to legal retrieval. That is precisely why we built this adapter: to demonstrate the gap qualitatively on the same benchmark that legal-specific search engines are evaluated on, so nobody has to take our word for how large the gap is.
 
-## Configuration
+## Run
 
-Three shipped variants map to three model tiers:
+**Prerequisites:** `ANTHROPIC_API_KEY` in your environment (`.env.local` also works if you source it).
 
+**Command** (200 case-question rows via Claude Haiku — cheapest of the three variants):
+
+```bash
+pnpm benchmark run \
+  --benchmark-config configs/benchmarks/trustfoundry-legal-search/case-questions-200.json \
+  --provider-config configs/providers/anthropic-legal-search-haiku.json \
+  --scorer-config configs/scorers/trustfoundry-legal-search.json \
+  --out runs/anthropic-haiku-case-questions-200 \
+  --parallel 4 \
+  --force
+```
+
+Swap the provider config for `anthropic-legal-search-sonnet.json` or `anthropic-legal-search-opus.json` to run the same rows against Claude Sonnet or Opus. Approximate 200-row costs from prior runs: ~$8 (Haiku), ~$15 (Sonnet), ~$36 (Opus). Median request latency scales with tier: ~15s Haiku, ~74s Sonnet, ~80s Opus. Use `--limit N --offset K` for smokes.
+
+**Provider configs:**
 - [`configs/providers/anthropic-legal-search-haiku.json`](../../configs/providers/anthropic-legal-search-haiku.json)
 - [`configs/providers/anthropic-legal-search-sonnet.json`](../../configs/providers/anthropic-legal-search-sonnet.json)
 - [`configs/providers/anthropic-legal-search-opus.json`](../../configs/providers/anthropic-legal-search-opus.json)
-
-Set `ANTHROPIC_API_KEY` in your environment. Benchmark configs at [`configs/benchmarks/anthropic-legal-search/`](../../configs/benchmarks/anthropic-legal-search/).

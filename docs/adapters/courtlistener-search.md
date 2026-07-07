@@ -14,9 +14,23 @@ Runs the benchmark against [CourtListener's v4 opinion-search API](https://www.c
 
 CourtListener is a legal-specific search engine. Its recall and MRR numbers should sit in the same "legal-domain-competitive" band as TrustFoundry's, though the two rank differently on some rows — often for reasons of corpus coverage or reporter normalization. Latencies at the CL v4 API are typically a second or two, and quotas are meaningful (see the fallback numbers in the config); this adapter is fine for the 200-row benchmark but you'll want to plan around the day quota if you run a 5k.
 
-## Configuration
+## Run
 
-See [`configs/providers/courtlistener-search.json`](../../configs/providers/courtlistener-search.json). Set `COURTLISTENER_API_TOKEN` in your environment to get authenticated rate limits. The token is only required if you're running against production CourtListener; the tests use fixture responses and do not require a token.
+**Prerequisites:** none. `COURTLISTENER_API_TOKEN` in your environment is optional — with it you get CL's authenticated rate limits; without it you get the anonymous limits (5/min, 50/hr, 125/day for the search endpoint). Tests use fixture responses so no token is needed to run `pnpm test`.
+
+**Command** (200 case-question rows against the shipped `case-questions-200` benchmark config):
+
+```bash
+pnpm benchmark run \
+  --benchmark-config configs/benchmarks/trustfoundry-legal-search/case-questions-200.json \
+  --provider-config configs/providers/courtlistener-search.json \
+  --scorer-config configs/scorers/trustfoundry-legal-search.json \
+  --out runs/cl-search-case-questions-200 \
+  --parallel 1 \
+  --force
+```
+
+Use `--limit N --offset K` for smokes or subsets; `--parallel 1` is required against anonymous CL to stay under the 5/min limit. Point at `key-facts-200.json`, `laws-200.json`, or `regs-200.json` for the other three targets. Configuration knobs are in [`configs/providers/courtlistener-search.json`](../../configs/providers/courtlistener-search.json).
 
 ## Jurisdiction filtering
 

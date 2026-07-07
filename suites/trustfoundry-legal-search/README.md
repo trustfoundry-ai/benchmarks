@@ -134,6 +134,20 @@ pnpm benchmark publish-result \
 pnpm benchmark verify-result results/trustfoundry-legal-search/2026-07-05/case-questions/200
 ```
 
+## Provider options
+
+Any provider adapter registered in the harness can run against these datasets. The `Run` section above uses the `trustfoundry-legal-search` provider as the canonical baseline. Four additional adapters ship for comparison — every one uses the same scorer, datasets, and top-K, so cross-provider numbers are directly comparable.
+
+| Adapter | What it is | Full setup + run |
+|---|---|---|
+| `trustfoundry-legal-search` | TrustFoundry public search API | (this file, above) |
+| `courtlistener-search` | CourtListener v4 opinion-search API (legal-specific search engine) | [`docs/adapters/courtlistener-search.md`](../../docs/adapters/courtlistener-search.md) |
+| `anthropic-legal-search` | Anthropic Messages API + `web_search` tool (haiku / sonnet / opus) — qualitative LLM demonstrator | [`docs/adapters/anthropic-legal-search.md`](../../docs/adapters/anthropic-legal-search.md) |
+| `openai-legal-search` | OpenAI Responses API + `web_search` tool (gpt-5.5) — qualitative LLM demonstrator | [`docs/adapters/openai-legal-search.md`](../../docs/adapters/openai-legal-search.md) |
+| `exa-legal-search` | Exa `/search` API restricted to legal aggregators — qualitative general-web-search demonstrator | [`docs/adapters/exa-legal-search.md`](../../docs/adapters/exa-legal-search.md) |
+
+The LLM/Exa adapters are shipped as **qualitative demonstrators** — the point is to make the retrieval-quality gap between "legal-specific search engine" and "general web search / LLM with a search tool" reproducible on the same benchmark. Each adapter README documents its integration approach, known failure modes, and expected cost/latency profile.
+
 ## Metrics
 
 The scorer can match either an expected document UUID or an accepted citation. TrustFoundry public API runs match on document UUID because the API returns it; adapters for systems that do not use TrustFoundry UUIDs can return citation fields and score against canonical or alternate citations.
