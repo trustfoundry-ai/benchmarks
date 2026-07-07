@@ -22,9 +22,12 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { CourtListenerRateLimiter } from '../src/adapters/providers/courtlistener-rate-limits.mjs';
+
 const DEFAULT_OUT = 'data/courtlistener/court-jurisdictions.json';
 const CL_COURTS_ENDPOINT = 'https://www.courtlistener.com/api/rest/v4/courts/';
 const PAGE_SIZE = 100;
+const MAX_RETRIES = 6;
 
 const STATE_JURISDICTIONS = new Set(['S', 'SA', 'SS', 'ST', 'SAG']);
 const FEDERAL_JURISDICTIONS = new Set(['F', 'FD', 'FB', 'FS', 'MA']);
@@ -52,12 +55,54 @@ Options:
 `);
 }
 
+function sleep(ms) {
+  return ms > 0 ? new Promise((resolve) => setTimeout(resolve, ms)) : Promise.resolve();
+}
+
+async function fetchPageWithRetry(url, headers, limiter) {
+  let lastError = null;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
+    // Honor sliding-window + Retry-After / X-RateLimit-Reset budgets before firing.
+    const sleepMs = limiter.computeSleepMs();
+    if (sleepMs > 0) {
+      process.stderr.write(`  waiting ${sleepMs}ms for CL rate limiter to open a slot\n`);
+      await sleep(sleepMs);
+    }
+    if (limiter.isQuotaExhausted()) {
+      throw new Error(
+        `CourtListener quota exhausted (${limiter.exhaustedWindow()} window). ` +
+          `Wait for the window to reset, or rerun with --token to raise the limits.`
+      );
+    }
+    let response;
+    try {
+      response = await fetch(url, { headers });
+      limiter.recordCall(Date.now());
+      limiter.applyResponseHeaders(response.headers);
+    } catch (err) {
+      lastError = `fetch threw: ${err?.message ?? err}`;
+      continue;
+    }
+    if (response.ok) return await response.json();
+    if (response.status !== 429 && (response.status < 500 || response.status >= 600)) {
+      throw new Error(`CourtListener responded ${response.status} ${response.statusText} for ${url}`);
+    }
+    lastError = `HTTP ${response.status} ${response.statusText}`;
+    process.stderr.write(`  attempt ${attempt + 1}/${MAX_RETRIES + 1} — ${lastError} (rate limiter will schedule the next attempt)\n`);
+  }
+  throw new Error(`CourtListener request failed after ${MAX_RETRIES + 1} attempts: ${lastError} (${url})`);
+}
+
 async function fetchAllCourts(token) {
   const headers = {
     'User-Agent': 'trustfoundry-ai/benchmarks (build-cl-jurisdictions.mjs)',
     Accept: 'application/json'
   };
   if (token) headers.Authorization = `Token ${token}`;
+
+  const limiter = await CourtListenerRateLimiter.bootstrap({
+    onLog: (msg) => process.stderr.write(`${msg}\n`)
+  });
 
   const all = [];
   let nextUrl = `${CL_COURTS_ENDPOINT}?page_size=${PAGE_SIZE}`;
@@ -66,11 +111,7 @@ async function fetchAllCourts(token) {
   while (nextUrl) {
     page += 1;
     process.stderr.write(`Fetching page ${page}: ${nextUrl}\n`);
-    const response = await fetch(nextUrl, { headers });
-    if (!response.ok) {
-      throw new Error(`CourtListener responded ${response.status} ${response.statusText} for ${nextUrl}`);
-    }
-    const body = await response.json();
+    const body = await fetchPageWithRetry(nextUrl, headers, limiter);
     if (!Array.isArray(body?.results)) {
       throw new Error(`Unexpected response shape from ${nextUrl}: no results array`);
     }
