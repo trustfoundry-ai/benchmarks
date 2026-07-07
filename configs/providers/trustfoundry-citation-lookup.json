@@ -1,7 +1,0 @@
-{
-  "_comment": "TrustFoundry public API search provider for citation-lookup rows. state_filter_enabled is false because state is inapplicable to citation lookup: a citation string is unambiguous across jurisdictions, and the API rejects the call when a state is sent alongside model_type=citation_search. The benchmark loader sets each row's model_type to citation_search.",
-  "endpoint": "https://api.trustfoundry.ai/public/v1/search",
-  "api_key_env": "TF_API_KEY",
-  "request_timeout_ms": 60000,
-  "state_filter_enabled": false
-}

@@ -24,9 +24,8 @@ The public benchmarks in this space measure adjacent capabilities. [LegalBench](
 | Suite | Status | Published numbers |
 |---|---|---|
 | `trustfoundry-legal-search` | Numbers published | 8 bundles under [`results/trustfoundry-legal-search/2026-07-05/`](results/trustfoundry-legal-search/2026-07-05/) (200-row and 5k-row × case-questions / key-facts / laws / regs) |
-| `trustfoundry-citation-lookup` | In development | Not yet — dataset and scorer land in this release; evaluation numbers to follow. |
 
-"Numbers published" means a scored result bundle exists under [`results/`](results/) with checksummed row-level evidence and passes `pnpm verify:results`. Suites marked "In development" ship the dataset, adapter, and scorer so consumers can rerun them locally — but the harness maintainers have not yet published a canonical evaluation.
+"Numbers published" means a scored result bundle exists under [`results/`](results/) with checksummed row-level evidence and passes `pnpm verify:results`.
 
 ## Latest Benchmarks
 
@@ -104,7 +103,6 @@ For full runs with large raw artifacts, raw rows may be stored as `raw.jsonl.gz`
 ## Suites
 
 - [TrustFoundry Legal Search](suites/trustfoundry-legal-search/README.md): legal search recall over public 5,000-row case-question, key-fact, law, and regulation datasets.
-- [Citation Lookup](suites/trustfoundry-citation-lookup/README.md): rank-1 citation-lookup accuracy over 4,618 rows of case-law, statute, regulation, and held-out non-citation negative queries, stratified by difficulty (clean vs. sloppy vs. reporter-variation).
 
 ## Setup
 
@@ -174,7 +172,7 @@ The image stamps the source commit it was built from into `$HARNESS_COMMIT_SHA`,
 - `bin/` and `src/`: the benchmark CLI and harness framework.
 - `configs/`: benchmark, provider, and scorer configuration.
 - `data/`: public benchmark datasets.
-- `suites/trustfoundry-legal-search/` and `suites/trustfoundry-citation-lookup/`: suite-specific *documentation* only. Suite-scoped adapters live under `src/adapters/`.
+- `suites/trustfoundry-legal-search/`: suite-specific *documentation* only. Suite-scoped adapters live under `src/adapters/`.
 - `results/`: published result bundles, organized as `results/<benchmark>/<date>/<type>/<size>/`. Each benchmark also has a `results/<benchmark>/latest.json` pointer that names the currently-published bundle for each `(type, size)` — stable URL for external consumers who don't want to guess the date.
 - `agent-skills/`: optional agent workflow instructions.
 - `Dockerfile`, `entrypoint.sh`: reproducible container image (see "Running the harness in a container" above).

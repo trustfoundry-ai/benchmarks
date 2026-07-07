@@ -4,6 +4,15 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+### Removed
+
+- **`trustfoundry-citation-lookup` benchmark, scorer, provider config, dataset,
+  suite doc, and registry entries** — pulled from the public repo pending
+  full end-to-end validation. The companion `courtlistener-citation-lookup`
+  provider is also unshipped (still private-only). Both will return together
+  as a `0.10.0` release once the flow is vetted. Nothing that was published
+  under `results/` referenced this suite, so no result bundles change.
+
 ## [0.9.0] - 2026-07-07
 
 Vendor provider adapters promoted from the private `benchmarks-lab`
