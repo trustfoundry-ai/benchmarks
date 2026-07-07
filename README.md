@@ -199,6 +199,26 @@ matching `compatibility` fingerprints can be merged and compared;
 matching `resume` fingerprints share the same shard slice; the
 `manifest` fingerprint is unique per run.
 
+### Verifying releases
+
+Each tagged release ships with a signed [SLSA build provenance
+attestation](https://slsa.dev/spec/v1.0/provenance) produced by GitHub's
+[`actions/attest-build-provenance`](https://github.com/actions/attest-build-provenance)
+action. Verify the release tarball before consuming it:
+
+```bash
+gh release download v0.8.0 -R trustfoundry-ai/benchmarks \
+    -p 'trustfoundry-ai-benchmarks-harness-*.tgz'
+
+gh attestation verify \
+    trustfoundry-ai-benchmarks-harness-0.8.0.tgz \
+    -R trustfoundry-ai/benchmarks
+```
+
+`gh attestation verify` confirms the tarball was built by this repo's
+release workflow at the tagged commit; a mismatched or missing
+attestation fails the check.
+
 ## Extending
 
 The harness keeps benchmarks, providers, and scorers behind adapter boundaries. Future public suites can add a benchmark loader and scorer, while alternative platforms can add a provider adapter that returns the same normalized result shape used by the scorer.
