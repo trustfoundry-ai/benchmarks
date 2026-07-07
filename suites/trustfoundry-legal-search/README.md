@@ -1,169 +1,85 @@
 # TrustFoundry Legal Search
 
-This suite evaluates whether a search API returns the expected legal document or citation for a generated legal search prompt. Public datasets cover case questions, case key facts, law questions, and regulation questions. Each row contains a generated query, an expected TrustFoundry document UUID, accepted citation metadata, and jurisdiction metadata. The TrustFoundry provider calls:
+This suite evaluates whether a search backend returns the expected U.S. legal document or citation for a generated legal-search prompt. Public datasets cover **case questions**, **case key facts**, **law questions**, and **regulation questions**. Each row carries a generated query, an expected TrustFoundry document UUID, accepted citation metadata, and jurisdiction metadata.
 
-```text
-POST https://api.trustfoundry.ai/public/v1/search
-```
-
-## Setup
-
-Create an API key from your TrustFoundry account dashboard, then export it as `TF_API_KEY`:
-
-```bash
-export TF_API_KEY=your_key_here
-```
-
-Install dependencies from the repository root:
-
-```bash
-pnpm install
-```
-
-## Run
-
-TrustFoundry Legal Search is one benchmark family with four targets. Each target has a deterministic 5,000-row JSONL dataset and a 200-row smoke config that reads the first 200 rows from the same file by setting `limit: 200`.
-
-The key-fact file is selected from the existing deterministic 10k source after excluding rows whose normalized query is empty. Law and regulation files are the first 5,000 rows from their deterministic 10k source files.
-
-### Targets
-
-All targets use the same public search endpoint and `trustfoundry-legal-search` scorer.
-
-- `case_question` - Case questions
-  - Data: [`case_questions.jsonl`](../../data/trustfoundry-legal-search/case_questions.jsonl)
-  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search/case-questions-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search/case-questions-5k.json)
-  - Published bundles: [`200`](../../results/trustfoundry-legal-search/2026-07-05/case-questions/200/), [`5k`](../../results/trustfoundry-legal-search/2026-07-05/case-questions/5k/)
-- `case_key_fact` - Case key facts
-  - Data: [`case_key_facts.jsonl`](../../data/trustfoundry-legal-search/case_key_facts.jsonl)
-  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search/key-facts-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search/key-facts-5k.json)
-  - Published bundles: [`200`](../../results/trustfoundry-legal-search/2026-07-05/key-facts/200/), [`5k`](../../results/trustfoundry-legal-search/2026-07-05/key-facts/5k/)
-- `law_question` - Law questions
-  - Data: [`laws.jsonl`](../../data/trustfoundry-legal-search/laws.jsonl)
-  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search/laws-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search/laws-5k.json)
-  - Published bundles: [`200`](../../results/trustfoundry-legal-search/2026-07-05/laws/200/), [`5k`](../../results/trustfoundry-legal-search/2026-07-05/laws/5k/)
-- `reg_question` - Regulation questions
-  - Data: [`regs.jsonl`](../../data/trustfoundry-legal-search/regs.jsonl)
-  - Configs: [`200`](../../configs/benchmarks/trustfoundry-legal-search/regs-200.json), [`5k`](../../configs/benchmarks/trustfoundry-legal-search/regs-5k.json)
-  - Published bundles: [`200`](../../results/trustfoundry-legal-search/2026-07-05/regs/200/), [`5k`](../../results/trustfoundry-legal-search/2026-07-05/regs/5k/)
-
-The generic provider config [`trustfoundry-legal-search.json`](../../configs/providers/trustfoundry-legal-search.json) omits `model_type` and sends each row's `model_type`, so the same provider config works for all four targets.
-
-**Latest bundles.** [`results/trustfoundry-legal-search/latest.json`](../../results/trustfoundry-legal-search/latest.json) points at the currently-published bundle for each `(type, size)` — a stable pointer that resolves to whichever dated bundle is currently canonical, so external consumers don't have to guess the date.
-
-### Test Data Schema
-
-Each line in a dataset JSONL file is one JSON object. The main fields are:
-
-| Field | Description |
-| --- | --- |
-| `query_text` | The legal query sent to the search API after the suite's query normalization step. |
-| `document_uuid` | TrustFoundry document UUID for the expected document. TrustFoundry runs can score against this because the public search API returns document UUIDs in results. |
-| `expected.canonical_citation` | Primary citation for the expected document. |
-| `expected.alternates` | Additional accepted citations for the expected document. |
-| `expected.cl_cluster_id` | CourtListener opinion-cluster ID for the expected document (case-law rows only). Sourced from CourtListener bulk data via TrustFoundry's internal document store. Provides a native-ID join key for downstream consumers whose result rows expose a top-level `cluster_id` mapped to the same CL cluster space. `null` on laws/regs rows. |
-| `geo_level_1_identifier` | Row-level state or `FED` jurisdiction value. The TrustFoundry provider sends this as the state filter when state filtering is enabled. |
-| `model_type` | Expected model type for the row: `case_question`, `case_key_fact`, `law_question`, or `reg_question`. The generic TrustFoundry provider config uses this row-level value. |
-| `doc_type` / `document_type` | Source document category metadata. |
-| `field` | Source field used to generate the query, such as `questions` or `key_facts`. |
-| `split` | Dataset split, currently `test` for public rows. |
-| `source_dataset` / `source_index` | Provenance fields for tracing the row back to the source generation set. |
-
-The scorer tries native IDs first (`document_uuid` when the result carries a TrustFoundry UUID; `cl_cluster_id` when the result carries a CL-mapped opinion-cluster ID), then falls back to citation matching. Any match at rank K counts as a hit@K; ordering does not change the metric math. Adapters that don't populate any native ID on their results still score via citation matching, which remains the general fallback.
-
-### Dataset schema history
-
-Field additions and other dataset-shape changes are documented in the repo-root [CHANGELOG.md](../../CHANGELOG.md). The most recent change added `expected.cl_cluster_id` (case-law rows only) so consumers whose result rows expose a CL-mapped native opinion-cluster ID can match on it instead of relying on citation-string normalization.
-
-### Commands
-
-Smoke run, first deterministic 200 rows:
-
-```bash
-pnpm benchmark run \
-  --benchmark-config configs/benchmarks/trustfoundry-legal-search/case-questions-200.json \
-  --provider-config configs/providers/trustfoundry-legal-search.json \
-  --out runs/trustfoundry-legal-search-case-questions-200 \
-  --parallel 8 \
-  --force
-```
-
-Full public 5k run:
-
-```bash
-pnpm benchmark run \
-  --benchmark-config configs/benchmarks/trustfoundry-legal-search/case-questions-5k.json \
-  --provider-config configs/providers/trustfoundry-legal-search.json \
-  --out runs/trustfoundry-legal-search-case-questions-5k \
-  --parallel 8 \
-  --force
-```
-
-Use the matching config for other targets — `configs/benchmarks/trustfoundry-legal-search/{key-facts,laws,regs}-{200,5k}.json` — and a run directory name that mirrors the target.
-
-The TrustFoundry public-search provider makes one retry for transient provider failures: fetch errors, streamed provider error events, missing result events, or HTTP 5xx responses. It does not retry validation errors or HTTP 4xx responses. If the retry succeeds, the row is scored from the successful response and latency includes the full elapsed time across both attempts; if it still fails, it is reported as a provider failure.
-
-### Request limit and scorer cutoffs
-
-Both knobs live in one place: [`configs/scorers/trustfoundry-legal-search.json`](../../configs/scorers/trustfoundry-legal-search.json).
-
-| Field | Purpose |
-| --- | --- |
-| `api_request_limit` | Number of results requested per `/public/v1/search` call (forwarded as `limit` in the request body). |
-| `cutoffs` | List of K values for `hits@K` reported in the scores file. |
-| `headline_cutoff` | The featured `hits@K` shown in the run summary. |
-
-**Public API cap.** `api_request_limit` must align with the caller-facing cap enforced by the public search API at <https://api.trustfoundry.ai>. The current cap is 25; raising `api_request_limit` past it causes every call to fail with HTTP 400.
-
-**Startup validation.** The runner refuses to start unless:
-
-1. `api_request_limit >= max(cutoffs plus headline_cutoff)`; otherwise `hits@K` for K > `api_request_limit` is meaningless because the API would never return enough results.
-2. `cutoffs` and `headline_cutoff` match the values the trustfoundry-legal-search scorer is actually computing. The published result-bundle schema currently pins `hits@K` to `K in {1, 5, 10, 25}`; if you need different K values, update `src/adapters/scorers/trustfoundry-legal-search.mjs` and the artifact schema together.
-
-Each validation error names both numbers and points back to <https://api.trustfoundry.ai>.
-
-Individual provider configs can still pin an explicit `limit` if an adapter needs different semantics; the explicit value wins over the scorer-driven default.
-
-Create a shareable result bundle from a run:
-
-```bash
-pnpm benchmark publish-result \
-  --run runs/trustfoundry-legal-search-case-questions-200 \
-  --out results/trustfoundry-legal-search/2026-07-05/case-questions/200 \
-  --force
-pnpm benchmark verify-result results/trustfoundry-legal-search/2026-07-05/case-questions/200
-```
+The suite is provider-agnostic. Any provider adapter registered in the harness can run against these datasets, and results are directly comparable across providers because every run uses the same scorer, the same rows, and the same top-K.
 
 ## Provider options
 
-Any provider adapter registered in the harness can run against these datasets. The `Run` section above uses the `trustfoundry-legal-search` provider as the canonical baseline. Four additional adapters ship for comparison — every one uses the same scorer, datasets, and top-K, so cross-provider numbers are directly comparable.
-
-| Adapter | What it is | Full setup + run |
+| Adapter | What it is | Setup + run |
 |---|---|---|
-| `trustfoundry-legal-search` | TrustFoundry public search API | (this file, above) |
+| `trustfoundry-legal-search` | TrustFoundry public search API — canonical baseline for this suite | [`docs/adapters/trustfoundry-legal-search.md`](../../docs/adapters/trustfoundry-legal-search.md) |
 | `courtlistener-search` | CourtListener v4 opinion-search API (legal-specific search engine) | [`docs/adapters/courtlistener-search.md`](../../docs/adapters/courtlistener-search.md) |
 | `anthropic-legal-search` | Anthropic Messages API + `web_search` tool (haiku / sonnet / opus) — qualitative LLM demonstrator | [`docs/adapters/anthropic-legal-search.md`](../../docs/adapters/anthropic-legal-search.md) |
 | `openai-legal-search` | OpenAI Responses API + `web_search` tool (gpt-5.5) — qualitative LLM demonstrator | [`docs/adapters/openai-legal-search.md`](../../docs/adapters/openai-legal-search.md) |
 | `exa-legal-search` | Exa `/search` API restricted to legal aggregators — qualitative general-web-search demonstrator | [`docs/adapters/exa-legal-search.md`](../../docs/adapters/exa-legal-search.md) |
 
-The LLM/Exa adapters are shipped as **qualitative demonstrators** — the point is to make the retrieval-quality gap between "legal-specific search engine" and "general web search / LLM with a search tool" reproducible on the same benchmark. Each adapter README documents its integration approach, known failure modes, and expected cost/latency profile.
+The LLM/Exa adapters are shipped as **qualitative demonstrators** — the point is to make the retrieval-quality gap between "legal-specific search engine" and "general web search / LLM with a search tool" reproducible on the same benchmark. Each adapter README documents its integration approach, prerequisite env vars, exact `pnpm benchmark run` invocation, and expected cost / latency.
+
+## Datasets
+
+Four targets, each shipped as a deterministic 5,000-row JSONL plus a 200-row smoke config that reads the first 200 rows via `limit: 200`. All four use the same public search endpoint and the `trustfoundry-legal-search` scorer.
+
+| Target | Data file | Configs |
+|---|---|---|
+| `case_question` — Case questions | [`case_questions.jsonl`](../../data/trustfoundry-legal-search/case_questions.jsonl) | [`200`](../../configs/benchmarks/trustfoundry-legal-search/case-questions-200.json) · [`5k`](../../configs/benchmarks/trustfoundry-legal-search/case-questions-5k.json) |
+| `case_key_fact` — Case key facts | [`case_key_facts.jsonl`](../../data/trustfoundry-legal-search/case_key_facts.jsonl) | [`200`](../../configs/benchmarks/trustfoundry-legal-search/key-facts-200.json) · [`5k`](../../configs/benchmarks/trustfoundry-legal-search/key-facts-5k.json) |
+| `law_question` — Law questions | [`laws.jsonl`](../../data/trustfoundry-legal-search/laws.jsonl) | [`200`](../../configs/benchmarks/trustfoundry-legal-search/laws-200.json) · [`5k`](../../configs/benchmarks/trustfoundry-legal-search/laws-5k.json) |
+| `reg_question` — Regulation questions | [`regs.jsonl`](../../data/trustfoundry-legal-search/regs.jsonl) | [`200`](../../configs/benchmarks/trustfoundry-legal-search/regs-200.json) · [`5k`](../../configs/benchmarks/trustfoundry-legal-search/regs-5k.json) |
+
+The key-fact file is drawn from the deterministic 10k source after excluding rows whose normalized query is empty. Law and regulation files are the first 5k rows from their deterministic 10k sources.
+
+## Published numbers
+
+The `trustfoundry-legal-search` provider results below are the current canonical published numbers. Bundles are checksummed and verifiable with `pnpm benchmark verify-result <bundle>`.
+
+| Date | Target | Bundle | 200-row companion |
+|---|---|---|---|
+| 2026-07-05 | case-questions | [`5k`](../../results/trustfoundry-legal-search/2026-07-05/case-questions/5k/) | [`200`](../../results/trustfoundry-legal-search/2026-07-05/case-questions/200/) |
+| 2026-07-05 | key-facts | [`5k`](../../results/trustfoundry-legal-search/2026-07-05/key-facts/5k/) | [`200`](../../results/trustfoundry-legal-search/2026-07-05/key-facts/200/) |
+| 2026-07-05 | laws | [`5k`](../../results/trustfoundry-legal-search/2026-07-05/laws/5k/) | [`200`](../../results/trustfoundry-legal-search/2026-07-05/laws/200/) |
+| 2026-07-05 | regs | [`5k`](../../results/trustfoundry-legal-search/2026-07-05/regs/5k/) | [`200`](../../results/trustfoundry-legal-search/2026-07-05/regs/200/) |
+
+**Latest pointer.** [`results/trustfoundry-legal-search/latest.json`](../../results/trustfoundry-legal-search/latest.json) maps each `(target, size)` to its currently-canonical dated bundle — a stable URL for external consumers who don't want to guess the date. `pnpm verify:results` verifies the pointer and every bundle it references.
+
+For a concrete example of what a bundle's scored summary looks like, see [`results/trustfoundry-legal-search/2026-07-05/case-questions/5k/result.json`](../../results/trustfoundry-legal-search/2026-07-05/case-questions/5k/result.json). The full checked-in bundle also carries the raw row-level evidence, manifest, and checksums.
+
+## Test data schema
+
+Each line in a dataset JSONL is one JSON object. The main fields:
+
+| Field | Description |
+| --- | --- |
+| `query_text` | The legal query sent to the search API after the suite's query normalization step. |
+| `document_uuid` | TrustFoundry document UUID for the expected document. TrustFoundry runs score against this because the public search API returns document UUIDs on results. |
+| `expected.canonical_citation` | Primary citation for the expected document. |
+| `expected.alternates` | Additional accepted citations for the expected document. |
+| `expected.cl_cluster_id` | CourtListener opinion-cluster ID for the expected document (case-law rows only). Sourced from CourtListener bulk data via TrustFoundry's document store. Provides a native-ID join key for downstream consumers whose result rows expose a top-level `cluster_id` mapped to the same CL cluster space. `null` on laws/regs rows. |
+| `geo_level_1_identifier` | Row-level state or `FED` jurisdiction value. Provider adapters forward this to their backend's state filter when appropriate. |
+| `model_type` | Expected model type for the row: `case_question`, `case_key_fact`, `law_question`, or `reg_question`. The generic TrustFoundry provider config reads this row-level value. |
+| `doc_type` / `document_type` | Source document category metadata. |
+| `field` | Source field used to generate the query, such as `questions` or `key_facts`. |
+| `split` | Dataset split, currently `test` for public rows. |
+| `source_dataset` / `source_index` | Provenance fields for tracing the row back to the source generation set. |
+
+The scorer tries native IDs first (`document_uuid` when the result carries a TrustFoundry UUID; `cl_cluster_id` when the result carries a CL-mapped opinion-cluster ID), then falls back to citation matching. Any match at rank K counts as `hit@K`; ordering does not change the metric math. Adapters that don't populate any native ID on their results still score via citation matching, which remains the general fallback.
+
+### Dataset schema history
+
+Field additions and other dataset-shape changes are documented in the repo-root [`CHANGELOG.md`](../../CHANGELOG.md). The most recent change added `expected.cl_cluster_id` (case-law rows only) so consumers whose result rows expose a CL-mapped native opinion-cluster ID can match on it instead of relying on citation-string normalization.
 
 ## Metrics
 
-The scorer can match either an expected document UUID or an accepted citation. TrustFoundry public API runs match on document UUID because the API returns it; adapters for systems that do not use TrustFoundry UUIDs can return citation fields and score against canonical or alternate citations.
+The scorer computes both native-ID and citation matches, and reports several ranked metrics:
 
-- `hit@1`: the expected document or citation is the first result.
-- `hit@5`, `hit@10`, `hit@25`: the expected document or citation appears within the top `k` results.
-- `MRR`: mean reciprocal rank. A hit at rank 1 contributes `1.0`, rank 2 contributes `0.5`, rank 10 contributes `0.1`, and a miss contributes `0`. Aggregate MRR values are truncated to four decimal places.
-- `failure_rate`: share of rows where the provider request failed or could not be scored.
-- `strict_overall`: metrics over all rows with valid expected documents, counting provider failures as misses.
-- `overall`: metrics over successful scored rows with valid expected documents.
-- `latency_ms`: request timing summary with min, mean, p50, p95, and max.
+- `hit@1` — the expected document (or an accepted citation) is the first result.
+- `hit@5`, `hit@10`, `hit@25` — expected document / citation appears within the top `k` results.
+- `MRR` — mean reciprocal rank. Hit at rank 1 contributes `1.0`, rank 2 contributes `0.5`, rank 10 contributes `0.1`, miss contributes `0`. Aggregate MRR values truncated to four decimal places.
+- `failure_rate` — share of rows where the provider request failed or could not be scored.
+- `strict_overall` — metrics over all rows with valid expected documents, counting provider failures as misses.
+- `overall` — metrics over successful scored rows with valid expected documents.
+- `latency_ms` — request timing summary with min, mean, p50, p95, and max.
 
-Each run writes raw provider outputs and row-level scores so aggregate metrics can be recomputed from the evidence.
+Each run writes raw provider outputs and row-level scores so aggregate metrics can be recomputed from the evidence. Top-level `hit@k` and `MRR` are computed over successfully scored rows and report provider failures separately; use `strict_overall` when provider failures should count as misses.
 
-Top-level `hit@k` and `MRR` are computed over successfully scored rows and report provider failures separately. Use `strict_overall` when provider failures should count as misses.
-
-## Example Test Results
-
-For example output, inspect the scored summary at [`result.json`](../../results/trustfoundry-legal-search/2026-07-05/case-questions/5k/result.json). The full checked-in bundle also includes the raw row evidence, manifest, and checksums.
+The scorer's configuration (`api_request_limit`, `cutoffs`, `headline_cutoff`) is documented in [`docs/adapters/trustfoundry-legal-search.md`](../../docs/adapters/trustfoundry-legal-search.md#request-limit-and-scorer-cutoffs). Those knobs apply to any adapter running against this benchmark, since they configure the shared scorer.
