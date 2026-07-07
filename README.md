@@ -209,6 +209,23 @@ Current adapters:
 pnpm benchmark adapters
 ```
 
+## Public API
+
+`@trustfoundry-ai/benchmarks-harness` exposes a curated set of named exports from its root barrel. Anything imported from that surface follows semver — additive changes are minor bumps, breaking changes are major bumps.
+
+The public surface groups by purpose:
+
+- **Adapter authoring** — `defineBenchmarkAdapter`, `defineProviderAdapter`, `defineScorerAdapter`, `defaultRegistry`, `createRegistry`, `getAdapter` (+ per-kind getters), `adapterInventory`.
+- **Run entry points** — `executeRun` (+ `runOpenEvaluation` alias), `scoreRun`, `retryFailedRun` (+ `retryFailed` alias), `mergeRuns`, `buildReport`, `executeProviderCaseWithRetry`.
+- **Adapter id + scorer config validation** — `benchmarkAdapterId`, `providerAdapterId`, `scorerAdapterId`, `maxScorerCutoff`, `readApiRequestLimit`, `validateApiRequestLimitAgainstCutoffs`, `validateScorerCutoffsMatchImplementation`.
+- **Reference implementations for adapters** — `FileBackedRateLimiter`, `createProviderRateLimiter`, `rateLimitedProviderResult`, `summarizeTokenUsage`, `normalizeTokenUsage`, `writeCaseCheckpoint`, `loadCaseCheckpoints`, `writeCaseProgressCheckpoint`, `clearCheckpoints`, `buildManifest`, `assertCompatibleManifest`, `computeFingerprints`.
+- **Result artifacts + verification** — `publishResultBundle`, `verifyResultBundle`, `buildRawRow` / `buildRawRows`, `reconstructPairFromRawRow` / `reconstructFromRawRows`, `scoreRawRows`, `readRawJsonl`.
+- **Primitives for adapter authors** — `readJson` / `writeJson` / `readJsonl` / `readJsonlStream` / `writeJsonl` / `writeText` / `exists` / `relativePath` / `createJsonlWriter`, `sha256Text` / `sha256File`, `stableJson` / `hashObject` / `hashFile`, `canonicalStringify`, `acceptedCitationSet` / `normalizeCitation` / `splitCitationList`, `applyQueryTransform` / `stripSyntheticInstructionPrefixes`, `mapWithConcurrency` / `applyShard` / `normalizeScheduler`.
+
+See [`docs/adapter-contracts.md`](docs/adapter-contracts.md) for the long-form contract guide and [`src/core/contracts/README.md`](src/core/contracts/README.md) for the adapter-authoring reference.
+
+**Not public API:** everything in `src/core/*.mjs` that is NOT re-exported by [`src/index.mjs`](src/index.mjs) — those helpers are internal and may change without notice. If you need to reach into them, pin a specific version of the package first.
+
 ## Development
 
 Run tests:
