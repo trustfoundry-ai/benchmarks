@@ -1,7 +1,7 @@
 {
-  "_comment": "First 200 deterministic case-question rows from the canonical trustfoundry-legal-search dataset shipped by the linked @trustfoundry-ai/benchmarks-harness package. Filtered to case rows only, since the anthropic-legal-search provider adapter only supports doc_type=case + model_type in {case_question, case_key_fact}.",
+  "_comment": "First 200 case-question rows from the public trustfoundry-legal-search dataset, paired with the anthropic-legal-search provider. Use CLI --offset/--limit to run subsets (e.g. --limit 1 for a wiring smoke).",
   "benchmarkId": "trustfoundry-legal-search",
-  "dataDir": "node_modules/@trustfoundry-ai/benchmarks-harness/data/trustfoundry-legal-search",
+  "dataDir": "data/trustfoundry-legal-search",
   "files": ["case_questions.jsonl"],
   "datasetSize": "anthropic-legal-search-case-questions-200",
   "datasetNames": ["case_questions"],

@@ -38,8 +38,8 @@ result bundle still verifies byte-for-byte.
 - **Provider configs** for all promoted adapters under
   `configs/providers/`; **benchmark configs** for the LLM/Exa adapters
   under `configs/benchmarks/{anthropic,openai,exa}-legal-search*/`
-  (four slices per variant: smoke-1 / 20-offset-1 / 179-offset-21 /
-  200 for the full 200-row bench).
+  (a single `case-questions-200.json` per variant; use CLI
+  `--offset` / `--limit` for smokes and subsets).
 - **`docs/adapters/`** — per-adapter READMEs documenting integration
   approach, known shortcomings, and (for the LLM/Exa demonstrators)
   the qualitative-comparison framing.
