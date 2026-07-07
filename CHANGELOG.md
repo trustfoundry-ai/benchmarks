@@ -6,7 +6,7 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [0.8.0] - 2026-07-07
 
-Enterprise-hardening pass ahead of the first external design-partner
+Harness-maintainability pass ahead of the first external design-partner
 access. No dataset or scored-metric changes: every previously-published
 result bundle still verifies byte-for-byte.
 
