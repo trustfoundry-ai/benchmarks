@@ -43,19 +43,23 @@ DATE=$(date -u +%Y-%m-%d)
 BENCHMARK_FAMILY=trustfoundry-legal-search
 PROVIDER_CFG=configs/providers/trustfoundry-legal-search.json
 
-# Canonical list of configs this suite knows how to run. Drives validation
-# and the all-200 / all-5k aliases. Keep in sync with the GHA dropdown in
-# Trust-Foundry/benchmarks-lab/.github/workflows/tf-legal-search-run.yml.
-ALL_CONFIGS=(
-  trustfoundry-legal-search/case-questions-200
-  trustfoundry-legal-search/case-questions-5k
-  trustfoundry-legal-search/key-facts-200
-  trustfoundry-legal-search/key-facts-5k
-  trustfoundry-legal-search/laws-200
-  trustfoundry-legal-search/laws-5k
-  trustfoundry-legal-search/regs-200
-  trustfoundry-legal-search/regs-5k
-)
+# Configs are discovered from disk so this list stays in sync with the
+# committed configs/benchmarks/ tree instead of drifting whenever a new
+# config is added. Only *-200.json and *-5k.json are surfaced — these are
+# the size suffixes the all-200 / all-5k aliases refer to.
+ALL_CONFIGS=()
+while IFS= read -r cfg_path; do
+  # Strip leading "configs/benchmarks/" and trailing ".json" to get the
+  # logical id the rest of this script (and the GHA dropdown) uses.
+  cfg_id="${cfg_path#configs/benchmarks/}"
+  cfg_id="${cfg_id%.json}"
+  ALL_CONFIGS+=("$cfg_id")
+done < <(find configs/benchmarks -type f \( -name '*-200.json' -o -name '*-5k.json' \) | sort)
+
+if [ "${#ALL_CONFIGS[@]}" -eq 0 ]; then
+  echo "No *-200.json / *-5k.json configs found under configs/benchmarks/" >&2
+  exit 2
+fi
 
 declare -a CONFIGS_TO_RUN=()
 case "$BENCHMARK_CONFIG" in
