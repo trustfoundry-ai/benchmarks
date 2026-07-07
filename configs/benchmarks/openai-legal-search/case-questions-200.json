@@ -1,0 +1,11 @@
+{
+  "_comment": "First 200 deterministic case-question rows from the canonical trustfoundry-legal-search dataset shipped by the linked @trustfoundry-ai/benchmarks-harness package. Filtered to case rows only, since the openai-legal-search provider adapter only supports doc_type=case + model_type in {case_question, case_key_fact}. Mirrors configs/benchmarks/anthropic-legal-search/case-questions-200.json byte-for-byte apart from datasetSize so the two runs are strictly comparable.",
+  "benchmarkId": "trustfoundry-legal-search",
+  "dataDir": "node_modules/@trustfoundry-ai/benchmarks-harness/data/trustfoundry-legal-search",
+  "files": ["case_questions.jsonl"],
+  "datasetSize": "openai-legal-search-case-questions-200",
+  "datasetNames": ["case_questions"],
+  "splits": ["test"],
+  "queryTransformId": "strip-synthetic-instruction-prefixes-v1",
+  "limit": 200
+}

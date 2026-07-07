@@ -1,0 +1,12 @@
+{
+  "_comment": "Rows 22-200 of the canonical trustfoundry-legal-search case_questions dataset (offset=21, limit=179). Third and final slice for the aggregators-only 200-row benchmark; row 1 was the smoke, rows 2-21 were the validation batch. All three slices are merged into a single 200-row bundle at analysis time.",
+  "benchmarkId": "trustfoundry-legal-search",
+  "dataDir": "node_modules/@trustfoundry-ai/benchmarks-harness/data/trustfoundry-legal-search",
+  "files": ["case_questions.jsonl"],
+  "datasetSize": "exa-legal-search-aggregators-only-case-questions-179-offset-21",
+  "datasetNames": ["case_questions"],
+  "splits": ["test"],
+  "queryTransformId": "strip-synthetic-instruction-prefixes-v1",
+  "offset": 21,
+  "limit": 179
+}

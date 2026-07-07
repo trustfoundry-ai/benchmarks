@@ -19,6 +19,11 @@
  */
 import { trustfoundryCitationLookupBenchmarkAdapter } from '../adapters/benchmarks/trustfoundry-citation-lookup.mjs';
 import { trustfoundryLegalSearchBenchmarkAdapter } from '../adapters/benchmarks/trustfoundry-legal-search.mjs';
+import { anthropicLegalSearchProviderAdapter } from '../adapters/providers/anthropic-legal-search.mjs';
+import { courtlistenerCitationLookupProviderAdapter } from '../adapters/providers/courtlistener-citation-lookup.mjs';
+import { courtlistenerSearchProviderAdapter } from '../adapters/providers/courtlistener-search.mjs';
+import { exaLegalSearchProviderAdapter } from '../adapters/providers/exa-legal-search.mjs';
+import { openaiLegalSearchProviderAdapter } from '../adapters/providers/openai-legal-search.mjs';
 import { trustfoundryLegalSearchProviderAdapter } from '../adapters/providers/trustfoundry-legal-search.mjs';
 import { trustfoundryCitationLookupScorerAdapter } from '../adapters/scorers/trustfoundry-citation-lookup.mjs';
 import { trustfoundryLegalSearchScorerAdapter } from '../adapters/scorers/trustfoundry-legal-search.mjs';
@@ -45,6 +50,11 @@ export function createRegistry() {
 export const defaultRegistry = createRegistry();
 defaultRegistry.register('benchmarks', trustfoundryLegalSearchBenchmarkAdapter);
 defaultRegistry.register('benchmarks', trustfoundryCitationLookupBenchmarkAdapter);
+defaultRegistry.register('providers', anthropicLegalSearchProviderAdapter);
+defaultRegistry.register('providers', courtlistenerCitationLookupProviderAdapter);
+defaultRegistry.register('providers', courtlistenerSearchProviderAdapter);
+defaultRegistry.register('providers', exaLegalSearchProviderAdapter);
+defaultRegistry.register('providers', openaiLegalSearchProviderAdapter);
 defaultRegistry.register('providers', trustfoundryLegalSearchProviderAdapter);
 defaultRegistry.register('scorers', trustfoundryLegalSearchScorerAdapter);
 defaultRegistry.register('scorers', trustfoundryCitationLookupScorerAdapter);

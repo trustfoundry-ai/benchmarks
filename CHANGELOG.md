@@ -4,6 +4,71 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-07-07
+
+Vendor provider adapters promoted from the private `benchmarks-lab`
+overlay. No dataset or scored-metric changes: every previously-published
+result bundle still verifies byte-for-byte.
+
+### Added
+
+- **`courtlistener-search` provider adapter.** Wraps CourtListener's v4
+  opinion-search API. Legal-specific search engine; natural apples-to-apples
+  comparison to `trustfoundry-legal-search`. Reads rate limits live from
+  CourtListener's docs page at startup; honors `Retry-After` /
+  `X-RateLimit-Reset` on 429.
+- **`courtlistener-citation-lookup` provider adapter.** Wraps
+  CourtListener's v4 citation-lookup endpoint. Used by the
+  `trustfoundry-citation-lookup` benchmark.
+- **`anthropic-legal-search` provider adapter.** Wraps Anthropic's
+  Messages API with the built-in `web_search_20250305` tool. Three shipped
+  provider configs cover Haiku / Sonnet / Opus. Ships as a **qualitative
+  demonstrator**, not a competing product — makes the "general LLM +
+  web-search vs legal-specific search" gap reproducible against the
+  200-row benchmark.
+- **`openai-legal-search` provider adapter.** Wraps OpenAI's Responses
+  API with the built-in `web_search` tool. Also supports MCP tool
+  configuration as an extension capability (unit-tested; not yet
+  exercised at 200-row scale). Same qualitative-demonstrator framing.
+- **`exa-legal-search` provider adapter.** Wraps Exa's `/search` API.
+  Ships with `domain_scope: aggregators_only` as the default — no
+  per-row court-coverage map required, portable out of the box. The
+  adapter's other modes (`primary_only`, `primary_plus_aggregators`,
+  `unrestricted`) rely on `src/data/court-url-map.mjs` +
+  `court-url-map.template.csv` (starter set: SCOTUS + 13 federal
+  circuits) and can be extended with a user-provided CSV via
+  `TF_COURT_URLS_CSV`.
+- **Provider configs** for all promoted adapters under
+  `configs/providers/`; **benchmark configs** for the LLM/Exa adapters
+  under `configs/benchmarks/{anthropic,openai,exa}-legal-search*/`
+  (four slices per variant: smoke-1 / 20-offset-1 / 179-offset-21 /
+  200 for the full 200-row bench).
+- **`docs/adapters/`** — per-adapter READMEs documenting integration
+  approach, known shortcomings, and (for the LLM/Exa demonstrators)
+  the qualitative-comparison framing.
+- **`src/data/citation-extractor.mjs` + `src/data/court-url-map.mjs`**
+  — per-URL citation parsing and court_id → host resolution helpers
+  used by the exa adapter.
+- **~160 new tests** across the new adapters + citation-extractor +
+  court-url-map. Full public suite: 304/304 green.
+
+### Registry
+
+- `defaultRegistry` gains registrations for the five new provider
+  adapters (`anthropic-legal-search`, `courtlistener-search`,
+  `courtlistener-citation-lookup`, `exa-legal-search`,
+  `openai-legal-search`) alongside the existing
+  `trustfoundry-legal-search`.
+
+### Governance
+
+- CourtListener adapter outbound `User-Agent` uses a role alias
+  (`benchmarks@trustfoundry.ai`) per the amended promotion checklist,
+  not personal contact info.
+- CourtListener quota-exhaustion error message describes the
+  header-driven cooldown (`Retry-After` / `X-RateLimit-Reset`) rather
+  than any IP-rotation strategy the adapter does not use.
+
 ## [0.8.0] - 2026-07-07
 
 General maintainability pass on the harness. No dataset or scored-metric

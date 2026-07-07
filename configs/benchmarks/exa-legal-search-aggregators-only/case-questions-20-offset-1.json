@@ -1,0 +1,12 @@
+{
+  "_comment": "Rows 2-21 of the canonical trustfoundry-legal-search case_questions dataset. Skips row 1 (covered by the smoke run) and runs the next 20 rows as a bounded validation before the full 200-row benchmark.",
+  "benchmarkId": "trustfoundry-legal-search",
+  "dataDir": "node_modules/@trustfoundry-ai/benchmarks-harness/data/trustfoundry-legal-search",
+  "files": ["case_questions.jsonl"],
+  "datasetSize": "exa-legal-search-aggregators-only-case-questions-20-offset-1",
+  "datasetNames": ["case_questions"],
+  "splits": ["test"],
+  "queryTransformId": "strip-synthetic-instruction-prefixes-v1",
+  "offset": 1,
+  "limit": 20
+}

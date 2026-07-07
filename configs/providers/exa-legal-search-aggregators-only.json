@@ -1,0 +1,21 @@
+{
+  "_comment": "Aggregators-only variant: natural-language question sent to Exa with includeDomains restricted to the curated free legal aggregators (CourtListener, Justia, Google Scholar, OpenJurist, caselaw.findlaw.com). No per-row court-specific domain scoping — every row sends the identical aggregator list, so no court-url-map is required and the adapter is trivially portable to the public repo. Measures how Exa performs against public case law when the search is restricted to open aggregators.",
+  "endpoint": "https://api.exa.ai/search",
+  "api_key_env": "EXA_API_KEY",
+  "query_mode": "question",
+  "domain_scope": "aggregators_only",
+  "top_k": 25,
+  "search_type": "auto",
+  "highlight_sentences": 3,
+  "highlights_per_url": 3,
+  "request_timeout_ms": 60000,
+  "pricing": {
+    "vendor": "exa",
+    "source": "https://exa.ai/pricing",
+    "source_accessed_at": "2026-07-06",
+    "currency": "USD",
+    "unit": "per_1k_queries",
+    "search_per_1k_queries": 5,
+    "contents_per_1k_pages": 1
+  }
+}

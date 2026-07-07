@@ -1,0 +1,11 @@
+{
+  "_comment": "First 200 deterministic case-question rows from the canonical trustfoundry-legal-search dataset. Aggregators-only companion to configs/benchmarks/exa-legal-search-question-with-aggregators/case-questions-200.json — same rows, but the provider config restricts includeDomains to the aggregators (no per-row court scoping). Mirrors the other three exa variants byte-for-byte apart from datasetSize.",
+  "benchmarkId": "trustfoundry-legal-search",
+  "dataDir": "node_modules/@trustfoundry-ai/benchmarks-harness/data/trustfoundry-legal-search",
+  "files": ["case_questions.jsonl"],
+  "datasetSize": "exa-legal-search-aggregators-only-case-questions-200",
+  "datasetNames": ["case_questions"],
+  "splits": ["test"],
+  "queryTransformId": "strip-synthetic-instruction-prefixes-v1",
+  "limit": 200
+}

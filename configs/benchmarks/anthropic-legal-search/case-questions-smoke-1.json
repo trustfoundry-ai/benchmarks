@@ -1,0 +1,11 @@
+{
+  "_comment": "1-row smoke over the canonical trustfoundry-legal-search case_questions dataset. Used to validate that anthropic-legal-search end-to-end wiring works before larger runs.",
+  "benchmarkId": "trustfoundry-legal-search",
+  "dataDir": "node_modules/@trustfoundry-ai/benchmarks-harness/data/trustfoundry-legal-search",
+  "files": ["case_questions.jsonl"],
+  "datasetSize": "anthropic-legal-search-case-questions-smoke-1",
+  "datasetNames": ["case_questions"],
+  "splits": ["test"],
+  "queryTransformId": "strip-synthetic-instruction-prefixes-v1",
+  "limit": 1
+}
