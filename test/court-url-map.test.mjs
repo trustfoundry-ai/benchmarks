@@ -66,7 +66,11 @@ test('courtIdToUrls returns full URLs, not just hosts', () => {
   const urls = courtIdToUrls('mich');
   assert.equal(urls.length >= 1, true);
   assert.equal(urls[0].startsWith('http'), true);
-  assert.equal(urls[0].includes('courts.michigan.gov'), true);
+  // Assert on the URL's hostname exactly rather than a bare .includes()
+  // check — the substring test would also accept e.g.
+  // `https://evil.example/redirect?target=courts.michigan.gov`
+  // (CodeQL: incomplete-url-substring-sanitization).
+  assert.equal(new URL(urls[0]).hostname, 'courts.michigan.gov');
 });
 
 test('courtIdToEntry surfaces jurisdiction / courtType / courtName metadata', () => {
