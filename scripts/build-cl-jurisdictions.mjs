@@ -213,7 +213,7 @@ function buildStateMap(courthouseRecords) {
   return map;
 }
 
-function buildJurisdictionsJson(courtRecords, stateByCourtId) {
+function buildJurisdictionsJson(courtRecords, stateByCourtId, sources) {
   const states = {};
   const federalCourts = [];
   const stateCourtsWithoutState = [];
@@ -255,11 +255,16 @@ function buildJurisdictionsJson(courtRecords, stateByCourtId) {
   }
   federalCourts.sort((a, b) => a.id.localeCompare(b.id));
 
+  // Byte-stable output: everything downstream of `sources` depends
+  // deterministically on the two dated bulk files. No run-time timestamp
+  // in the JSON so re-running against the same dumps produces the same
+  // bytes (avoids gratuitous diffs when the file is checked in).
   return {
-    generated_at: new Date().toISOString(),
     source: {
       bucket: S3_BASE,
-      note: 'Built by scripts/build-cl-jurisdictions.mjs from CourtListener\'s public bulk data (search_court + courthouses). Rerun with --refresh to pick up newer CL dumps.'
+      courts_file: sources.courts,
+      courthouses_file: sources.courthouses,
+      note: 'Built by scripts/build-cl-jurisdictions.mjs from CourtListener\'s public bulk data (search_court + courthouses). To refresh: `node scripts/build-cl-jurisdictions.mjs --refresh`.'
     },
     state_jurisdictions: [...STATE_JURISDICTIONS].sort(),
     federal_jurisdictions: [...FEDERAL_JURISDICTIONS].sort(),
@@ -326,7 +331,10 @@ async function main() {
 
   const stateByCourtId = buildStateMap(courthouseRecords);
 
-  const output = buildJurisdictionsJson(courtRecords, stateByCourtId);
+  const output = buildJurisdictionsJson(courtRecords, stateByCourtId, {
+    courts: path.basename(courtsKey),
+    courthouses: path.basename(courthousesKey)
+  });
   const outPath = path.join(dataDir, OUT_FILENAME);
   const tmpPath = `${outPath}.tmp`;
   await writeFile(tmpPath, JSON.stringify(output, null, 2) + '\n', 'utf8');

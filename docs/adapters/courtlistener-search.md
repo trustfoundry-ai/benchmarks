@@ -18,19 +18,18 @@ CourtListener is a legal-specific search engine. Its recall and MRR numbers shou
 
 See [`configs/providers/courtlistener-search.json`](../../configs/providers/courtlistener-search.json). Set `COURTLISTENER_API_TOKEN` in your environment to get authenticated rate limits. The token is only required if you're running against production CourtListener; the tests use fixture responses and do not require a token.
 
-## Setup: jurisdiction filtering (optional but recommended)
+## Jurisdiction filtering
 
-To scope each row's search to the target court's jurisdiction (state supreme + appellate, or federal), the adapter reads a court-id → jurisdiction mapping from `data/courtlistener/court-jurisdictions.json`. That file is **not shipped** with the repo — you generate it locally from CourtListener's public REST API:
+The adapter scopes each row's search to the target court's jurisdiction (state supreme + appellate for state rows, federal appellate + district + bankruptcy for federal rows). Scoping is driven by a court-id → jurisdiction mapping the adapter reads from `data/courtlistener/court-jurisdictions.json`.
+
+**The mapping is checked in.** It was built from CourtListener's public bulk data — the exact source files are recorded in the JSON's `source` field (currently `courts-2026-06-30.csv.bz2` + `courthouses-2026-06-30.csv.bz2`). No setup required to run the adapter with filtering.
+
+To refresh against newer CL dumps:
 
 ```bash
-node scripts/build-cl-jurisdictions.mjs
-# → data/courtlistener/court-jurisdictions.json
+node scripts/build-cl-jurisdictions.mjs --refresh
 ```
 
-The script pulls the current courts list from `https://www.courtlistener.com/api/rest/v4/courts/` (paginated JSON, ~2k courts across ~20 pages) and writes the file in the shape the adapter expects. Rerun periodically to pick up CL updates.
+The script downloads the current `courts-*.csv.bz2` and `courthouses-*.csv.bz2` from CL's public S3 bucket, decompresses them via `bunzip2` (standard on macOS + Linux; use WSL on Windows), joins them into the shape the adapter expects, and writes the JSON in place. Rebuild is deterministic against the same input dumps — reruns produce byte-identical output. Requires `bunzip2` on `PATH`. No CL API rate limits apply (pulls from S3, not the API).
 
-If you set `COURTLISTENER_API_TOKEN` in your environment (or pass `--token`), the script uses the authenticated rate limit; without a token it uses the anonymous limit, which is still fine for a ~20-request generation pass.
-
-**If the file is absent, the adapter still runs** — it just skips jurisdiction filtering, so each row's query hits the full CL corpus (broader net, slightly lower precision). Recall numbers reported in the private-side comparison writeups assume filtering *is* enabled.
-
-Configure the filter mode via the provider config's `jurisdiction_filter` field. Defaults to state supreme + appellate (`state_appellate_supreme`); other modes documented in the adapter source.
+Configure the filter mode via the provider config's `jurisdiction_filter` field. Defaults to state supreme + appellate (`state_appellate_supreme`); other modes documented in the adapter source. If the mapping file is deleted, the adapter falls back to unfiltered search so a partial checkout still works.

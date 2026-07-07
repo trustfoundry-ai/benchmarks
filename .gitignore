@@ -11,7 +11,11 @@ coverage/
 
 .codegraph/
 
-# Locally-populated by scripts/build-cl-jurisdictions.mjs (bulk CSVs from CL S3
-# plus the joined court-jurisdictions.json the courtlistener-search adapter
-# loads at run time). See docs/adapters/courtlistener-search.md for setup.
-data/courtlistener/
+# CL bulk-file cache (bz2 + decompressed csv). The joined
+# court-jurisdictions.json IS checked in — it's derived from public
+# CourtListener data via scripts/build-cl-jurisdictions.mjs and the
+# `source` field records which dated bulk files it was built from.
+# Only the source csv/bz2 caches (which are large and reproducible)
+# are excluded.
+data/courtlistener/*.csv
+data/courtlistener/*.csv.bz2
