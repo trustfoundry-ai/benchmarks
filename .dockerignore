@@ -1,0 +1,42 @@
+# Everything the container does not need at runtime. Keeps the image
+# small and stops local run artifacts / credentials / editor state from
+# leaking into published images.
+
+node_modules/
+.pnpm-store/
+
+# Local run artifacts + operator scratch space
+runs/
+results/
+tmp/
+output/
+coverage/
+coverage.lcov
+
+# Secrets / editor state / VCS metadata
+.env
+.env.*
+!.env.example
+.git/
+.gitignore
+.github/
+.gitattributes
+.editorconfig
+.vscode/
+.idea/
+
+# Tool caches / private overlays that must never ship to the image
+.codegraph/
+.claude/
+.venv/
+AGENTS.md
+CLAUDE.md
+
+# Dev-only trees
+test/
+docs/
+research/
+
+# Docker files themselves
+Dockerfile
+.dockerignore

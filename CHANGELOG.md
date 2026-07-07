@@ -4,7 +4,110 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-07-07
+
+General maintainability pass on the harness. No dataset or scored-metric
+changes: every previously-published result bundle still verifies
+byte-for-byte.
+
+### Added
+
+- **Hand-authored TypeScript declarations for the public API.** New
+  `src/index.d.mts` (root barrel), `src/core/index.d.mts` (core
+  sub-path), and `src/testing/index.d.mts` (fixture helpers). Package
+  now advertises `"types"` on every `exports` conditional so consumers
+  get autocomplete and `--strict` type-check on `defineProviderAdapter`,
+  `executeRun`, `RateLimiter`, `sha256Text`, and the rest of the
+  public surface. `pnpm typecheck` script + `typescript@^5` devDep.
+- **`test/public-api-surface.test.mjs`** — snapshot of the exact
+  set of keys exported from `src/index.mjs`. Fails on drift so
+  additions to the public API become an explicit, reviewable act.
+- **Coverage reporting via c8.** `pnpm test:coverage` writes an
+  lcov report to `coverage/lcov.info` which CI uploads as an
+  artifact. No coverage gate this release — reporting only.
+- **`pnpm lint`** — minimal ESLint flat config (`@eslint/js`
+  recommended, one no-unused-vars tweak). Runs on every PR.
+- **`.github/dependabot.yml`** — weekly grouped npm and github-actions
+  updates.
+- **`.github/workflows/codeql.yml`** — CodeQL analysis on push, PR,
+  and weekly, with the `security-and-quality` query pack.
+- **SLSA build-provenance attestations on tagged releases.** The
+  release workflow now packs a tarball via `pnpm pack`, attests it
+  with `actions/attest-build-provenance@v1`, and attaches the
+  tarball to the GitHub release so consumers can
+  `gh attestation verify` the bytes they run against.
+- **`CITATION.cff`** at the repo root.
+- **`results/trustfoundry-legal-search/latest.json`** — stable
+  JSON pointer from each `(type, size)` to the currently-published
+  dated bundle. Verified by `pnpm verify:results`.
+- **`.dockerignore`** — keeps `runs/`, `results/`, `.env*`, `.git/`,
+  `test/`, `docs/`, and editor state out of the image.
+
 ### Changed
+
+- **`src/core/` no longer names the trustfoundry-legal-search
+  adapter.** Cutoff-vs-implementation validation moved onto the
+  scorer adapter via an optional `validateConfig({ scorerConfig })`
+  method (declared in the scorer-adapter contract). The runner
+  calls it during startup validation instead of pulling scorer
+  constants across the framework boundary. All `DEFAULT_*`
+  fallbacks that pointed at trustfoundry-legal-search were
+  removed from `runner.mjs`, `artifacts.mjs`, `manifest.mjs`,
+  `merge.mjs`, and `retry-failed.mjs`; each now throws a helpful
+  error naming the registered adapter ids when the config leaves
+  the id unset. CLI operational defaults (`BENCHMARK_CONFIG` etc.)
+  moved from `runner.mjs` to `cli.mjs`. `validateScorerCutoffsMatchImplementation`
+  is now defined in a leaf module (`src/core/scorer-validators.mjs`)
+  and re-exported from `runner.mjs` for backward compat.
+- **`src/index.mjs` is now an explicit named-export list, not
+  `export * from './core/index.mjs'`.** The stable public surface
+  is the 76 names snapshotted in `test/public-api-surface.test.mjs`;
+  additions require an explicit list edit + test update.
+  `src/core/index.mjs` still re-exports everything internal, but
+  its header comment now warns that not every symbol is public.
+- **Dockerfile layer order** — `package.json` + `pnpm-lock.yaml`
+  now copy in before `pnpm install --frozen-lockfile` so a `src/`
+  edit no longer busts the install cache. Removed the redundant
+  `chmod +x entrypoint.sh` step (the file carries `100755` in git).
+- **`entrypoint.sh` discovers configs from disk.** The hardcoded
+  `ALL_CONFIGS` list is replaced by a `find configs/benchmarks
+  -name '*-200.json' -o -name '*-5k.json'` walk; adding a new
+  benchmark config no longer requires editing the shell script.
+- **CI runs lint, typecheck, and coverage** in addition to
+  `pnpm test` + `pnpm verify:results`.
+- **PR template** — the "no third-party vendor product names"
+  checkbox is split into two: an unchanged ban on internal
+  infrastructure names (`data-plane`, `index`, `query-service`,
+  internal hostnames) and an explicit allowance for vendor
+  product names in adapters or configs specifically evaluating
+  that vendor. Plus a new role-alias User-Agent rule.
+
+### Documentation
+
+- **New `## Why this exists` section in `README.md`.** Two
+  subsections: transparency and governance for published metrics
+  (why the harness exists at all), and why a legal-search
+  benchmark specifically (gap analysis vs. LegalBench and
+  Harvey LAB).
+- **`## Public API` section in `README.md`** listing the stable
+  surface groups and pointing at `docs/adapter-contracts.md` for
+  semantics.
+- **`### Verifying releases`** subsection under Manifest And
+  Reproducibility, with the `gh attestation verify` recipe.
+- **`## Repository Layout`** now labels `suites/` as
+  documentation-only (adapters live under `src/adapters/`) and
+  points at `results/<benchmark>/latest.json` for external
+  consumers who want a stable "latest" URL.
+- **`src/core/contracts/README.md`** — outdated "Adapter
+  factories (coming in Phase 3)" section rewritten to describe
+  the shipped factories and point at `docs/adapter-contracts.md`.
+- **Suite README** picks up a "Latest bundles" one-liner
+  pointing at the pointer file.
+- **`.github/CODEOWNERS`** — TODO comment at top to revisit at
+  3+ maintainers (personal handles become a bottleneck fast).
+
+<!-- Below: changes that had accumulated in the [Unreleased] block
+     during the pre-0.8.0 refactor cycle. Rolled into this release. -->
 
 - **Repository layout restructured to group by suite.** Every
   suite-specific artifact now lives under a `trustfoundry-<suite>/`
@@ -53,7 +156,8 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
   — was an internal-only localhost variant that shouldn't have shipped
   publicly.
 
-### Documentation
+<!-- Documentation continues below (rolled up from the pre-0.8.0
+     [Unreleased] block). -->
 
 - New `docs/adapter-contracts.md` — long-form guide to the three
   adapter kinds, the four artifact schemas, and the versioning rules.

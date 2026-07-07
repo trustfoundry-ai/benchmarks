@@ -36,8 +36,6 @@ import { getAdapter } from './registry.mjs';
 import { buildReport, executeProviderCaseWithRetry } from './runner.mjs';
 import { mapWithConcurrency, normalizeScheduler } from './scheduler.mjs';
 
-const DEFAULT_SCORER_ID = 'trustfoundry-legal-search';
-
 const RETRYABLE_STATUSES = new Set([
   'provider_error',
   'provider_failure',
@@ -180,7 +178,7 @@ export async function retryFailedRun({
   const providerResults = await readJsonl(
     path.join(resolvedRun, 'provider-results.jsonl')
   );
-  let previousScores = null;
+  let previousScores;
   try {
     previousScores = await readJson(path.join(resolvedRun, 'scores.json'));
   } catch {
@@ -220,7 +218,13 @@ export async function retryFailedRun({
     config: providerConfig
   });
 
-  const scorerId = sourceManifest.scorer?.id ?? DEFAULT_SCORER_ID;
+  const scorerId = sourceManifest.scorer?.id;
+  if (typeof scorerId !== 'string' || !scorerId) {
+    throw new Error(
+      `retryFailedRun: source manifest at ${resolvedRun} is missing scorer.id — ` +
+        `cannot determine which scorer to invoke.`
+    );
+  }
   const scorerAdapter = getAdapter('scorers', scorerId);
   const scorerConfigResolved =
     scorerConfigPath ?? sourceManifest.scorer?.configPath ?? null;

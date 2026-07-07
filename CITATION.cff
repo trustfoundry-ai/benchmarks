@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: TrustFoundry Benchmarks
+message: >-
+  If you use these benchmarks or the harness in your work, please
+  cite the tagged release you ran against so the numbers are
+  reproducible.
+type: software
+authors:
+  - name: TrustFoundry
+    website: https://trustfoundry.ai
+repository-code: https://github.com/trustfoundry-ai/benchmarks
+license: Apache-2.0
+version: 0.8.0
+date-released: 2026-07-07

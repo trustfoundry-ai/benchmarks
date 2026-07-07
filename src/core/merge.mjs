@@ -24,15 +24,12 @@ import {
   exists,
   readJson,
   readJsonl,
-  readJsonlStream,
   relativePath,
   writeJson,
   writeJsonl
 } from './fs.mjs';
 import { computeFingerprints } from './manifest.mjs';
 import { getAdapter } from './registry.mjs';
-
-const DEFAULT_SCORER_ID = 'trustfoundry-legal-search';
 
 function nowCompact() {
   return new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
@@ -226,7 +223,13 @@ export async function mergeRuns({
     });
   }
 
-  const scorerAdapter = getAdapter('scorers', mergedManifest.scorer?.id ?? DEFAULT_SCORER_ID);
+  const mergedScorerId = mergedManifest.scorer?.id;
+  if (typeof mergedScorerId !== 'string' || !mergedScorerId) {
+    throw new Error(
+      `mergeRuns: input manifests are missing scorer.id — cannot pick a scorer to rescore the merge.`
+    );
+  }
+  const scorerAdapter = getAdapter('scorers', mergedScorerId);
   const scores = await scoreMerged({
     scorerAdapter,
     manifest: mergedManifest,

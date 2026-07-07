@@ -1,21 +1,31 @@
 {
   "name": "@trustfoundry-ai/benchmarks-harness",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "private": false,
   "license": "Apache-2.0",
   "type": "module",
   "main": "./src/index.mjs",
+  "types": "./src/index.d.mts",
   "exports": {
-    ".": "./src/index.mjs",
+    ".": {
+      "types": "./src/index.d.mts",
+      "default": "./src/index.mjs"
+    },
     "./contracts": "./src/core/contracts/index.mjs",
     "./adapters/registry": "./src/core/registry.mjs",
     "./adapters/providers/*": "./src/adapters/providers/*.mjs",
     "./adapters/scorers/*": "./src/adapters/scorers/*.mjs",
     "./adapters/benchmarks/*": "./src/adapters/benchmarks/*.mjs",
-    "./core": "./src/core/index.mjs",
+    "./core": {
+      "types": "./src/core/index.d.mts",
+      "default": "./src/core/index.mjs"
+    },
     "./core/*": "./src/core/*.mjs",
     "./artifacts": "./src/core/artifacts.mjs",
-    "./testing": "./src/testing/index.mjs",
+    "./testing": {
+      "types": "./src/testing/index.d.mts",
+      "default": "./src/testing/index.mjs"
+    },
     "./cli": "./src/cli.mjs",
     "./package.json": "./package.json"
   },
@@ -37,10 +47,20 @@
   "scripts": {
     "benchmark": "node bin/benchmarks.mjs",
     "test": "node --test",
+    "test:coverage": "c8 --reporter=text --reporter=lcov --report-dir=coverage --include=src/** node --test",
+    "lint": "eslint src test scripts bin",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "verify:results": "node scripts/verify-result-bundles.mjs"
   },
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "pnpm@9.15.9"
+  "packageManager": "pnpm@9.15.9",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "c8": "^11.0.0",
+    "eslint": "^10.6.0",
+    "globals": "^17.7.0",
+    "typescript": "^5.6.0"
+  }
 }

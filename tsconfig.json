@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowJs": false,
+    "checkJs": false,
+    "declaration": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "include": [
+    "src/**/*.d.mts",
+    "src/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "runs",
+    "results",
+    "tmp",
+    "output"
+  ]
+}

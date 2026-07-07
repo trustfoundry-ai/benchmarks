@@ -157,8 +157,15 @@ export async function buildManifest({
       paths.providerConfigFile ? sha256File(paths.providerConfigFile) : null,
       paths.scorerConfigFile ? sha256File(paths.scorerConfigFile) : null
     ]);
+  const resolvedScorerId = scorerId ?? scorerDescription?.id;
+  if (typeof resolvedScorerId !== 'string' || !resolvedScorerId) {
+    throw new Error(
+      `buildManifest: scorer id missing — pass an explicit 'scorerId' or supply a ` +
+        `'scorerDescription' with an 'id' field.`
+    );
+  }
   const scorer = {
-    id: scorerId ?? scorerDescription?.id ?? 'trustfoundry-legal-search',
+    id: resolvedScorerId,
     ...(scorerDescription ?? {}),
     configPath: paths.scorerConfigPath,
     configSha256: scorerConfigSha256

@@ -5,12 +5,22 @@ import { readJson, readJsonl, writeJson, exists } from './core/fs.mjs';
 import { retryFailedRun } from './core/retry-failed.mjs';
 import {
   buildReport,
-  defaultPaths,
   executeRun,
   mergeRuns,
   scoreRun
 } from './core/runner.mjs';
 import { defaultRegistry } from './core/registry.mjs';
+
+// Operational defaults for the shipped CLI. The framework core has no
+// hardcoded default adapter; this CLI is the layer that names the
+// shipped `trustfoundry-legal-search` suite as its out-of-the-box
+// convenience. Consumers who wire their own adapter register it and
+// pass explicit --benchmark-config / --provider-config / --scorer-config
+// paths.
+const DEFAULT_BENCHMARK_CONFIG = 'configs/benchmarks/trustfoundry-legal-search/case-questions-200.json';
+const DEFAULT_PROVIDER_CONFIG = 'configs/providers/trustfoundry-legal-search.json';
+const DEFAULT_SCORER_CONFIG = 'configs/scorers/trustfoundry-legal-search.json';
+const DEFAULT_OUT_DIR = 'runs/trustfoundry-legal-search-case-questions-200';
 
 function printHelp() {
   console.log(`TrustFoundry benchmarks
@@ -31,10 +41,10 @@ Commands:
   report --run DIR
 
 Defaults:
-  benchmark-config ${defaultPaths().benchmarkConfig}
-  provider-config  ${defaultPaths().providerConfig}
-  scorer-config    ${defaultPaths().scorerConfig}
-  out              runs/trustfoundry-legal-search-case-questions-200
+  benchmark-config ${DEFAULT_BENCHMARK_CONFIG}
+  provider-config  ${DEFAULT_PROVIDER_CONFIG}
+  scorer-config    ${DEFAULT_SCORER_CONFIG}
+  out              ${DEFAULT_OUT_DIR}
   parallel         4
 `);
 }
@@ -109,7 +119,7 @@ function runSummaryLine(summary) {
 }
 
 async function runCommand(options) {
-  const out = options.out ?? 'runs/trustfoundry-legal-search-case-questions-200';
+  const out = options.out ?? DEFAULT_OUT_DIR;
   const result = await executeRun({
     repoRoot: repoRoot(),
     outDir: out,
@@ -117,11 +127,11 @@ async function runCommand(options) {
     providerId: stringOption(options.provider),
     scorerId: stringOption(options.scorer),
     benchmarkConfigPath:
-      stringOption(options['benchmark-config']) ?? defaultPaths().benchmarkConfig,
+      stringOption(options['benchmark-config']) ?? DEFAULT_BENCHMARK_CONFIG,
     providerConfigPath:
-      stringOption(options['provider-config']) ?? defaultPaths().providerConfig,
+      stringOption(options['provider-config']) ?? DEFAULT_PROVIDER_CONFIG,
     scorerConfigPath:
-      stringOption(options['scorer-config']) ?? defaultPaths().scorerConfig,
+      stringOption(options['scorer-config']) ?? DEFAULT_SCORER_CONFIG,
     limit: numberOption(options.limit, null),
     offset: numberOption(options.offset, null),
     parallel: numberOption(options.parallel, 4),
@@ -152,7 +162,13 @@ async function scoreCommand(options) {
   const providerResults = await readJsonl(
     path.join(resolvedRun, 'provider-results.jsonl')
   );
-  const scorerId = overrideScorerId ?? manifest.scorer?.id ?? 'trustfoundry-legal-search';
+  const scorerId = overrideScorerId ?? manifest.scorer?.id;
+  if (typeof scorerId !== 'string' || !scorerId) {
+    throw new Error(
+      `score: cannot determine scorer id — pass --scorer or ensure ` +
+        `${path.join(resolvedRun, 'manifest.json')} records manifest.scorer.id.`
+    );
+  }
   const scorerAdapter = defaultRegistry.scorers.get(scorerId);
   if (!scorerAdapter) throw new Error(`Unknown scorer '${scorerId}'`);
   const scorerConfig = overrideScorerConfigPath

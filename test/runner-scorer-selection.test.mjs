@@ -6,9 +6,18 @@ import {
   validateScorerCutoffsMatchImplementation
 } from '../src/core/runner.mjs';
 
-test('scorerAdapterId defaults to trustfoundry-legal-search when neither config sets it', () => {
-  assert.equal(scorerAdapterId({}, {}), 'trustfoundry-legal-search');
-  assert.equal(scorerAdapterId(), 'trustfoundry-legal-search');
+test('scorerAdapterId throws when neither config sets it (no framework default)', () => {
+  assert.throws(() => scorerAdapterId({}, {}), /Scorer adapter id missing/);
+  assert.throws(() => scorerAdapterId(), /Scorer adapter id missing/);
+});
+
+test('scorerAdapterId error names the registered scorer ids', () => {
+  try {
+    scorerAdapterId({}, {});
+    assert.fail('expected throw');
+  } catch (error) {
+    assert.match(error.message, /Registered scorers:/);
+  }
 });
 
 test('scorerAdapterId reads benchmarkConfig.scorer with precedence over scorer config', () => {
@@ -60,13 +69,20 @@ test('validateScorerCutoffsMatchImplementation error references the passed score
   }
 });
 
-test('validateScorerCutoffsMatchImplementation defaults to trustfoundry-legal-search constants when no override', () => {
-  // trustfoundry-legal-search's SUPPORTED_HEADLINE_CUTOFF is 25 — the default should accept it and reject 1.
+test('trustfoundry-legal-search scorer.validateConfig rejects a diverging headline cutoff', async () => {
+  const { trustfoundryLegalSearchScorerAdapter } = await import(
+    '../src/adapters/scorers/trustfoundry-legal-search.mjs'
+  );
   assert.doesNotThrow(() =>
-    validateScorerCutoffsMatchImplementation({ cutoffs: [1, 5, 10, 25], headline_cutoff: 25 })
+    trustfoundryLegalSearchScorerAdapter.validateConfig({
+      scorerConfig: { cutoffs: [1, 5, 10, 25], headline_cutoff: 25 }
+    })
   );
   assert.throws(
-    () => validateScorerCutoffsMatchImplementation({ cutoffs: [1, 5, 10, 25], headline_cutoff: 1 }),
+    () =>
+      trustfoundryLegalSearchScorerAdapter.validateConfig({
+        scorerConfig: { cutoffs: [1, 5, 10, 25], headline_cutoff: 1 }
+      }),
     /headline_cutoff 1 differs/
   );
 });

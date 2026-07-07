@@ -3,6 +3,7 @@ import {
   normalizeCitation,
   splitCitationList
 } from '../../core/citations.mjs';
+import { validateScorerCutoffsMatchImplementation } from '../../core/scorer-validators.mjs';
 
 const VERSION = 'trustfoundry-legal-search-v1';
 const DEFAULT_CUTOFFS = [1, 5, 10, 25];
@@ -510,6 +511,14 @@ export const trustfoundryLegalSearchScorerAdapter = {
   version: VERSION,
   SUPPORTED_CUTOFFS: DEFAULT_CUTOFFS,
   SUPPORTED_HEADLINE_CUTOFF: DEFAULT_HEADLINE_CUTOFF,
+
+  validateConfig({ scorerConfig }) {
+    validateScorerCutoffsMatchImplementation(scorerConfig ?? {}, {
+      supportedCutoffs: DEFAULT_CUTOFFS,
+      supportedHeadlineCutoff: DEFAULT_HEADLINE_CUTOFF,
+      scorerId: this.id
+    });
+  },
 
   async describe() {
     return {

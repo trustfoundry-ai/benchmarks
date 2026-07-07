@@ -1,12 +1,23 @@
 # TrustFoundry Benchmarks
 
 > **Status: Under active development (pre-1.0).**
-> This harness is being iterated on in the open. Contracts,
-> artifact schemas, and adapters may change between minor
-> versions until v1.0. Individual benchmark suites carry
-> their own maturity status — see the [suite status](#suite-status) table below.
+> Current release: **0.8.0**. This harness is being iterated on in
+> the open. Contracts, artifact schemas, and adapters may change
+> between minor versions until v1.0. Individual benchmark suites
+> carry their own maturity status — see the
+> [suite status](#suite-status) table below.
 
 This repository contains public benchmark harnesses for metrics TrustFoundry runs against its system. The goal is to make selected evaluations reproducible and extensible: you can rerun the same benchmark against TrustFoundry, inspect the row-level evidence behind the scores, or add another provider adapter for comparison.
+
+## Why this exists
+
+### Transparency and governance for published metrics
+
+TrustFoundry publishes evaluation numbers about its own product. This harness is how we make those numbers reproducible byte-for-byte with a TrustFoundry API key — so no vendor claim on this repo rests on our word alone. Every run produces a `manifest.json` that pins the harness commit, config hashes, and dataset provenance; every published bundle carries checksums for the row-level evidence. See [Manifest And Reproducibility](#manifest-and-reproducibility) for the mechanism, and [Verifying releases](#verifying-releases) for how to check that the harness code itself was built from this repo at the tagged commit.
+
+### Why a legal-search benchmark, specifically
+
+The public benchmarks in this space measure adjacent capabilities. [LegalBench](https://hazyresearch.stanford.edu/legalbench/) measures LLM legal-reasoning on small self-contained tasks with no external retrieval. [Harvey LAB](https://www.harvey.ai/blog/introducing-the-legal-agentic-benchmark-lab-a-benchmark-for-long-running-legal-work) measures long-running agentic workflows over customer documents without requiring actual legal authority as input. Neither measures a search engine's ability to *find, interpret, and surface specific legal authority* — a capability foundational to every legal-tech agent (research, drafting). This suite fills that gap across four document families: case opinions, case key facts, statutes, and regulations. The test data is question-answer style rather than keyword-based or citation-based, mirroring how lawyers and legal agents actually reach for authority — a materially harder and more valuable target than keyword matching or exact citation lookup. We have not seen it benchmarked publicly by anyone else.
 
 ## Suite status
 
@@ -163,8 +174,8 @@ The image stamps the source commit it was built from into `$HARNESS_COMMIT_SHA`,
 - `bin/` and `src/`: the benchmark CLI and harness framework.
 - `configs/`: benchmark, provider, and scorer configuration.
 - `data/`: public benchmark datasets.
-- `suites/trustfoundry-legal-search/` and `suites/trustfoundry-citation-lookup/`: suite-specific documentation.
-- `results/`: generated result bundles.
+- `suites/trustfoundry-legal-search/` and `suites/trustfoundry-citation-lookup/`: suite-specific *documentation* only. Suite-scoped adapters live under `src/adapters/`.
+- `results/`: published result bundles, organized as `results/<benchmark>/<date>/<type>/<size>/`. Each benchmark also has a `results/<benchmark>/latest.json` pointer that names the currently-published bundle for each `(type, size)` — stable URL for external consumers who don't want to guess the date.
 - `agent-skills/`: optional agent workflow instructions.
 - `Dockerfile`, `entrypoint.sh`: reproducible container image (see "Running the harness in a container" above).
 
@@ -199,6 +210,26 @@ matching `compatibility` fingerprints can be merged and compared;
 matching `resume` fingerprints share the same shard slice; the
 `manifest` fingerprint is unique per run.
 
+### Verifying releases
+
+Each tagged release ships with a signed [SLSA build provenance
+attestation](https://slsa.dev/spec/v1.0/provenance) produced by GitHub's
+[`actions/attest-build-provenance`](https://github.com/actions/attest-build-provenance)
+action. Verify the release tarball before consuming it:
+
+```bash
+gh release download v0.8.0 -R trustfoundry-ai/benchmarks \
+    -p 'trustfoundry-ai-benchmarks-harness-*.tgz'
+
+gh attestation verify \
+    trustfoundry-ai-benchmarks-harness-0.8.0.tgz \
+    -R trustfoundry-ai/benchmarks
+```
+
+`gh attestation verify` confirms the tarball was built by this repo's
+release workflow at the tagged commit; a mismatched or missing
+attestation fails the check.
+
 ## Extending
 
 The harness keeps benchmarks, providers, and scorers behind adapter boundaries. Future public suites can add a benchmark loader and scorer, while alternative platforms can add a provider adapter that returns the same normalized result shape used by the scorer.
@@ -208,6 +239,23 @@ Current adapters:
 ```bash
 pnpm benchmark adapters
 ```
+
+## Public API
+
+`@trustfoundry-ai/benchmarks-harness` exposes a curated set of named exports from its root barrel. Anything imported from that surface follows semver — additive changes are minor bumps, breaking changes are major bumps.
+
+The public surface groups by purpose:
+
+- **Adapter authoring** — `defineBenchmarkAdapter`, `defineProviderAdapter`, `defineScorerAdapter`, `defaultRegistry`, `createRegistry`, `getAdapter` (+ per-kind getters), `adapterInventory`.
+- **Run entry points** — `executeRun` (+ `runOpenEvaluation` alias), `scoreRun`, `retryFailedRun` (+ `retryFailed` alias), `mergeRuns`, `buildReport`, `executeProviderCaseWithRetry`.
+- **Adapter id + scorer config validation** — `benchmarkAdapterId`, `providerAdapterId`, `scorerAdapterId`, `maxScorerCutoff`, `readApiRequestLimit`, `validateApiRequestLimitAgainstCutoffs`, `validateScorerCutoffsMatchImplementation`.
+- **Reference implementations for adapters** — `FileBackedRateLimiter`, `createProviderRateLimiter`, `rateLimitedProviderResult`, `summarizeTokenUsage`, `normalizeTokenUsage`, `writeCaseCheckpoint`, `loadCaseCheckpoints`, `writeCaseProgressCheckpoint`, `clearCheckpoints`, `buildManifest`, `assertCompatibleManifest`, `computeFingerprints`.
+- **Result artifacts + verification** — `publishResultBundle`, `verifyResultBundle`, `buildRawRow` / `buildRawRows`, `reconstructPairFromRawRow` / `reconstructFromRawRows`, `scoreRawRows`, `readRawJsonl`.
+- **Primitives for adapter authors** — `readJson` / `writeJson` / `readJsonl` / `readJsonlStream` / `writeJsonl` / `writeText` / `exists` / `relativePath` / `createJsonlWriter`, `sha256Text` / `sha256File`, `stableJson` / `hashObject` / `hashFile`, `canonicalStringify`, `acceptedCitationSet` / `normalizeCitation` / `splitCitationList`, `applyQueryTransform` / `stripSyntheticInstructionPrefixes`, `mapWithConcurrency` / `applyShard` / `normalizeScheduler`.
+
+See [`docs/adapter-contracts.md`](docs/adapter-contracts.md) for the long-form contract guide and [`src/core/contracts/README.md`](src/core/contracts/README.md) for the adapter-authoring reference.
+
+**Not public API:** everything in `src/core/*.mjs` that is NOT re-exported by [`src/index.mjs`](src/index.mjs) — those helpers are internal and may change without notice. If you need to reach into them, pin a specific version of the package first.
 
 ## Development
 

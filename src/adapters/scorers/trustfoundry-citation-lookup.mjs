@@ -3,6 +3,7 @@ import {
   normalizeCitation,
   splitCitationList
 } from '../../core/citations.mjs';
+import { validateScorerCutoffsMatchImplementation } from '../../core/scorer-validators.mjs';
 
 const SCORER_ID = 'trustfoundry-citation-lookup';
 const BENCHMARK_ID = 'trustfoundry-citation-lookup';
@@ -486,6 +487,14 @@ export const trustfoundryCitationLookupScorerAdapter = {
   version: VERSION,
   SUPPORTED_CUTOFFS: DEFAULT_CUTOFFS,
   SUPPORTED_HEADLINE_CUTOFF: DEFAULT_HEADLINE_CUTOFF,
+
+  validateConfig({ scorerConfig }) {
+    validateScorerCutoffsMatchImplementation(scorerConfig ?? {}, {
+      supportedCutoffs: DEFAULT_CUTOFFS,
+      supportedHeadlineCutoff: DEFAULT_HEADLINE_CUTOFF,
+      scorerId: this.id
+    });
+  },
 
   async describe() {
     return {

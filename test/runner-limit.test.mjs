@@ -9,8 +9,20 @@ import {
   validateScorerCutoffsMatchImplementation
 } from '../src/core/runner.mjs';
 
-test('benchmarkAdapterId defaults to the legal-search adapter', () => {
-  assert.equal(benchmarkAdapterId({}), 'trustfoundry-legal-search');
+test('benchmarkAdapterId throws when no config field is set (no framework default)', () => {
+  assert.throws(
+    () => benchmarkAdapterId({}),
+    /Benchmark adapter id missing/
+  );
+});
+
+test('benchmarkAdapterId error names the registered benchmark ids', () => {
+  try {
+    benchmarkAdapterId({});
+    assert.fail('expected throw');
+  } catch (error) {
+    assert.match(error.message, /Registered benchmarks:/);
+  }
 });
 
 test('benchmarkAdapterId reads benchmarkId config aliases', () => {
@@ -111,31 +123,37 @@ test('validateApiRequestLimitAgainstCutoffs is a no-op when neither side is set'
   assert.deepEqual(result, { apiRequestLimit: null, maxCutoff: null });
 });
 
-test('validateScorerCutoffsMatchImplementation accepts the implementation defaults', () => {
+const LEGAL_SEARCH_SUPPORT = {
+  supportedCutoffs: [1, 5, 10, 25],
+  supportedHeadlineCutoff: 25,
+  scorerId: 'trustfoundry-legal-search'
+};
+
+test('validateScorerCutoffsMatchImplementation accepts matching cutoffs', () => {
   assert.doesNotThrow(() =>
-    validateScorerCutoffsMatchImplementation({
-      cutoffs: [1, 5, 10, 25],
-      headline_cutoff: 25
-    })
+    validateScorerCutoffsMatchImplementation(
+      { cutoffs: [1, 5, 10, 25], headline_cutoff: 25 },
+      LEGAL_SEARCH_SUPPORT
+    )
   );
 });
 
 test('validateScorerCutoffsMatchImplementation accepts cutoffs in any order', () => {
   assert.doesNotThrow(() =>
-    validateScorerCutoffsMatchImplementation({
-      cutoffs: [25, 1, 10, 5],
-      headline_cutoff: 25
-    })
+    validateScorerCutoffsMatchImplementation(
+      { cutoffs: [25, 1, 10, 5], headline_cutoff: 25 },
+      LEGAL_SEARCH_SUPPORT
+    )
   );
 });
 
 test('validateScorerCutoffsMatchImplementation throws when cutoffs diverge', () => {
   assert.throws(
     () =>
-      validateScorerCutoffsMatchImplementation({
-        cutoffs: [1, 5, 10, 100],
-        headline_cutoff: 100
-      }),
+      validateScorerCutoffsMatchImplementation(
+        { cutoffs: [1, 5, 10, 100], headline_cutoff: 100 },
+        LEGAL_SEARCH_SUPPORT
+      ),
     /cutoffs .* differs from the scorer's implementation/
   );
 });
@@ -143,14 +161,20 @@ test('validateScorerCutoffsMatchImplementation throws when cutoffs diverge', () 
 test('validateScorerCutoffsMatchImplementation throws when headline_cutoff diverges', () => {
   assert.throws(
     () =>
-      validateScorerCutoffsMatchImplementation({
-        cutoffs: [1, 5, 10, 25],
-        headline_cutoff: 50
-      }),
+      validateScorerCutoffsMatchImplementation(
+        { cutoffs: [1, 5, 10, 25], headline_cutoff: 50 },
+        LEGAL_SEARCH_SUPPORT
+      ),
     /headline_cutoff 50 differs/
   );
 });
 
 test('validateScorerCutoffsMatchImplementation is a no-op when neither field is set', () => {
-  assert.doesNotThrow(() => validateScorerCutoffsMatchImplementation({}));
+  assert.doesNotThrow(() => validateScorerCutoffsMatchImplementation({}, LEGAL_SEARCH_SUPPORT));
+});
+
+test('validateScorerCutoffsMatchImplementation is a no-op when the scorer publishes no supported cutoffs', () => {
+  assert.doesNotThrow(() =>
+    validateScorerCutoffsMatchImplementation({ cutoffs: [1, 2, 3], headline_cutoff: 3 })
+  );
 });

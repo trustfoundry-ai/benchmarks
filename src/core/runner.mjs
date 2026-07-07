@@ -21,27 +21,17 @@ import {
   createProviderRateLimiter,
   rateLimitedProviderResult
 } from './rate-limit.mjs';
-import { getAdapter } from './registry.mjs';
+import { defaultRegistry, getAdapter } from './registry.mjs';
 import { applyShard, mapWithConcurrency, normalizeScheduler } from './scheduler.mjs';
+import { validateScorerCutoffsMatchImplementation } from './scorer-validators.mjs';
 import { summarizeTokenUsage } from './token-usage.mjs';
-import {
-  SUPPORTED_CUTOFFS as TRUSTFOUNDRY_LEGAL_SEARCH_SUPPORTED_CUTOFFS,
-  SUPPORTED_HEADLINE_CUTOFF as TRUSTFOUNDRY_LEGAL_SEARCH_SUPPORTED_HEADLINE_CUTOFF
-} from '../adapters/scorers/trustfoundry-legal-search.mjs';
 
-const DEFAULT_BENCHMARK_CONFIG = 'configs/benchmarks/trustfoundry-legal-search/case-questions-200.json';
-const DEFAULT_PROVIDER_CONFIG = 'configs/providers/trustfoundry-legal-search.json';
-const DEFAULT_SCORER_CONFIG = 'configs/scorers/trustfoundry-legal-search.json';
-const DEFAULT_BENCHMARK_ADAPTER = 'trustfoundry-legal-search';
-const DEFAULT_SCORER_ID = 'trustfoundry-legal-search';
+// Re-exported for backward compatibility with callers who imported this
+// helper from runner.mjs before it moved to scorer-validators.mjs.
+export { validateScorerCutoffsMatchImplementation };
 
 function nowCompact() {
   return new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
-}
-
-function parsePositiveInteger(value, fallback) {
-  const parsed = Number.parseInt(String(value ?? ''), 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
 export function maxScorerCutoff(scorerConfig = {}) {
@@ -65,46 +55,6 @@ export function readApiRequestLimit(scorerConfig = {}) {
   return parsed;
 }
 
-function sameIntegerSet(a, b) {
-  if (!Array.isArray(a) || !Array.isArray(b)) return false;
-  const sortA = [...a].map(Number).filter(Number.isFinite).sort((x, y) => x - y);
-  const sortB = [...b].map(Number).filter(Number.isFinite).sort((x, y) => x - y);
-  if (sortA.length !== sortB.length) return false;
-  return sortA.every((value, idx) => value === sortB[idx]);
-}
-
-export function validateScorerCutoffsMatchImplementation(
-  scorerConfig = {},
-  {
-    supportedCutoffs = TRUSTFOUNDRY_LEGAL_SEARCH_SUPPORTED_CUTOFFS,
-    supportedHeadlineCutoff = TRUSTFOUNDRY_LEGAL_SEARCH_SUPPORTED_HEADLINE_CUTOFF,
-    scorerId = DEFAULT_SCORER_ID
-  } = {}
-) {
-  const configuredCutoffs = scorerConfig.cutoffs;
-  const configuredHeadline =
-    scorerConfig.headline_cutoff ?? scorerConfig.headlineCutoff;
-
-  if (configuredCutoffs !== undefined && !sameIntegerSet(configuredCutoffs, supportedCutoffs)) {
-    throw new Error(
-      `Scorer config invalid: cutoffs ${JSON.stringify(configuredCutoffs)} ` +
-        `differs from the scorer's implementation ${JSON.stringify(supportedCutoffs)}. ` +
-        `The result-bundle schema currently pins hits@K to these specific K values; ` +
-        `update both src/adapters/scorers/${scorerId}.mjs and the artifact schema ` +
-        `together to change them.`
-    );
-  }
-  if (
-    configuredHeadline !== undefined &&
-    Number.parseInt(String(configuredHeadline), 10) !== supportedHeadlineCutoff
-  ) {
-    throw new Error(
-      `Scorer config invalid: headline_cutoff ${configuredHeadline} ` +
-        `differs from the scorer's implementation ${supportedHeadlineCutoff}.`
-    );
-  }
-}
-
 export function validateApiRequestLimitAgainstCutoffs(scorerConfig = {}) {
   const apiRequestLimit = readApiRequestLimit(scorerConfig);
   const maxCutoff = maxScorerCutoff(scorerConfig);
@@ -122,54 +72,58 @@ export function validateApiRequestLimitAgainstCutoffs(scorerConfig = {}) {
   return { apiRequestLimit, maxCutoff };
 }
 
-export function defaultPaths() {
-  return {
-    benchmarkConfig: DEFAULT_BENCHMARK_CONFIG,
-    providerConfig: DEFAULT_PROVIDER_CONFIG,
-    scorerConfig: DEFAULT_SCORER_CONFIG
-  };
+function registeredIdsMessage(kind) {
+  const kindPlural = `${kind}s`;
+  const ids = Array.from(defaultRegistry?.[kindPlural]?.keys?.() ?? []);
+  return ids.length
+    ? `Registered ${kindPlural}: ${ids.sort().join(', ')}.`
+    : `No ${kindPlural} are registered.`;
 }
 
+// Resolves the benchmark adapter id from a benchmark config. Throws with
+// an actionable error listing the registered benchmark ids when the
+// config sets none — the framework has no shipped default.
 export function benchmarkAdapterId(config = {}) {
-  return (
+  const id =
     config.benchmark_adapter ??
     config.benchmarkAdapter ??
     config.benchmark_id ??
-    config.benchmarkId ??
-    DEFAULT_BENCHMARK_ADAPTER
+    config.benchmarkId;
+  if (typeof id === 'string' && id.length > 0) return id;
+  throw new Error(
+    `Benchmark adapter id missing from benchmark config — set ` +
+      `'benchmark_adapter' (or 'benchmark_id'). ${registeredIdsMessage('benchmark')}`
   );
 }
 
 // Resolves the scorer adapter id from the benchmark + scorer configs.
 // Precedence: benchmarkConfig.scorer (or aliases) > scorerConfig.scorer (or
-// aliases) > 'trustfoundry-legal-search' (default). Existing configs that omit the
-// scorer field continue to select trustfoundry-legal-search unchanged.
+// aliases) > scorerConfig.id. Throws when nothing sets it — the framework
+// has no shipped default.
 export function scorerAdapterId(benchmarkConfig = {}, scorerConfig = {}) {
-  return (
+  const id =
     benchmarkConfig.scorer ??
     benchmarkConfig.scorer_id ??
     benchmarkConfig.scorerId ??
     scorerConfig.scorer ??
     scorerConfig.scorer_id ??
-    scorerConfig.id ??
-    DEFAULT_SCORER_ID
+    scorerConfig.id;
+  if (typeof id === 'string' && id.length > 0) return id;
+  throw new Error(
+    `Scorer adapter id missing — set 'scorer' on the benchmark config or ` +
+      `'id' on the scorer config. ${registeredIdsMessage('scorer')}`
   );
 }
 
+// Resolves the provider adapter id from a provider config. Throws when
+// none is set — the framework has no shipped default.
 export function providerAdapterId(providerConfig = {}) {
-  return (
-    providerConfig.provider ??
-    providerConfig.providerId ??
-    'trustfoundry-legal-search'
+  const id = providerConfig.provider ?? providerConfig.providerId;
+  if (typeof id === 'string' && id.length > 0) return id;
+  throw new Error(
+    `Provider adapter id missing from provider config — set 'provider'. ` +
+      `${registeredIdsMessage('provider')}`
   );
-}
-
-function scorerConstants(scorerAdapter) {
-  return {
-    supportedCutoffs: scorerAdapter?.SUPPORTED_CUTOFFS ?? TRUSTFOUNDRY_LEGAL_SEARCH_SUPPORTED_CUTOFFS,
-    supportedHeadlineCutoff:
-      scorerAdapter?.SUPPORTED_HEADLINE_CUTOFF ?? TRUSTFOUNDRY_LEGAL_SEARCH_SUPPORTED_HEADLINE_CUTOFF
-  };
 }
 
 async function loadOptionalJsonConfig(repoRoot, configPath) {
@@ -184,6 +138,7 @@ export async function loadRunInputs({
   benchmarkConfigPath = null,
   providerConfigPath = null,
   scorerConfigPath = null,
+  scorerIdOverride = null,
   limit = null,
   offset = null
 }) {
@@ -195,14 +150,14 @@ export async function loadRunInputs({
   const scorerConfig = scorerLoaded.config;
   if (limit !== null) benchmarkConfig.limit = limit;
   if (offset !== null) benchmarkConfig.offset = offset;
-  const scorerId = scorerAdapterId(benchmarkConfig, scorerConfig);
+  const scorerId =
+    typeof scorerIdOverride === 'string' && scorerIdOverride
+      ? scorerIdOverride
+      : scorerAdapterId(benchmarkConfig, scorerConfig);
   const scorerAdapter = getAdapter('scorers', scorerId);
-  const { supportedCutoffs, supportedHeadlineCutoff } = scorerConstants(scorerAdapter);
-  validateScorerCutoffsMatchImplementation(scorerConfig, {
-    supportedCutoffs,
-    supportedHeadlineCutoff,
-    scorerId
-  });
+  if (typeof scorerAdapter.validateConfig === 'function') {
+    scorerAdapter.validateConfig({ scorerConfig });
+  }
   const { apiRequestLimit } = validateApiRequestLimitAgainstCutoffs(scorerConfig);
   if (apiRequestLimit !== null && providerConfig.limit === undefined) {
     providerConfig.limit = apiRequestLimit;
@@ -444,15 +399,18 @@ export async function executeRun({
     benchmarkConfigPath,
     providerConfigPath,
     scorerConfigPath,
+    scorerIdOverride: scorerId,
     limit,
     offset
   });
-  const resolvedBenchmarkId = benchmarkId ?? benchmarkAdapterId(inputs.benchmarkConfig);
-  const resolvedProviderId = providerId ?? providerAdapterId(inputs.providerConfig);
-  const resolvedScorerId = scorerId ?? inputs.scorerId ?? DEFAULT_SCORER_ID;
+  const resolvedBenchmarkId =
+    benchmarkId ?? benchmarkAdapterId(inputs.benchmarkConfig);
+  const resolvedProviderId =
+    providerId ?? providerAdapterId(inputs.providerConfig);
+  const resolvedScorerId = inputs.scorerId;
   const benchmarkAdapter = getAdapter('benchmarks', resolvedBenchmarkId);
   const providerAdapter = getAdapter('providers', resolvedProviderId);
-  const scorerAdapter = getAdapter('scorers', resolvedScorerId);
+  const scorerAdapter = inputs.scorerAdapter;
 
   const loaded = await benchmarkAdapter.loadCases({
     config: inputs.benchmarkConfig,
@@ -656,7 +614,14 @@ export async function scoreRun({ repoRoot, runDir }) {
   const resolvedRun = path.resolve(repoRoot, runDir);
   const manifest = await readJson(path.join(resolvedRun, 'manifest.json'));
   const cases = await readJsonl(path.join(resolvedRun, 'cases.jsonl'));
-  const scorerAdapter = getAdapter('scorers', manifest.scorer?.id ?? DEFAULT_SCORER_ID);
+  const manifestScorerId = manifest.scorer?.id;
+  if (typeof manifestScorerId !== 'string' || !manifestScorerId) {
+    throw new Error(
+      `scoreRun: manifest.scorer.id missing from ${path.join(resolvedRun, 'manifest.json')} — ` +
+        `cannot determine which scorer to invoke.`
+    );
+  }
+  const scorerAdapter = getAdapter('scorers', manifestScorerId);
   const scores = await scoreFromDisk({
     scorerAdapter,
     manifest,
