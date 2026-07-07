@@ -6,6 +6,8 @@
   "request_timeout_ms": 180000,
   "max_output_tokens": 10000,
   "top_k": 25,
+  "temperature": 0,
+  "_reproducibility_note": "temperature pinned to 0 to reduce stochasticity between runs. Vendor may still produce non-identical outputs due to model snapshot floating and tool-use nondeterminism.",
   "pricing": {
     "model": "gpt-5.5-2026-04-23",
     "pricing_level": "OpenAI API standard pricing",
