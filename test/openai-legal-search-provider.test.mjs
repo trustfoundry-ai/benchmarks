@@ -99,6 +99,14 @@ test('buildRequestBody uses configured model, jurisdiction, topK, and web_search
   assert.doesNotMatch(JSON.stringify(body), /OPENAI_API_KEY|secret/i);
 });
 
+test('buildRequestBody forwards temperature=0 to the outgoing Responses request', () => {
+  const body = _internals.buildRequestBody(CASE_ROW, {
+    model: 'gpt-5.5-test',
+    temperature: 0
+  });
+  assert.equal(body.temperature, 0);
+});
+
 test('buildRequestBody honors allowed/blocked domain filters when provided', () => {
   const body = _internals.buildRequestBody(CASE_ROW, {
     model: 'gpt-5.5-test',

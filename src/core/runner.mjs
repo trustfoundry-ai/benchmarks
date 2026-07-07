@@ -187,14 +187,20 @@ export async function loadRunInputs({
 
 async function writeArtifacts(artifacts, artifactBase) {
   if (!Array.isArray(artifacts) || artifacts.length === 0) return;
+  const resolvedBase = path.resolve(artifactBase);
   for (const artifact of artifacts) {
     const relPath = artifact?.path;
     if (typeof relPath !== 'string' || !relPath) continue;
-    if (relPath.includes('..')) {
+    if (relPath.includes('..') || path.isAbsolute(relPath)) {
       console.error(`skipping artifact with path traversal: ${relPath}`);
       continue;
     }
-    const target = path.resolve(artifactBase, relPath);
+    const target = path.resolve(resolvedBase, relPath);
+    const rel = path.relative(resolvedBase, target);
+    if (rel.startsWith('..') || path.isAbsolute(rel)) {
+      console.error(`skipping artifact with path traversal: ${relPath}`);
+      continue;
+    }
     try {
       if (typeof artifact.content === 'string') {
         await writeText(target, artifact.content);

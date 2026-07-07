@@ -8,6 +8,8 @@
   "max_tokens": 8192,
   "stream": false,
   "top_k": 25,
+  "temperature": 0,
+  "_reproducibility_note": "temperature pinned to 0 to reduce stochasticity between runs. Vendor may still produce non-identical outputs due to model snapshot floating and tool-use nondeterminism.",
   "pricing": {
     "model": "claude-haiku-4-5-20251001",
     "pricing_level": "Claude API standard pricing",

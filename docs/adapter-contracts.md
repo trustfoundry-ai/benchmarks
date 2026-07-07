@@ -287,6 +287,33 @@ bundle so `pnpm verify:results` can prove no bytes changed.
   change even if the schema is unchanged. Verify with `pnpm
   verify:results` after every touch of scoring or dataset code.
 
+## Reproducibility model
+
+"Reproducible" holds at four layers, each with a different guarantee:
+
+- **Code + config** — the run manifest pins the harness git commit, the
+  package version, and the exact bytes of every config file
+  (`configSha256`). An auditor with the same commit and configs runs the
+  same code path.
+- **Dataset** — the manifest pins the sha256 of every source file the
+  benchmark adapter consumed (`benchmark.sourceFiles[].sha256`). If a
+  dataset row changes, the manifest fingerprint changes.
+- **Vendor call** — provider adapters pin what they can in the outgoing
+  request (`temperature`, model IDs, tool budgets) and record whatever
+  the vendor returns in its response headers/body. The full raw response
+  lands in `provider-results.jsonl` so downstream tooling can re-derive
+  scores without re-hitting the vendor.
+- **Vendor stochasticity** — is NOT pinned. Model snapshots can float
+  behind a floating alias; sampling can produce different outputs at the
+  same temperature; tool-use scheduling is nondeterministic; web-search
+  results depend on live indexes. Two runs against the same code, configs,
+  and dataset will therefore produce statistically comparable
+  distributions but will not be byte-identical.
+
+The published `results/` bundles capture one specific run under these
+constraints. An auditor's rerun should land within noise, and any large
+divergence is itself a finding worth investigating.
+
 ## Registry and factories
 
 Adapters register with the shared `defaultRegistry`

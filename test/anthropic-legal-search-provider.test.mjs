@@ -81,6 +81,14 @@ test('buildRequestBody uses configured model, jurisdiction, topK, and web search
   assert.doesNotMatch(JSON.stringify(body), /ANTHROPIC_API_KEY|secret/i);
 });
 
+test('buildRequestBody forwards temperature=0 to the outgoing Messages request', () => {
+  const body = _internals.buildRequestBody(CASE_ROW, {
+    model: 'claude-test-model',
+    temperature: 0
+  });
+  assert.equal(body.temperature, 0);
+});
+
 test('buildSystemPrompt instructs the LLM to return the exact JSON envelope shape', () => {
   const system = _internals.buildSystemPrompt();
   assert.match(system, /Return only valid JSON/);

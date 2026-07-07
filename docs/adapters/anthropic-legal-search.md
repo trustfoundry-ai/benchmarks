@@ -4,9 +4,9 @@ Wraps [Anthropic's Messages API](https://docs.anthropic.com/en/api/messages) wit
 
 ## Why this adapter exists
 
-TrustFoundry publishes evaluation numbers about its own legal search product. A natural question is: *how does that compare to just asking a frontier LLM to search for the case?* This adapter is how we make that comparison reproducible.
+Anyone evaluating legal-search options is likely to ask *"can I just use a frontier LLM with a web-search tool for this?"* This adapter is provided so that question can be answered directly, on real benchmark rows, with an Anthropic API key and no additional wiring.
 
-The adapter is a **qualitative demonstrator**, not a competing product. We ship it so anyone with an Anthropic API key can rerun the same 200-row benchmark and see for themselves what happens when you ask Claude to do legal retrieval via general web search.
+The adapter is a **reference implementation** — it exists to make the LLM-plus-web-search option runnable inside the same harness, against the same rows and scorer as any other adapter registered in this repo. TrustFoundry is not publishing head-to-head numbers against it; the run outputs are for the evaluator to draw their own conclusions from.
 
 ## Integration approach
 
@@ -14,16 +14,14 @@ The adapter is a **qualitative demonstrator**, not a competing product. We ship 
 - Configurable per model: `claude-haiku`, `claude-sonnet`, `claude-opus` variants ship with their own `configs/providers/anthropic-legal-search-{haiku,opus,sonnet}.json` files. All three use the same prompt, JSON schema, and 25-result top-K so results are strictly comparable.
 - The `web_search_max_uses` knob is pinned per-config. Adapter surfaces `provider_failure` with kind `max_uses_exceeded` when the model exceeds its budget, so the scorer counts those rows as retrieval misses rather than dropping them.
 
-## Known shortcomings — and why they're the point
+## Failure modes evaluators are likely to encounter
 
-Every adapter in this file is a place where the "general LLM does web search" approach visibly falls over. The failure modes are stable across models and prompts:
+These are the failure classes the adapter is designed to surface honestly (as distinct `provider_failure` kinds where possible) rather than hide behind retries or silent drops. They are properties of "general LLM + general web search + a JSON schema" applied to legal retrieval, not Anthropic-specific:
 
-1. **JSON structure is not reliable.** Even with a strict schema and an explicit "return only valid JSON" instruction, models routinely truncate mid-envelope, escape braces incorrectly, or wrap the JSON in prose. Every model has some prompt-response rate at which it produces unparseable output; the harness records those as `provider_failure` kind `parse_error` and the scorer counts them as misses.
-2. **Non-primary sources.** Even when the model retrieves a real case, the URL it links to is often a secondary aggregator (case-summary blog, law-firm digest, code annotation), not a court opinion or a trusted case-law repository. The private-side citation-quality audit surfaces hundreds of these per model per 200-row run.
+1. **JSON structure is not always reliable.** Even with a strict schema and an explicit "return only valid JSON" instruction, models sometimes truncate mid-envelope, escape braces incorrectly, or wrap the JSON in prose. The harness records those as `provider_failure` kind `parse_error` and the scorer treats them as misses rather than dropping the row.
+2. **Non-primary sources.** Even when the model retrieves a real case, the URL it links to may be a secondary aggregator (case-summary blog, law-firm digest, code annotation), not a court opinion or a trusted case-law repository.
 3. **Citation hallucinations.** A real citation paired with a fabricated case name, or a real case name paired with an invented citation. Structured output constrains shape, not truth.
-4. **Latency, cost, and reliability scale unfavorably with model tier.** Median request latency runs from ~15s (Haiku) to ~80s (Opus) on the 200-row set. Cost tracks the same way.
-
-These aren't Anthropic-specific — they're properties of "general LLM + general web search + a JSON schema" applied to legal retrieval. That is precisely why we built this adapter: to demonstrate the gap qualitatively on the same benchmark that legal-specific search engines are evaluated on, so nobody has to take our word for how large the gap is.
+4. **Latency and cost scale with model tier.** Approximate 200-row budgets from prior runs: ~$8 (Haiku), ~$15 (Sonnet), ~$36 (Opus). Median request latency roughly ~15s (Haiku) up to ~80s (Opus). Use these to plan a smoke or a full run.
 
 ## Run
 
@@ -41,7 +39,7 @@ pnpm benchmark run \
   --force
 ```
 
-Swap the provider config for `anthropic-legal-search-sonnet.json` or `anthropic-legal-search-opus.json` to run the same rows against Claude Sonnet or Opus. Approximate 200-row costs from prior runs: ~$8 (Haiku), ~$15 (Sonnet), ~$36 (Opus). Median request latency scales with tier: ~15s Haiku, ~74s Sonnet, ~80s Opus. Use `--limit N --offset K` for smokes.
+Swap the provider config for `anthropic-legal-search-sonnet.json` or `anthropic-legal-search-opus.json` to run the same rows against Claude Sonnet or Opus. See "Failure modes evaluators are likely to encounter" above for approximate 200-row budgets and latency by tier. Use `--limit N --offset K` for smokes.
 
 **Provider configs:**
 - [`configs/providers/anthropic-legal-search-haiku.json`](../../configs/providers/anthropic-legal-search-haiku.json)

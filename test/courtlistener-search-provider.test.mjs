@@ -893,3 +893,44 @@ test('executeCase envelope shape is compatible with the raw-row schema', async (
   assert.equal(envelope.results[0].rank, 1);
   assert.deepEqual(envelope.results[0].citations, ['13 Mich. 233']);
 });
+
+test('response headers not on the allowlist (Set-Cookie, X-Debug-*) are dropped from the audit artifact', async () => {
+  const config = baseConfig({
+    _fetch: async () => ({
+      ok: true,
+      status: 200,
+      headers: new Map([
+        ['content-type', 'application/json'],
+        ['x-ratelimit-remaining', '4'],
+        ['retry-after', '30'],
+        // Below MUST be dropped — not on the allowlist.
+        ['set-cookie', 'session=abc123; Path=/'],
+        ['x-debug-user', 'internal-user-42'],
+        ['x-cache', 'HIT'],
+        ['server', 'nginx/1.24 (internal-build)']
+      ]),
+      text: async () =>
+        JSON.stringify({ count: 1, results: [{ id: 42, caseName: 'X', citation: '13 Mich. 233' }] })
+    })
+  });
+  const result = await courtlistenerSearchProviderAdapter.executeCase({
+    benchmarkCase: baseCase(),
+    config
+  });
+  assert.equal(result.status, 'completed');
+  const capture = JSON.parse(result.artifacts[0].content);
+  const responseHeaders = capture.pages[0].response.headers;
+  // On the allowlist — should survive.
+  assert.equal(responseHeaders['content-type'], 'application/json');
+  assert.equal(responseHeaders['x-ratelimit-remaining'], '4');
+  assert.equal(responseHeaders['retry-after'], '30');
+  // Off the allowlist — must be gone entirely (not even redacted).
+  assert.equal(responseHeaders['set-cookie'], undefined);
+  assert.equal(responseHeaders['x-debug-user'], undefined);
+  assert.equal(responseHeaders['x-cache'], undefined);
+  assert.equal(responseHeaders.server, undefined);
+  // Belt-and-suspenders: full serialized artifact must not contain the sensitive values.
+  const serialized = JSON.stringify(capture);
+  assert.equal(serialized.includes('session=abc123'), false);
+  assert.equal(serialized.includes('internal-user-42'), false);
+});
