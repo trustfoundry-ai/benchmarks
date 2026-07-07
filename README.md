@@ -1,12 +1,23 @@
 # TrustFoundry Benchmarks
 
 > **Status: Under active development (pre-1.0).**
-> This harness is being iterated on in the open. Contracts,
-> artifact schemas, and adapters may change between minor
-> versions until v1.0. Individual benchmark suites carry
-> their own maturity status — see the [suite status](#suite-status) table below.
+> Current release: **0.8.0**. This harness is being iterated on in
+> the open. Contracts, artifact schemas, and adapters may change
+> between minor versions until v1.0. Individual benchmark suites
+> carry their own maturity status — see the
+> [suite status](#suite-status) table below.
 
 This repository contains public benchmark harnesses for metrics TrustFoundry runs against its system. The goal is to make selected evaluations reproducible and extensible: you can rerun the same benchmark against TrustFoundry, inspect the row-level evidence behind the scores, or add another provider adapter for comparison.
+
+## Why this exists
+
+### Transparency and governance for published metrics
+
+TrustFoundry publishes evaluation numbers about its own product. This harness is how we make those numbers reproducible byte-for-byte by anyone with the same API key — so no vendor claim on this repo rests on our word alone. Every run produces a `manifest.json` that pins the harness commit, config hashes, and dataset provenance; every published bundle carries checksums for the row-level evidence. See [Manifest And Reproducibility](#manifest-and-reproducibility) for the mechanism, and [Verifying releases](#verifying-releases) for how to check that the harness code itself was built from this repo at the tagged commit.
+
+### Why a legal-search benchmark, specifically
+
+The public benchmarks in this space measure adjacent capabilities. [LegalBench](https://hazyresearch.stanford.edu/legalbench/) measures LLM legal-reasoning on small self-contained tasks with no external retrieval. [Harvey LAB](https://www.harvey.ai/blog/introducing-the-legal-agentic-benchmark-lab-a-benchmark-for-long-running-legal-work) measures long-running agentic workflows over customer documents without requiring actual legal authority as input. Neither measures a search engine's ability to *find, interpret, and surface specific legal authority* — a capability foundational to every legal-tech agent (research, drafting, citation validation, opinion generation). This suite fills that gap across four document families: case opinions, case key facts, statutes, and regulations. We have not seen it benchmarked publicly by anyone else.
 
 ## Suite status
 

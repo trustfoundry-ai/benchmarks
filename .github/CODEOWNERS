@@ -1,5 +1,10 @@
 # Ownership routes for benchmarks (public).
 # Two core maintainers own all reviewable surface.
+#
+# TODO: revisit this file when we cross 3+ maintainers. The current
+# personal-handle routing is fine at two people but becomes a
+# bottleneck fast; move to team handles (e.g. @trustfoundry-ai/benchmarks-core)
+# when a team exists.
 
 *                                        @iamgroot2285 @Sad-King-Billy
 /src/core/                               @iamgroot2285 @Sad-King-Billy

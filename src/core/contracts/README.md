@@ -78,10 +78,13 @@ these patterns or import them directly from `@trustfoundry-ai/benchmarks/core`
   run-manifest builder plus fingerprint helpers used by retry and merge
   to refuse operations across incompatible runs.
 
-## Adapter factories (coming in Phase 3)
+## Adapter factories
 
-Phase 3 of the refactor introduces `defineProviderAdapter`,
-`defineBenchmarkAdapter`, and `defineScorerAdapter` factory helpers
-exported from [`index.mjs`](./index.mjs). Consumers will register adapters
-via these helpers to pick up any future validation / defaulting the
-framework wants to add without breaking their adapter code.
+`defineProviderAdapter`, `defineBenchmarkAdapter`, and
+`defineScorerAdapter` are the current entry points for wiring up an
+adapter. They validate the plain-object shape at registration time and
+give the framework a place to add cross-cutting behavior later without
+breaking consumer code. See
+[`docs/adapter-contracts.md § Registry and factories`](../../../docs/adapter-contracts.md)
+for authored examples plus the versioning rules that govern additive vs.
+breaking contract changes.
