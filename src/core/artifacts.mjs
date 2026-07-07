@@ -2,7 +2,6 @@ import path from 'node:path';
 import { createReadStream, createWriteStream } from 'node:fs';
 import { readFile, stat, unlink } from 'node:fs/promises';
 import { pipeline } from 'node:stream/promises';
-import { createInterface } from 'node:readline';
 import { promisify } from 'node:util';
 import { createGunzip, createGzip, gunzip } from 'node:zlib';
 

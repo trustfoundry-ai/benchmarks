@@ -34,11 +34,6 @@ function nowCompact() {
   return new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
 }
 
-function parsePositiveInteger(value, fallback) {
-  const parsed = Number.parseInt(String(value ?? ''), 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
-}
-
 export function maxScorerCutoff(scorerConfig = {}) {
   const cutoffs = Array.isArray(scorerConfig.cutoffs) ? scorerConfig.cutoffs : [];
   const headline = scorerConfig.headline_cutoff ?? scorerConfig.headlineCutoff;

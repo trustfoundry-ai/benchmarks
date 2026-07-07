@@ -7,5 +7,6 @@ AGENTS.md
 CLAUDE.md
 runs/
 tmp/
+coverage/
 
 .codegraph/

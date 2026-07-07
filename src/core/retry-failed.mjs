@@ -178,7 +178,7 @@ export async function retryFailedRun({
   const providerResults = await readJsonl(
     path.join(resolvedRun, 'provider-results.jsonl')
   );
-  let previousScores = null;
+  let previousScores;
   try {
     previousScores = await readJson(path.join(resolvedRun, 'scores.json'));
   } catch {

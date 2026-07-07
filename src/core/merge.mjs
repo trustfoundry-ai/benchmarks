@@ -24,7 +24,6 @@ import {
   exists,
   readJson,
   readJsonl,
-  readJsonlStream,
   relativePath,
   writeJson,
   writeJsonl
