@@ -13,7 +13,7 @@ This repository contains public benchmark harnesses for metrics TrustFoundry run
 
 ### Transparency and governance for published metrics
 
-TrustFoundry publishes evaluation numbers about its own product. This harness is how we make those numbers reproducible byte-for-byte with a TrustFoundry API key — so no vendor claim on this repo rests on our word alone. Every run produces a `manifest.json` that pins the harness commit, config hashes, and dataset provenance; every published bundle carries checksums for the row-level evidence. See [Manifest And Reproducibility](#manifest-and-reproducibility) for the mechanism, and [Verifying releases](#verifying-releases) for how to check that the harness code itself was built from this repo at the tagged commit.
+TrustFoundry publishes evaluation numbers about its own product. This harness is how we make those numbers reproducible under identical inputs — the run `manifest.json` pins the harness commit, config bytes, and dataset digests, and every published bundle carries per-file checksums for the row-level evidence. An auditor rerunning against a TrustFoundry API key can compare their bundle to ours row-for-row. Vendor stochasticity (LLM sampling, tool-use nondeterminism, model-snapshot floating) means two runs won't be byte-identical, but the manifest captures the axes so distributions remain directly comparable. See [Manifest And Reproducibility](#manifest-and-reproducibility) for the mechanism, [`docs/adapter-contracts.md`](docs/adapter-contracts.md#reproducibility-model) for what "reproducible" means at each layer, and [Verifying releases](#verifying-releases) for how to check that the harness code itself was built from this repo at the tagged commit.
 
 ### Why a legal-search benchmark, specifically
 
