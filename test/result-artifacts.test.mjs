@@ -76,6 +76,7 @@ async function makeRun(repoRoot, root) {
       configSha256: await sha256File(path.join(repoRoot, 'configs/providers/trustfoundry-legal-search.json'))
     },
     scorer: {
+      id: 'trustfoundry-legal-search',
       configPath: 'configs/scorers/trustfoundry-legal-search.json',
       configSha256: await sha256File(path.join(repoRoot, 'configs/scorers/trustfoundry-legal-search.json'))
     },

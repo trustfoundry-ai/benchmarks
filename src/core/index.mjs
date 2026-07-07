@@ -6,6 +6,11 @@
 // `api.trustfoundry.ai` can use these directly or crib patterns from them.
 export * from './runner.mjs';
 export * from './registry.mjs';
+// scorer-validators.mjs is intentionally NOT re-exported here: its
+// `validateScorerCutoffsMatchImplementation` symbol is already
+// re-exported via runner.mjs above, and duplicate `export *` re-exports
+// for the same identifier become silently unavailable per ES spec.
+// Import from './scorer-validators.mjs' directly if you need it.
 export * from './artifacts.mjs';
 export * from './citations.mjs';
 export * from './query-transforms.mjs';

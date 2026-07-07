@@ -90,7 +90,11 @@ async function withFixture(fn) {
     // Minimal config files: point at real scorer config so validation passes.
     const bcPath = path.join(tmp, 'benchmark.json');
     const pcPath = path.join(tmp, 'provider.json');
-    await fs.writeFile(bcPath, JSON.stringify({ benchmarkId: benchmark.id }), 'utf8');
+    await fs.writeFile(
+      bcPath,
+      JSON.stringify({ benchmarkId: benchmark.id, scorer: 'trustfoundry-legal-search' }),
+      'utf8'
+    );
     await fs.writeFile(pcPath, JSON.stringify({ provider: provider.id }), 'utf8');
 
     try {
@@ -167,7 +171,11 @@ test('runner rejects artifact paths containing .. (no path traversal)', async ()
     registry.providers.set(provider.id, provider);
     const bcPath = path.join(tmp, 'b.json');
     const pcPath = path.join(tmp, 'p.json');
-    await fs.writeFile(bcPath, JSON.stringify({ benchmarkId: benchmark.id }), 'utf8');
+    await fs.writeFile(
+      bcPath,
+      JSON.stringify({ benchmarkId: benchmark.id, scorer: 'trustfoundry-legal-search' }),
+      'utf8'
+    );
     await fs.writeFile(pcPath, JSON.stringify({ provider: provider.id }), 'utf8');
     try {
       const outDir = path.join(tmp, 'run');

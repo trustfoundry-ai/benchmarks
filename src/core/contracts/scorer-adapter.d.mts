@@ -53,6 +53,10 @@ export interface ScorerDescribeResult {
   [key: string]: unknown;
 }
 
+export interface ScorerValidateConfigArgs {
+  scorerConfig: Record<string, unknown>;
+}
+
 export interface ScorerScoreArgs {
   manifest: RunManifest | null;
   cases: BenchmarkCase[];
@@ -90,7 +94,10 @@ export interface ScorerAdapter {
   describe(): Promise<ScorerDescribeResult>;
   score(args: ScorerScoreArgs): Promise<ScorerResult>;
   scoreStream?(args: ScorerScoreStreamArgs): Promise<ScorerResult>;
+  // Optional startup-time validation. When present, the runner invokes
+  // it before executeRun begins so the scorer can reject configs that
+  // would silently produce a result summary the bundle schema cannot
+  // represent (e.g. cutoffs that diverge from the scorer's
+  // implementation).
+  validateConfig?(args: ScorerValidateConfigArgs): void;
 }
-
-export declare const SUPPORTED_CUTOFFS: readonly number[] | undefined;
-export declare const SUPPORTED_HEADLINE_CUTOFF: number | undefined;

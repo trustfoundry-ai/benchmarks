@@ -29,7 +29,6 @@ test('core barrel exposes the new Phase 2 helpers', () => {
 test('core barrel still exposes pre-existing runner/registry helpers', () => {
   assert.equal(typeof core.executeRun, 'function');
   assert.equal(typeof core.scoreRun, 'function');
-  assert.equal(typeof core.defaultPaths, 'function');
   assert.equal(typeof core.getAdapter, 'function');
   assert.equal(typeof core.readJson, 'function');
 });

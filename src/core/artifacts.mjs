@@ -21,7 +21,6 @@ import {
 import { getAdapter } from './registry.mjs';
 
 const LARGE_RAW_GZIP_THRESHOLD_BYTES = 95 * 1024 * 1024;
-const DEFAULT_SCORER_ID = 'trustfoundry-legal-search';
 const gunzipAsync = promisify(gunzip);
 
 function safeParseJson(text) {
@@ -203,13 +202,13 @@ export function buildRawRows({ cases, providerResults, caseScores }) {
 //
 // Populates optional benchmark-specific fields (document_type, difficulty,
 // kind, negative_category, geo_level_2) when the raw row has them; older
-// bundles missing those fields get null defaults so trustfoundry-legal-search's scoring
-// path continues to work unchanged.
+// bundles missing those fields get null defaults so scorers that ignore
+// them can continue to work unchanged.
 export function reconstructPairFromRawRow(row) {
   const expectedKind = row.expected?.kind ?? 'exact';
   const benchmarkCase = {
     caseId: row.case_id,
-    benchmarkId: row.benchmark_id ?? 'trustfoundry-legal-search',
+    benchmarkId: row.benchmark_id ?? null,
     split: row.split,
     prompt: row.prompt,
     metadata: {
@@ -272,13 +271,19 @@ export function reconstructFromRawRows(rawRows) {
   return { cases, providerResults };
 }
 
-function resolveScorerId({ manifest, fallback = DEFAULT_SCORER_ID }) {
-  return (
+function resolveScorerId({ manifest, fallback = null }) {
+  const id =
     manifest?.scorer?.id ??
     manifest?.run?.scorer?.id ??
     manifest?.scorer_id ??
-    fallback
-  );
+    fallback;
+  if (typeof id !== 'string' || !id) {
+    throw new Error(
+      `Cannot determine scorer id: manifest is missing scorer.id (and no fallback was provided). ` +
+        `Manifests written by executeRun always record it; older bundles may need manual repair.`
+    );
+  }
+  return id;
 }
 
 // Streams raw rows through the scorer; never materializes more than one pair
@@ -453,11 +458,17 @@ export async function verifyResultBundle({ repoRoot, bundleDir, verifyInputs = t
       yield row;
     }
   }
-  // Prefer the scorer id recorded on the bundled result. Existing bundles
-  // published pre-refactor omit `result.run.scorer` — fall back to
-  // trustfoundry-legal-search so those bundles still verify byte-for-byte.
+  // Prefer the scorer id recorded on the bundled result. Every bundle
+  // published by executeRun records `result.run.scorer.id`; a bundle
+  // missing that field cannot be verified deterministically.
   const scorerIdForVerify =
-    result.run?.scorer?.id ?? result.summary?.execution?.scorer?.id ?? DEFAULT_SCORER_ID;
+    result.run?.scorer?.id ?? result.summary?.execution?.scorer?.id;
+  if (typeof scorerIdForVerify !== 'string' || !scorerIdForVerify) {
+    throw new Error(
+      `verifyResultBundle: bundle ${bundleDir} is missing result.run.scorer.id — ` +
+        `cannot determine which scorer to invoke for verification.`
+    );
+  }
   const recomputed = await scoreRawRowsStream({
     rawRowsIterable: countingRawRows(),
     manifest: result.run
