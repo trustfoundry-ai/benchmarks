@@ -23,35 +23,35 @@ test('scorerAdapterId error names the registered scorer ids', () => {
 test('scorerAdapterId reads benchmarkConfig.scorer with precedence over scorer config', () => {
   assert.equal(
     scorerAdapterId(
-      { scorer: 'trustfoundry-citation-lookup' },
+      { scorer: 'rank1-headline-scorer' },
       { id: 'trustfoundry-legal-search' }
     ),
-    'trustfoundry-citation-lookup'
+    'rank1-headline-scorer'
   );
-  assert.equal(scorerAdapterId({}, { scorer: 'trustfoundry-citation-lookup' }), 'trustfoundry-citation-lookup');
-  assert.equal(scorerAdapterId({}, { id: 'trustfoundry-citation-lookup' }), 'trustfoundry-citation-lookup');
+  assert.equal(scorerAdapterId({}, { scorer: 'rank1-headline-scorer' }), 'rank1-headline-scorer');
+  assert.equal(scorerAdapterId({}, { id: 'rank1-headline-scorer' }), 'rank1-headline-scorer');
 });
 
 test('scorerAdapterId accepts scorer_id/scorerId aliases on benchmark config', () => {
-  assert.equal(scorerAdapterId({ scorer_id: 'trustfoundry-citation-lookup' }, {}), 'trustfoundry-citation-lookup');
-  assert.equal(scorerAdapterId({ scorerId: 'trustfoundry-citation-lookup' }, {}), 'trustfoundry-citation-lookup');
+  assert.equal(scorerAdapterId({ scorer_id: 'rank1-headline-scorer' }, {}), 'rank1-headline-scorer');
+  assert.equal(scorerAdapterId({ scorerId: 'rank1-headline-scorer' }, {}), 'rank1-headline-scorer');
 });
 
-test('validateScorerCutoffsMatchImplementation with citation-lookup constants accepts headline=1', () => {
+test('validateScorerCutoffsMatchImplementation with headline=1 scorer constants accepts headline=1', () => {
   assert.doesNotThrow(() =>
     validateScorerCutoffsMatchImplementation(
       { cutoffs: [1, 5, 10, 25], headline_cutoff: 1 },
-      { supportedCutoffs: [1, 5, 10, 25], supportedHeadlineCutoff: 1, scorerId: 'trustfoundry-citation-lookup' }
+      { supportedCutoffs: [1, 5, 10, 25], supportedHeadlineCutoff: 1, scorerId: 'rank1-headline-scorer' }
     )
   );
 });
 
-test('validateScorerCutoffsMatchImplementation with citation-lookup constants rejects headline=25', () => {
+test('validateScorerCutoffsMatchImplementation with headline=1 scorer constants rejects headline=25', () => {
   assert.throws(
     () =>
       validateScorerCutoffsMatchImplementation(
         { cutoffs: [1, 5, 10, 25], headline_cutoff: 25 },
-        { supportedCutoffs: [1, 5, 10, 25], supportedHeadlineCutoff: 1, scorerId: 'trustfoundry-citation-lookup' }
+        { supportedCutoffs: [1, 5, 10, 25], supportedHeadlineCutoff: 1, scorerId: 'rank1-headline-scorer' }
       ),
     /headline_cutoff 25 differs/
   );
@@ -61,11 +61,11 @@ test('validateScorerCutoffsMatchImplementation error references the passed score
   try {
     validateScorerCutoffsMatchImplementation(
       { cutoffs: [1, 2, 3], headline_cutoff: 3 },
-      { supportedCutoffs: [1, 5, 10, 25], supportedHeadlineCutoff: 1, scorerId: 'trustfoundry-citation-lookup' }
+      { supportedCutoffs: [1, 5, 10, 25], supportedHeadlineCutoff: 1, scorerId: 'rank1-headline-scorer' }
     );
     assert.fail('expected throw');
   } catch (error) {
-    assert.match(error.message, /citation-lookup\.mjs/);
+    assert.match(error.message, /rank1-headline-scorer\.mjs/);
   }
 });
 
