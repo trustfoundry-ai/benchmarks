@@ -219,10 +219,16 @@ const URL_PARSERS = [
   // host so provenance is tracked.
   {
     name: 'primary_court_site',
+    // Exact-match or true-subdomain match on the hosts we treat as primary
+    // court sites. Bare `endsWith('courts.michigan.gov')` would also match
+    // `evilcourts.michigan.gov`, letting a spoofed URL get classified as
+    // authoritative (CodeQL: incomplete-url-substring-sanitization).
     hostMatch: (h) =>
       h.endsWith('.uscourts.gov') ||
-      h.endsWith('courts.michigan.gov') ||
-      h.endsWith('supremecourt.gov') ||
+      h === 'courts.michigan.gov' ||
+      h.endsWith('.courts.michigan.gov') ||
+      h === 'supremecourt.gov' ||
+      h.endsWith('.supremecourt.gov') ||
       h.endsWith('.gov'),
     parse: (_url, _pathname, host) => ({ source: 'url_parse', host, primary_court_site: true })
   }
