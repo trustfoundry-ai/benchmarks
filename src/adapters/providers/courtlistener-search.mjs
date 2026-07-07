@@ -11,9 +11,12 @@
 //      state_appellate_supreme court set (state → supreme + appellate; FED
 //      → federal appellate + district + bankruptcy). This mirrors what the
 //      TrustFoundry provider does via body.state, keeping the two runs
-//      apples-to-apples. Court IDs go in the URL's `court=` param, so the
-//      `q=` search text stays clean and doesn't consume its length budget
-//      or pollute semantic scoring.
+//      directly comparable on the same jurisdictional scope (the LLM /
+//      web-search adapters have looser jurisdictional discipline; parity
+//      here is with the TrustFoundry legal-search provider, not across
+//      every registered provider). Court IDs go in the URL's `court=`
+//      param, so the `q=` search text stays clean and doesn't consume its
+//      length budget or pollute semantic scoring.
 //
 // Auth: Authorization: Token <token> header (env var configurable, defaults
 // to COURTLISTENER_API_TOKEN).
@@ -109,20 +112,47 @@ function redactHeaders(headers) {
   return out;
 }
 
-// Materialize a fetch Response's headers as a plain object. Handles both
-// the WHATWG Headers instance (with .entries()) and the Map form used in
-// tests. Response headers are safe to record verbatim.
+// Response headers get captured into `raw-responses/*.json` audit artifacts
+// that ship in published `results/` bundles. Allowlist the fields the audit
+// actually needs so unexpected upstream metadata (Set-Cookie, X-Debug-*,
+// vendor-internal ids) never lands on disk. Extend deliberately.
+const RESPONSE_HEADER_ALLOWLIST = new Set([
+  'x-ratelimit-limit',
+  'x-ratelimit-limit-minute',
+  'x-ratelimit-limit-hour',
+  'x-ratelimit-limit-day',
+  'x-ratelimit-remaining',
+  'x-ratelimit-remaining-minute',
+  'x-ratelimit-remaining-hour',
+  'x-ratelimit-remaining-day',
+  'x-ratelimit-reset',
+  'retry-after',
+  'date',
+  'content-type',
+  'content-length'
+]);
+
+// Materialize a fetch Response's headers as a plain object, filtered through
+// RESPONSE_HEADER_ALLOWLIST. Handles both the WHATWG Headers instance (with
+// .entries()) and the Map / plain-object form used in tests.
 function serializeResponseHeaders(headers) {
   if (!headers) return {};
+  const out = {};
+  const emit = (name, value) => {
+    if (typeof name !== 'string') return;
+    if (RESPONSE_HEADER_ALLOWLIST.has(name.toLowerCase())) {
+      out[name] = value;
+    }
+  };
   if (typeof headers.entries === 'function') {
-    const out = {};
-    for (const [name, value] of headers.entries()) out[name] = value;
+    for (const [name, value] of headers.entries()) emit(name, value);
     return out;
   }
   if (typeof headers === 'object') {
-    return { ...headers };
+    for (const [name, value] of Object.entries(headers)) emit(name, value);
+    return out;
   }
-  return {};
+  return out;
 }
 
 function positiveInteger(value, fallback = null) {
