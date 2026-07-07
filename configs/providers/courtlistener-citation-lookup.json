@@ -1,9 +1,0 @@
-{
-  "_comment": "CourtListener v4 citation-lookup endpoint. POSTs {\"text\": \"<query>\"} and takes element[0] of the returned array. Rate limits are bootstrapped from the CL docs URL at startup; the fallback numbers below are only used if that fetch fails. Citation-lookup publishes 60/min; hour/day are set equal to per_minute as a conservative fallback since CL doesn't publish separate hour/day caps for this endpoint.",
-  "provider": "courtlistener-citation-lookup",
-  "endpoint": "https://www.courtlistener.com/api/rest/v4/citation-lookup/",
-  "token_env": "COURTLISTENER_API_TOKEN",
-  "request_timeout_ms": 60000,
-  "rate_limits_docs_url": "https://wiki.free.law/c/courtlistener/help/api/rest/v4/overview",
-  "rate_limits_fallback": { "per_minute": 60, "per_hour": 60, "per_day": 60 }
-}

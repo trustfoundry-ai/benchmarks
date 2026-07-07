@@ -17,9 +17,6 @@ result bundle still verifies byte-for-byte.
   comparison to `trustfoundry-legal-search`. Reads rate limits live from
   CourtListener's docs page at startup; honors `Retry-After` /
   `X-RateLimit-Reset` on 429.
-- **`courtlistener-citation-lookup` provider adapter.** Wraps
-  CourtListener's v4 citation-lookup endpoint. Used by the
-  `trustfoundry-citation-lookup` benchmark.
 - **`anthropic-legal-search` provider adapter.** Wraps Anthropic's
   Messages API with the built-in `web_search_20250305` tool. Three shipped
   provider configs cover Haiku / Sonnet / Opus. Ships as a **qualitative
@@ -54,10 +51,9 @@ result bundle still verifies byte-for-byte.
 
 ### Registry
 
-- `defaultRegistry` gains registrations for the five new provider
+- `defaultRegistry` gains registrations for the four new provider
   adapters (`anthropic-legal-search`, `courtlistener-search`,
-  `courtlistener-citation-lookup`, `exa-legal-search`,
-  `openai-legal-search`) alongside the existing
+  `exa-legal-search`, `openai-legal-search`) alongside the existing
   `trustfoundry-legal-search`.
 
 ### Governance
