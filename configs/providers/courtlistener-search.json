@@ -1,0 +1,11 @@
+{
+  "_comment": "CourtListener v4 opinion search. Two hardcoded invariants (not config knobs): (1) semantic=true; (2) per-row jurisdiction filter to state supreme+appellate (or federal courts for FED rows), mirroring the TrustFoundry provider's body.state filter. Rate limits are fetched live from the CL docs URL at startup; the fallback numbers are only used if that fetch fails or the parse is incomplete.",
+  "provider": "courtlistener-search",
+  "endpoint": "https://www.courtlistener.com/api/rest/v4/search/",
+  "token_env": "COURTLISTENER_API_TOKEN",
+  "request_timeout_ms": 60000,
+  "page_size": 25,
+  "top_k": 25,
+  "rate_limits_docs_url": "https://wiki.free.law/c/courtlistener/help/api/rest/v4/overview",
+  "rate_limits_fallback": { "per_minute": 5, "per_hour": 50, "per_day": 125 }
+}

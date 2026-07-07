@@ -1,0 +1,82 @@
+{
+  "generated_at": "2026-07-07T00:00:00.000Z",
+  "source": {
+    "endpoint": "https://www.courtlistener.com/api/rest/v4/courts/",
+    "note": "Fixture for courtlistener-search adapter tests. Small subset — Michigan (state supreme + appellate) plus a handful of federal courts. Not a substitute for scripts/build-cl-jurisdictions.mjs at run time."
+  },
+  "state_jurisdictions": ["S", "SA", "SS", "ST", "SAG"],
+  "federal_jurisdictions": ["F", "FB", "FD", "FS", "MA"],
+  "states": {
+    "MI": {
+      "court_count": 2,
+      "courts": [
+        {
+          "id": "mich",
+          "full_name": "Michigan Supreme Court",
+          "jurisdiction": "S",
+          "court_state": "MI",
+          "in_use": true
+        },
+        {
+          "id": "michctapp",
+          "full_name": "Michigan Court of Appeals",
+          "jurisdiction": "SA",
+          "court_state": "MI",
+          "in_use": true
+        }
+      ]
+    },
+    "CA": {
+      "court_count": 2,
+      "courts": [
+        {
+          "id": "cal",
+          "full_name": "California Supreme Court",
+          "jurisdiction": "S",
+          "court_state": "CA",
+          "in_use": true
+        },
+        {
+          "id": "calctapp",
+          "full_name": "California Court of Appeal",
+          "jurisdiction": "SA",
+          "court_state": "CA",
+          "in_use": true
+        }
+      ]
+    }
+  },
+  "federal": {
+    "court_count": 4,
+    "courts": [
+      {
+        "id": "scotus",
+        "full_name": "Supreme Court of the United States",
+        "jurisdiction": "F",
+        "court_state": null,
+        "in_use": true
+      },
+      {
+        "id": "ca9",
+        "full_name": "Court of Appeals for the Ninth Circuit",
+        "jurisdiction": "F",
+        "court_state": null,
+        "in_use": true
+      },
+      {
+        "id": "cand",
+        "full_name": "District Court, N.D. California",
+        "jurisdiction": "FD",
+        "court_state": null,
+        "in_use": true
+      },
+      {
+        "id": "canb",
+        "full_name": "Bankruptcy Court, N.D. California",
+        "jurisdiction": "FB",
+        "court_state": null,
+        "in_use": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+Jurisdiction,Court Type,Court Id,Court Name,Court URL
+Federal,Supreme,scotus,Supreme Court of the United States,https://www.supremecourt.gov/
+Federal,Appellate,ca1,U.S. Court of Appeals for the First Circuit,https://www.ca1.uscourts.gov/
+Federal,Appellate,ca2,U.S. Court of Appeals for the Second Circuit,https://www.ca2.uscourts.gov/
+Federal,Appellate,ca3,U.S. Court of Appeals for the Third Circuit,https://www.ca3.uscourts.gov/
+Federal,Appellate,ca4,U.S. Court of Appeals for the Fourth Circuit,https://www.ca4.uscourts.gov/
+Federal,Appellate,ca5,U.S. Court of Appeals for the Fifth Circuit,https://www.ca5.uscourts.gov/
+Federal,Appellate,ca6,U.S. Court of Appeals for the Sixth Circuit,https://www.ca6.uscourts.gov/
+Federal,Appellate,ca7,U.S. Court of Appeals for the Seventh Circuit,https://www.ca7.uscourts.gov/
+Federal,Appellate,ca8,U.S. Court of Appeals for the Eighth Circuit,https://www.ca8.uscourts.gov/
+Federal,Appellate,ca9,U.S. Court of Appeals for the Ninth Circuit,https://www.ca9.uscourts.gov/
+Federal,Appellate,ca10,U.S. Court of Appeals for the Tenth Circuit,https://www.ca10.uscourts.gov/
+Federal,Appellate,ca11,U.S. Court of Appeals for the Eleventh Circuit,https://www.ca11.uscourts.gov/
+Federal,Appellate,cadc,U.S. Court of Appeals for the D.C. Circuit,https://www.cadc.uscourts.gov/
+Federal,Appellate,cafed,U.S. Court of Appeals for the Federal Circuit,https://www.cafc.uscourts.gov/

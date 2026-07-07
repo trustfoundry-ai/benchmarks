@@ -1,0 +1,20 @@
+{
+  "_comment": "OpenAI Responses API web-search provider for case-law Legal Search rows. Model: gpt-5.5-2026-04-23. Requires OPENAI_API_KEY. Emits Bluebook citation fields consumed by the trustfoundry-legal-search scorer. Priced parallel to Claude Opus so the Opus/GPT-5.5 comparison is directly cost-comparable at 200-row scale.",
+  "endpoint": "https://api.openai.com/v1/responses",
+  "api_key_env": "OPENAI_API_KEY",
+  "model": "gpt-5.5-2026-04-23",
+  "request_timeout_ms": 180000,
+  "max_output_tokens": 10000,
+  "top_k": 25,
+  "pricing": {
+    "model": "gpt-5.5-2026-04-23",
+    "pricing_level": "OpenAI API standard pricing",
+    "source": "https://developers.openai.com/api/docs/pricing",
+    "source_accessed_at": "2026-07-06",
+    "currency": "USD",
+    "unit": "per_1m_tokens",
+    "input_per_million_tokens": 5,
+    "output_per_million_tokens": 30
+  },
+  "web_search_tool_type": "web_search"
+}

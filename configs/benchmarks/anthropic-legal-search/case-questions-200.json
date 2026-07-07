@@ -1,0 +1,11 @@
+{
+  "_comment": "First 200 case-question rows from the public trustfoundry-legal-search dataset, paired with the anthropic-legal-search provider. Use CLI --offset/--limit to run subsets (e.g. --limit 1 for a wiring smoke).",
+  "benchmarkId": "trustfoundry-legal-search",
+  "dataDir": "data/trustfoundry-legal-search",
+  "files": ["case_questions.jsonl"],
+  "datasetSize": "anthropic-legal-search-case-questions-200",
+  "datasetNames": ["case_questions"],
+  "splits": ["test"],
+  "queryTransformId": "strip-synthetic-instruction-prefixes-v1",
+  "limit": 200
+}

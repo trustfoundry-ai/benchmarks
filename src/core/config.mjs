@@ -34,12 +34,19 @@ export async function loadConfig(configPath, fallback = {}) {
 
 export function normalizeProviderSlug(providerId, config = {}) {
   const model = config.model ?? config.modelId ?? config.exactModelId;
-  return [providerId, model]
+  const raw = [providerId, model]
     .filter(Boolean)
     .join('-')
-    .replace(/[^A-Za-z0-9._-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .toLowerCase();
+    .replace(/[^A-Za-z0-9._-]+/g, '-');
+  // Trim leading/trailing dashes with an explicit index walk instead of a
+  // regex — even the anchored `/^-+/` and `/-+$/` patterns trip CodeQL's
+  // polynomial-redos rule (js/polynomial-redos) because the `-+` engine
+  // may retry from multiple positions on library-controlled input.
+  let start = 0;
+  let end = raw.length;
+  while (start < end && raw.charCodeAt(start) === 45 /* '-' */) start += 1;
+  while (end > start && raw.charCodeAt(end - 1) === 45) end -= 1;
+  return raw.slice(start, end).toLowerCase();
 }
 
 export function effectiveRunId({ benchmarkId, providerSlug, scorerId }) {

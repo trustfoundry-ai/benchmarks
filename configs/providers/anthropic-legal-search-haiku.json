@@ -1,0 +1,24 @@
+{
+  "_comment": "Claude Messages API web-search provider for case-law Legal Search rows. Model: claude-haiku-4-5-20251001. Requires ANTHROPIC_API_KEY. Emits Bluebook citation fields consumed by the trustfoundry-legal-search scorer.",
+  "endpoint": "https://api.anthropic.com/v1/messages",
+  "api_key_env": "ANTHROPIC_API_KEY",
+  "anthropic_version": "2023-06-01",
+  "model": "claude-haiku-4-5-20251001",
+  "request_timeout_ms": 180000,
+  "max_tokens": 8192,
+  "stream": false,
+  "top_k": 25,
+  "pricing": {
+    "model": "claude-haiku-4-5-20251001",
+    "pricing_level": "Claude API standard pricing",
+    "source": "https://platform.claude.com/docs/en/about-claude/models/overview",
+    "source_accessed_at": "2026-07-05",
+    "currency": "USD",
+    "unit": "per_1m_tokens",
+    "input_per_million_tokens": 1,
+    "output_per_million_tokens": 5
+  },
+  "web_search_tool_type": "web_search_20250305",
+  "web_search_tool_name": "web_search",
+  "web_search_max_uses": 3
+}

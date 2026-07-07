@@ -10,3 +10,12 @@ tmp/
 coverage/
 
 .codegraph/
+
+# CL bulk-file cache (bz2 + decompressed csv). The joined
+# court-jurisdictions.json IS checked in — it's derived from public
+# CourtListener data via scripts/build-cl-jurisdictions.mjs and the
+# `source` field records which dated bulk files it was built from.
+# Only the source csv/bz2 caches (which are large and reproducible)
+# are excluded.
+data/courtlistener/*.csv
+data/courtlistener/*.csv.bz2
