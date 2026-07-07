@@ -49,6 +49,8 @@ All targets use the same public search endpoint and `trustfoundry-legal-search` 
 
 The generic provider config [`trustfoundry-legal-search.json`](../../configs/providers/trustfoundry-legal-search.json) omits `model_type` and sends each row's `model_type`, so the same provider config works for all four targets.
 
+**Latest bundles.** [`results/trustfoundry-legal-search/latest.json`](../../results/trustfoundry-legal-search/latest.json) points at the currently-published bundle for each `(type, size)` — a stable pointer that resolves to whichever dated bundle is currently canonical, so external consumers don't have to guess the date.
+
 ### Test Data Schema
 
 Each line in a dataset JSONL file is one JSON object. The main fields are:

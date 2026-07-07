@@ -163,8 +163,8 @@ The image stamps the source commit it was built from into `$HARNESS_COMMIT_SHA`,
 - `bin/` and `src/`: the benchmark CLI and harness framework.
 - `configs/`: benchmark, provider, and scorer configuration.
 - `data/`: public benchmark datasets.
-- `suites/trustfoundry-legal-search/` and `suites/trustfoundry-citation-lookup/`: suite-specific documentation.
-- `results/`: generated result bundles.
+- `suites/trustfoundry-legal-search/` and `suites/trustfoundry-citation-lookup/`: suite-specific *documentation* only. Suite-scoped adapters live under `src/adapters/`.
+- `results/`: published result bundles, organized as `results/<benchmark>/<date>/<type>/<size>/`. Each benchmark also has a `results/<benchmark>/latest.json` pointer that names the currently-published bundle for each `(type, size)` — stable URL for external consumers who don't want to guess the date.
 - `agent-skills/`: optional agent workflow instructions.
 - `Dockerfile`, `entrypoint.sh`: reproducible container image (see "Running the harness in a container" above).
 

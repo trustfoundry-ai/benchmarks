@@ -1,0 +1,15 @@
+{
+  "$comment": "Stable pointer to the currently-published bundle for each (type, size). Update alongside any new dated result bundle. Verified by scripts/verify-result-bundles.mjs.",
+  "benchmark": "trustfoundry-legal-search",
+  "updated": "2026-07-05",
+  "bundles": {
+    "case-questions/200": "2026-07-05/case-questions/200",
+    "case-questions/5k": "2026-07-05/case-questions/5k",
+    "key-facts/200": "2026-07-05/key-facts/200",
+    "key-facts/5k": "2026-07-05/key-facts/5k",
+    "laws/200": "2026-07-05/laws/200",
+    "laws/5k": "2026-07-05/laws/5k",
+    "regs/200": "2026-07-05/regs/200",
+    "regs/5k": "2026-07-05/regs/5k"
+  }
+}
