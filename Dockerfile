@@ -45,10 +45,14 @@ RUN apt-get update \
 RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
 
 WORKDIR /app
-COPY . ./
 
+# Copy dependency manifests first so `pnpm install` caches independently of
+# source edits — a src/ change should NOT re-trigger the install layer.
+COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
-RUN chmod +x /app/entrypoint.sh
+# Then copy the rest of the source tree. Filtered by .dockerignore, so
+# runs/, results/, node_modules/, .git/, tests, docs, etc. do not ship.
+COPY . ./
 
 ENTRYPOINT ["/app/entrypoint.sh"]
