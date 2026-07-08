@@ -58,6 +58,136 @@ test('parseUrl handles Cornell LII supreme court URLs', () => {
   assert.equal(out.bluebook_from_url, '463 U.S. 1');
 });
 
+test('parseUrl handles the current /court/ findlaw path prefix', () => {
+  // FindLaw's default caselaw URLs today carry an extra "court" segment
+  // that the legacy 2-segment regex would miss.
+  const out = parseUrl('https://caselaw.findlaw.com/court/mi-court-of-appeals/116326994.html');
+  assert.equal(out.parser, 'findlaw_caselaw');
+  assert.equal(out.court_slug, 'mi-court-of-appeals');
+  assert.equal(out.docket, '116326994');
+  assert.equal(out.host, 'caselaw.findlaw.com');
+});
+
+test('parseUrl still handles the legacy findlaw path shape (no /court/ prefix)', () => {
+  const out = parseUrl('https://caselaw.findlaw.com/mi-supreme-court/1252927.html');
+  assert.equal(out.parser, 'findlaw_caselaw');
+  assert.equal(out.court_slug, 'mi-supreme-court');
+  assert.equal(out.docket, '1252927');
+});
+
+test('parseUrl derives Bluebook citation from Justia state direct-reporter URL', () => {
+  const out = parseUrl('https://law.justia.com/cases/california/court-of-appeal/4th/64/1190.html');
+  assert.equal(out.parser, 'justia_state_reporter');
+  assert.equal(out.state, 'california');
+  assert.equal(out.court_slug, 'court-of-appeal');
+  assert.equal(out.series, '4th');
+  assert.equal(out.volume, '64');
+  assert.equal(out.page, '1190');
+  assert.equal(out.bluebook_from_url, '64 Cal. App. 4th 1190');
+});
+
+test('parseUrl leaves bluebook_from_url null for unknown state/court combos', () => {
+  const out = parseUrl('https://law.justia.com/cases/texas/thirteenth-court-of-appeals/2d/50/100.html');
+  assert.equal(out.parser, 'justia_state_reporter');
+  assert.equal(out.state, 'texas');
+  assert.equal(out.court_slug, 'thirteenth-court-of-appeals');
+  assert.equal(out.bluebook_from_url, null);
+});
+
+test('parseUrl derives Bluebook citation from Justia state volumes-path URL', () => {
+  const out = parseUrl('https://law.justia.com/cases/massachusetts/supreme-court/volumes/323/323mass79.html');
+  assert.equal(out.parser, 'justia_state_volumes');
+  assert.equal(out.state, 'massachusetts');
+  assert.equal(out.volume, '323');
+  assert.equal(out.page, '79');
+  assert.equal(out.reporter_slug, 'mass');
+  assert.equal(out.bluebook_from_url, '323 Mass. 79');
+});
+
+test('parseUrl derives Bluebook citation from Justia federal-appellate URL', () => {
+  const out = parseUrl('https://law.justia.com/cases/federal/appellate-courts/F2/841/1281/420797/');
+  assert.equal(out.parser, 'justia_federal_appellate');
+  assert.equal(out.reporter_slug, 'F2');
+  assert.equal(out.volume, '841');
+  assert.equal(out.page, '1281');
+  assert.equal(out.bluebook_from_url, '841 F.2d 1281');
+});
+
+test('parseUrl records docket for Justia federal-district URL without deriving a citation', () => {
+  const out = parseUrl('https://law.justia.com/cases/federal/district-courts/michigan/miedce/2:2021cv10750/353419/60/');
+  assert.equal(out.parser, 'justia_federal_district');
+  assert.equal(out.state, 'michigan');
+  assert.equal(out.court_slug, 'miedce');
+  assert.equal(out.docket, '2:2021cv10750');
+  assert.equal(out.bluebook_from_url, null);
+});
+
+test('parseUrl still handles the year-first Justia case shape (justia_case wins)', () => {
+  // Regression: adding justia_state_reporter must not swallow the existing
+  // {state}/{court}/{year}/{slug}.html shape handled by justia_case.
+  const out = parseUrl('https://law.justia.com/cases/mississippi/supreme-court/1966/44190-0.html');
+  assert.equal(out.parser, 'justia_case');
+  assert.equal(out.state, 'mississippi');
+  assert.equal(out.year, '1966');
+});
+
+test('parseUrl accepts justia_case URL without the .html suffix', () => {
+  // Justia sometimes serves the canonical page without an extension.
+  const out = parseUrl('https://law.justia.com/cases/california/court-of-appeal/2008/b175953');
+  assert.equal(out.parser, 'justia_case');
+  assert.equal(out.state, 'california');
+  assert.equal(out.year, '2008');
+  assert.equal(out.docket_slug, 'b175953');
+});
+
+test('parseUrl derives Bluebook citation from FindLaw US Reports URL', () => {
+  const out = parseUrl('https://caselaw.findlaw.com/court/us-supreme-court/553/639.html');
+  assert.equal(out.parser, 'findlaw_supreme_us');
+  assert.equal(out.volume, '553');
+  assert.equal(out.page, '639');
+  assert.equal(out.bluebook_from_url, '553 U.S. 639');
+});
+
+test('parseUrl handles Justia SCOTUS URL with /case.pdf suffix', () => {
+  const out = parseUrl('https://supreme.justia.com/cases/federal/us/514/779/case.pdf');
+  assert.equal(out.parser, 'justia_supreme_us');
+  assert.equal(out.bluebook_from_url, '514 U.S. 779');
+});
+
+test('parseUrl handles Cal. App. Supp. page in state-reporter URLs', () => {
+  const out = parseUrl('https://law.justia.com/cases/california/court-of-appeal/4th/61/supp5.html');
+  assert.equal(out.parser, 'justia_state_reporter');
+  assert.equal(out.state, 'california');
+  assert.equal(out.series, '4th');
+  assert.equal(out.volume, '61');
+  assert.equal(out.page, '5');
+  assert.equal(out.supplement, true);
+  assert.equal(out.bluebook_from_url, '61 Cal. App. 4th Supp. 5');
+});
+
+test('parseUrl derives F. Supp. 2d citation from reporter-indexed federal district URL', () => {
+  // Regression from the smoke: this URL used to be swallowed by
+  // justia_federal_district as if `FSupp2` were a state slug, losing the
+  // derivable Bluebook citation.
+  const out = parseUrl('https://law.justia.com/cases/federal/district-courts/FSupp2/304/858/2563386/');
+  assert.equal(out.parser, 'justia_federal_reporter_district');
+  assert.equal(out.reporter_slug, 'FSupp2');
+  assert.equal(out.volume, '304');
+  assert.equal(out.page, '858');
+  assert.equal(out.bluebook_from_url, '304 F. Supp. 2d 858');
+});
+
+test('parseUrl still classifies state-based federal-district URL as docket-keyed', () => {
+  // Regression: tightening justia_federal_district to lowercase state
+  // slugs must not break the state/court-slug shape.
+  const out = parseUrl('https://law.justia.com/cases/federal/district-courts/michigan/miedce/2:2021cv10750/353419/60/');
+  assert.equal(out.parser, 'justia_federal_district');
+  assert.equal(out.state, 'michigan');
+  assert.equal(out.court_slug, 'miedce');
+  assert.equal(out.docket, '2:2021cv10750');
+  assert.equal(out.bluebook_from_url, null);
+});
+
 test('parseUrl returns unmatched_host for a host with no dedicated parser', () => {
   const out = parseUrl('https://random.example.com/some/path');
   assert.equal(out.parser, null);

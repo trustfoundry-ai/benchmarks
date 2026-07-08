@@ -1,0 +1,19 @@
+{
+  "_comment": "Primary-only variant: natural-language question sent to Parallel with source_policy.include_domains restricted to the row's issuing court's own `.gov` site, derived from the row's court_id via src/data/court-url-map.mjs (CSV overrideable via TF_COURT_URLS_CSV). Isolates the ranker's contribution by removing coverage as a variable — for rows where the court publishes the opinion on its own site, this is the easiest possible retrieval task. The row's answer already implies the court, so this is a diagnostic ablation, not an ordinary measurement.",
+  "endpoint": "https://api.parallel.ai/v1/search",
+  "api_key_env": "PARALLEL_API_KEY",
+  "query_mode": "question",
+  "domain_scope": "primary_only",
+  "search_mode": "advanced",
+  "objective": "Retrieve U.S. case law opinions relevant to the search query.",
+  "top_k": 25,
+  "request_timeout_ms": 60000,
+  "pricing": {
+    "vendor": "parallel",
+    "source": "https://docs.parallel.ai/api-reference/search/search",
+    "source_accessed_at": "2026-07-08",
+    "currency": "USD",
+    "unit": "per_1k_queries",
+    "notes": "Pricing not published on the Search API reference page as of the source_accessed_at date. Contact Parallel for current pricing."
+  }
+}
