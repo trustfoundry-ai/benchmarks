@@ -1,0 +1,7 @@
+{
+  "_comment": "Citation-lookup regulation — deterministic 200-row subset (85 bluebook + 115 noisy — regulations has fewer than 100 bluebook rows so the deficit is filled from noisy). Stratified by authority.",
+  "benchmarkId": "citation-lookup",
+  "datasetPath": "data/citation-lookup-regulations-200/dataset.jsonl",
+  "datasetLabel": "citation-lookup-regulations-200",
+  "scorer": "citation-lookup"
+}

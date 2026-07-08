@@ -1,0 +1,105 @@
+{
+  "axis_retry_budget": 3,
+  "canonicals_dropped_by_exclusion": {
+    "case_law": 48,
+    "regulation": 17,
+    "statute": 13
+  },
+  "canonicals_extract_failed": {
+    "regulation": 2,
+    "statute": 3
+  },
+  "canonicals_per_group": 2,
+  "canonicals_with_zero_sloppy": 0,
+  "exclusion_set_size": 21905,
+  "eyecite_git_sha": "f6c257abc452efbe941d317524c68357fa186629",
+  "generated_at": "2026-07-04T00:04:45.875618+00:00",
+  "negatives_by_category": {
+    "address": 5,
+    "date_iso": 5,
+    "date_long": 5,
+    "date_short": 4,
+    "date_slash": 5,
+    "digits_only": 4,
+    "phone": 5,
+    "section_prose": 5,
+    "single_word_non_reporter": 4,
+    "truncation_prefix": 3,
+    "version": 5
+  },
+  "negatives_dropped_by_exclusion": 11,
+  "priority_axes": [
+    "drop_dots",
+    "case_toggle",
+    "spell_out",
+    "drop_dots_and_spaces",
+    "drop_trailing_word",
+    "state_swap",
+    "amp_and_swap",
+    "section_marker_swap",
+    "section_marker_bare",
+    "section_marker_drop",
+    "whitespace_mangle",
+    "interior_whitespace",
+    "run_together",
+    "extra_internal_whitespace_reporter",
+    "ocr_substitute",
+    "char_typo",
+    "trailing_prose"
+  ],
+  "row_counts": {
+    "bluebook": 89,
+    "noisy": 267
+  },
+  "seed_negatives": 9999,
+  "seed_stratified_sample": 7777,
+  "seed_variations": 8888,
+  "noisy_axes_kept_counts": {
+    "case_toggle": 820,
+    "char_typo": 32,
+    "drop_dots": 804,
+    "drop_dots_and_spaces": 197,
+    "drop_trailing_word": 3,
+    "interior_whitespace": 7,
+    "ocr_substitute": 91,
+    "section_marker_bare": 5,
+    "section_marker_drop": 5,
+    "section_marker_swap": 53,
+    "spell_out": 529,
+    "whitespace_mangle": 8
+  },
+  "noisy_excluded_variants": 79,
+  "noisy_no_op_axes_counts": {
+    "amp_and_swap": 158,
+    "case_toggle": 42,
+    "char_typo": 50,
+    "drop_dots": 58,
+    "drop_dots_and_spaces": 150,
+    "drop_trailing_word": 157,
+    "extra_internal_whitespace_reporter": 144,
+    "interior_whitespace": 143,
+    "ocr_substitute": 53,
+    "run_together": 144,
+    "section_marker_bare": 30,
+    "section_marker_drop": 30,
+    "spell_out": 333,
+    "state_swap": 158,
+    "trailing_prose": 30,
+    "whitespace_mangle": 150
+  },
+  "noisy_per_canonical": 3,
+  "source_csv_shas": {
+    "cases_rep_cites_fed": "af2c9501ceb8be56a036143c059018528d2ad9ef2d91cb462896f3fd44942498",
+    "cases_rep_cites_fed_top100": "9028add3b3589358e115915f8569901a598efb556a3cbb6f50e94c6375f3d6ed",
+    "laws_regs": "120d4dcd392cbb3ecd5ac625895037cb1bcc24bacffc3c28e9e9c3fd918a2c16",
+    "laws_regs_top100": "189f94d8abce16425446aa199156fc56a89733ec1519f394d539731ea979bf55"
+  },
+  "variations_dropped_authority_cap": 1600,
+  "variations_dropped_excluded": 0,
+  "variations_dropped_no_route": 563,
+  "post_build_filter": {
+    "removed_variation_rows": 400,
+    "reason": "Variation rows sample citation-parser regex surfaces; they measure recognition breadth, not document retrieval. Recognition-coverage tests belong in the parser project (eyecite-ttf), not in a legal-platform retrieval benchmark. Kept the pre-filter counts in the git history at f66df3f / 6c3ec63.",
+    "removed_at": "2026-07-08T16:50:58.922Z"
+  }
+}

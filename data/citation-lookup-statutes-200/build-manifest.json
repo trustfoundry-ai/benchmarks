@@ -1,0 +1,19 @@
+{
+  "kind": "statutes",
+  "subset_size": 200,
+  "source_dataset": "data/citation-lookup-statutes/dataset.jsonl",
+  "source_dataset_sha256": "4eb71e62796fbf2da842639581915393d9993f6c0c0622e7ff31f3bd2602b813",
+  "tier_counts": {
+    "bluebook_available": 89,
+    "noisy_available": 267,
+    "bluebook_sampled": 89,
+    "noisy_sampled": 111
+  },
+  "seeds": {
+    "bluebook": 7772,
+    "noisy": 7773
+  },
+  "sampling": "stratified-by-authority_identifier, largest-remainder rounding, mulberry32 shuffle",
+  "variation_excluded": 0,
+  "generated_at": "2026-07-08T20:15:32.730Z"
+}

@@ -1,0 +1,7 @@
+{
+  "_comment": "Citation-lookup regulation — full dataset (340 rows: 85 bluebook + 255 noisy).",
+  "benchmarkId": "citation-lookup",
+  "datasetPath": "data/citation-lookup-regulations/dataset.jsonl",
+  "datasetLabel": "citation-lookup-regulations",
+  "scorer": "citation-lookup"
+}

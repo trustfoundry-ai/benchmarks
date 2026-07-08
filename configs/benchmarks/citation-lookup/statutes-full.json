@@ -1,0 +1,7 @@
+{
+  "_comment": "Citation-lookup statute — full dataset (356 rows: 89 bluebook + 267 noisy).",
+  "benchmarkId": "citation-lookup",
+  "datasetPath": "data/citation-lookup-statutes/dataset.jsonl",
+  "datasetLabel": "citation-lookup-statutes",
+  "scorer": "citation-lookup"
+}

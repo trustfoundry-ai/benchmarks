@@ -1,0 +1,7 @@
+{
+  "_comment": "Citation-lookup benchmark — synthetic non-citation negatives. Correct iff the provider returns zero results.",
+  "benchmarkId": "citation-lookup",
+  "datasetPath": "data/citation-lookup-negatives/dataset.jsonl",
+  "datasetLabel": "citation-lookup-negatives",
+  "scorer": "citation-lookup"
+}

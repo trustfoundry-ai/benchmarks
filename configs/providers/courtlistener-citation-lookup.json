@@ -1,0 +1,10 @@
+{
+  "_comment": "CourtListener v4 citation-lookup endpoint. POSTs {\"text\": \"<query>\"} and takes element[0] of the returned array. Rate limits depend on auth state: when COURTLISTENER_API_TOKEN is set, the adapter uses the citation-lookup authenticated tier directly (60/min, no docs-page fetch). When no token is set, the adapter bootstraps from rate_limits_docs_url and falls back to rate_limits_anonymous if the fetch fails.",
+  "provider": "courtlistener-citation-lookup",
+  "endpoint": "https://www.courtlistener.com/api/rest/v4/citation-lookup/",
+  "token_env": "COURTLISTENER_API_TOKEN",
+  "request_timeout_ms": 60000,
+  "rate_limits_docs_url": "https://wiki.free.law/c/courtlistener/help/api/rest/v4/overview",
+  "rate_limits_anonymous": { "per_minute": 5, "per_hour": 50, "per_day": 125 },
+  "rate_limits_authenticated": { "per_minute": 10, "per_hour": 100, "per_day": 5000 }
+}

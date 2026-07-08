@@ -1,0 +1,7 @@
+{
+  "_comment": "Citation-lookup case_law — deterministic 200-row subset (100 bluebook + 100 noisy, stratified by authority). See scripts/build-citation-lookup-subsets.mjs.",
+  "benchmarkId": "citation-lookup",
+  "datasetPath": "data/citation-lookup-cases-200/dataset.jsonl",
+  "datasetLabel": "citation-lookup-cases-200",
+  "scorer": "citation-lookup"
+}

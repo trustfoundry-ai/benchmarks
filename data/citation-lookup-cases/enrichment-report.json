@@ -1,0 +1,1813 @@
+{
+  "total_rows": 2720,
+  "unique_citations": 680,
+  "resolved_rows": 2720,
+  "unresolved_rows": 0,
+  "coverage_pct_rows": 100,
+  "resolved_citations": 680,
+  "coverage_pct_citations": 100,
+  "collision_count": 0,
+  "by_authority": {
+    "akb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "akd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ald": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "almb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "almd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "alnb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "alnd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "alsb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "alsd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "arb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ard": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "areb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ared": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "arwb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "arwd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "azd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "bap1": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "bap10": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "bap2": {
+      "total": 6,
+      "resolved": 6,
+      "pct": 100
+    },
+    "bap6": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "bap8": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "bap9": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "bapma": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "bapme": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "bia": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "bta": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ca1": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "ca10": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ca11": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ca13": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ca2": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ca3": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ca4": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "ca5": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ca6": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ca7": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ca8": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ca9": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "cacb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "cacd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "cadc": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "caeb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "caed": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "californiad": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "canalzoned": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "canb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "cand": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "casb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "casd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "cc": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "ccpa": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "circtdal": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "circtdar": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdca": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdco": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdct": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtddc": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "circtdel": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdga": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdia": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdid": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdil": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "circtdin": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "circtdks": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "circtdky": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "circtdla": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdma": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdmd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdme": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "circtdmi": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdmn": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "circtdmo": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdms": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdmt": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdnd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdne": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdnh": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdnj": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "circtdnv": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdoh": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdor": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdpa": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdri": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "circtdsc": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdsd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdtx": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdut": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdva": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdvt": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "circtdwa": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdwi": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdwv": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtdwy": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtedar": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtedil": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtedla": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtedmi": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtedmo": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtednc": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtedny": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtedok": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtedpa": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtedsc": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtedtn": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtedtx": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtedva": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtedwa": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtedwi": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtmdal": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtmdpa": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtmdtn": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtnc": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtndal": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtndca": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtndfl": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtndga": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtndil": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "circtndms": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtndny": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtndoh": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtndwv": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtnia": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtny": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtsdal": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtsdca": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtsdfl": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtsdga": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtsdia": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtsdil": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtsdms": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtsdny": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtsdoh": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtwdar": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtwdky": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtwdmi": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "circtwdmo": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtwdnc": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "circtwdny": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtwdok": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtwdpa": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtwdtex": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtwdtn": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtwdva": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtwdwa": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "circtwdwi": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "cit": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "cob": {
+      "total": 6,
+      "resolved": 6,
+      "pct": 100
+    },
+    "cod": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ctb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ctd": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "cusc": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "dcb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "dcd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "deb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ded": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "deptinterior": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "eca": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "fisc": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "fiscr": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "fld": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "flmb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "flmd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "flnb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "flnd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "flsb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "flsd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "gad": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "gamb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "gamd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ganb": {
+      "total": 6,
+      "resolved": 6,
+      "pct": 100
+    },
+    "gand": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "gasb": {
+      "total": 5,
+      "resolved": 5,
+      "pct": 100
+    },
+    "gasd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "gub": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "gud": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "hib": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "hid": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "iad": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ianb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "iand": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "iasb": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "iasd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "idb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "idd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ilcb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ilcd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "illinoised": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ilnb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ilnd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ilsb": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "ilsd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "indianad": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "innb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "innd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "insb": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "insd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "jpml": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "judcoun2": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "judcoun5": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "judcoun7": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "judcoun8": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "judcoun9": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ksb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ksd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "kyd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "kyeb": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "kyed": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "kywb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "kywd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "lad": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "laeb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "laed": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "lamb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "lamd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "lawb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "lawd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "mab": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "mad": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "mdb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "mdd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "meb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "med": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "michd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "mieb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "mied": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "missd": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "miwb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "miwd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "mnb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "mnd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "mod": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "moeb": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "moed": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "mowb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "mowd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "msnb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "msnd": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "mspb": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "mssb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "mssd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "mtb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "mtd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ncd": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "nceb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nced": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "ncmb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ncmd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ncwb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ncwd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ndb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ndd": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "nebraskab": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ned": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nhb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nhd": {
+      "total": 3,
+      "resolved": 3,
+      "pct": 100
+    },
+    "njb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "njd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nmb": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "nmd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nmid": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nvb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nvd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nyd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nyeb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nyed": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nynb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nynd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nysb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nysd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nywb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "nywd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ohiod": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ohnb": {
+      "total": 6,
+      "resolved": 6,
+      "pct": 100
+    },
+    "ohnd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ohsb": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "ohsd": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "okd": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "okeb": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "oked": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "oknb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "oknd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "okwb": {
+      "total": 7,
+      "resolved": 7,
+      "pct": 100
+    },
+    "okwd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "orb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ord": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "paeb": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "paed": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "pamb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "pamd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "pawb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "pawd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "pennsylvaniad": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "philadeptjust": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "prb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "prd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "reglrailreorgct": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "rib": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "rid": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "scb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "scd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "scotus": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "sdb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "sdd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "southcarolinaed": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "southcarolinawd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "superctsdfla": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "tax": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "tecoa": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "tennessed": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "texd": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "tneb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "tned": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "tnmb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "tnmd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "tnwb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "tnwd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "txeb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "txed": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "txnb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "txnd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "txsb": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "txsd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "txwb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "txwd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "usberlinct": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "uscfc": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "uscirct": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "usdistct": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "usjudconfcomdis": {
+      "total": 4,
+      "resolved": 4,
+      "pct": 100
+    },
+    "usprovctla": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "ussurveyor": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "utb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "utd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "vad": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "vaeb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "vaed": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "vawb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "vawd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "vib": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "vid": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "vtb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "vtd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "waeb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "waed": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "washd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "wawb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "wawd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "wieb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "wied": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "wisd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "wiwb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "wiwd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "wvad": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "wvnb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "wvnd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "wvsb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "wvsd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "wyb": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    },
+    "wyd": {
+      "total": 8,
+      "resolved": 8,
+      "pct": 100
+    }
+  },
+  "unresolved_sample": [],
+  "collision_sample": [],
+  "generated_at": "2026-07-08T16:51:04.086Z",
+  "cache_hits": 680,
+  "spanner_queries_issued": 0,
+  "refresh_used": false
+}
