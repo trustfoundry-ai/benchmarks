@@ -1,0 +1,26 @@
+name: "TrustFoundry benchmarks CodeQL config"
+
+# Layered on GitHub's default security-and-quality suite. Rules dropped
+# below are ones that repeatedly produce false positives on this codebase
+# and don't map to a real threat model for this repo (a public benchmarks
+# harness that does not accept untrusted URLs for redirection, HTTP proxying,
+# or other user-controlled routing).
+queries:
+  - uses: security-and-quality
+
+query-filters:
+  # `js/incomplete-url-substring-sanitization` fires on any
+  # `Array.prototype.includes` call whose element is a hostname-looking
+  # string — including test assertions like `domains.includes('x.com')`
+  # against a hostname allowlist, which is element-equality, not
+  # URL-substring matching. Six exa-test alerts and seven parallel-test
+  # alerts have already been dismissed with this rationale; excluding
+  # the rule prevents future adapter tests from triggering the same
+  # false-positive class.
+  #
+  # Safe to exclude repo-wide: no src/ code performs URL substring
+  # sanitization on user-controlled input. If a future feature adds
+  # URL-redirect / SSRF-adjacent code, restore this rule scoped to that
+  # subtree with a targeted `paths:` filter here.
+  - exclude:
+      id: js/incomplete-url-substring-sanitization
