@@ -4,6 +4,17 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-07-08
+
+Fifth vendor provider adapter shipped (`parallel-legal-search`), plus a
+batch of citation-extractor URL-parser additions that improve scoring
+precision for both the new adapter and the pre-existing `exa-legal-search`.
+The adapter-authoring skill is also promoted alongside — checked in for
+both Claude Code (`.claude/skills/`) and OpenAI Codex (`.agents/skills/`)
+conventions.
+
+No dataset, scored-metric, or result-bundle changes. Every previously-published bundle still verifies byte-for-byte.
+
 ### Added
 
 - **`parallel-legal-search` provider adapter.** Wraps [Parallel's
@@ -16,17 +27,68 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
   `exa-legal-search` (via `src/data/citation-extractor.mjs`).
 - **Provider config** `configs/providers/parallel-legal-search-aggregators-only.json`
   and **benchmark config** `configs/benchmarks/parallel-legal-search-aggregators-only/case-questions-200.json`.
+- **Primary-only provider + benchmark configs**
+  (`configs/providers/parallel-legal-search-primary-only.json` and
+  `configs/benchmarks/parallel-legal-search-primary-only/case-questions-200.json`).
+  Diagnostic ablation: restricts `include_domains` per-row to the row's own
+  issuing court's `.gov` site via `src/data/court-url-map.mjs`. Not shipped
+  as a default (opt-in via config), same shape as the exa diagnostic variants.
 - **`docs/adapters/parallel-legal-search.md`** — per-adapter README mirroring
   the Exa doc's structure.
 - **25 new tests** in `test/parallel-legal-search-provider.test.mjs`
   covering request-body construction, envelope normalization, citation
   extraction, executeCase full path, API-key redaction, Parallel's 422
   validation-error surface, and timeout classification.
+- **`.claude/skills/legal-search-adapter/SKILL.md` and
+  `.agents/skills/legal-search-adapter/SKILL.md`** — coding-agent walkthrough
+  for adding a new legal-search provider adapter. Same body checked in twice
+  under Claude Code's and OpenAI Codex's respective conventions. README's
+  "Extending" section gains a "Coding-agent skill" subsection pointing at
+  both.
 
-### Registry
+### Changed
 
-- `defaultRegistry` gains a `parallel-legal-search` provider registration
-  alphabetized between `openai-legal-search` and `trustfoundry-legal-search`.
+- **Citation-extractor URL parsers.** Extended `src/data/citation-extractor.mjs`
+  to parse the URL shapes FindLaw and Justia serve today that the shipped
+  parsers didn't previously cover. New parsers: `findlaw_supreme_us` (US
+  Reports), `justia_state_reporter` (California-style direct-reporter),
+  `justia_state_volumes` (Massachusetts-style filename-encoded citations),
+  `justia_federal_appellate` (F.2d / F.3d), `justia_federal_reporter_district`
+  (F.Supp. / F.Supp.2d / F.Supp.3d). Extended parsers: `findlaw_caselaw`
+  accepts the current `/court/` path prefix; `justia_supreme_us` accepts
+  the `/case.pdf` suffix; `justia_state_reporter` accepts `supp{N}` page
+  suffix; `justia_case` no longer requires the `.html` extension. Also
+  seeds `STATE_COURT_REPORTERS` with California, New York, Illinois, and
+  Massachusetts. 14 new tests in `test/citation-extractor.test.mjs`.
+  Effect: on a 200-row Parallel smoke, 81% of returned URLs parsed cleanly
+  and 121 of them derived a Bluebook citation directly from the URL, up
+  from prior negligible coverage on those hosts.
+
+### Fixed
+
+- **`justia_federal_district` parser mis-classifying reporter-indexed URLs.**
+  URLs of shape `/cases/federal/district-courts/FSupp2/{vol}/{page}/{opinion-id}/`
+  were being swallowed as if `FSupp2` were a state slug and `{vol}` were a
+  court slug — dropping the derivable Bluebook citation on the floor. Added
+  a new `justia_federal_reporter_district` parser matched first (uppercase
+  reporter slugs starting with `F`), and tightened `justia_federal_district`
+  to only match lowercase state slugs so it can't swallow reporter URLs
+  again. `federalReporterFromSlug` extended to translate `FSupp` / `FSupp2` /
+  `FSupp3` to `F. Supp.` / `F. Supp. 2d` / `F. Supp. 3d`.
+
+### CI
+
+- **`.github/codeql/codeql-config.yml`** — layered on `security-and-quality`
+  with a `query-filter` excluding `js/incomplete-url-substring-sanitization`.
+  That rule fires on `Array.prototype.includes` calls against hostname
+  allowlists in adapter tests (`domains.includes('courtlistener.com')` —
+  element-equality, not URL-substring matching). Six exa-test alerts and
+  seven parallel-test alerts had already been dismissed with this
+  rationale; the config filter prevents future adapter tests from
+  regenerating the same false-positive class. Safe to exclude repo-wide:
+  no src/ code performs URL-substring sanitization on user-controlled
+  input. `.github/workflows/codeql.yml` updated to wire the config via
+  `config-file:`.
 
 ## [0.9.1] - 2026-07-07
 
