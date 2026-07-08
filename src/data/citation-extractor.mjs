@@ -149,6 +149,111 @@ const URL_PARSERS = [
     }
   },
   {
+    name: 'justia_state_reporter',
+    // Direct-reporter index shape (no year segment):
+    //   /cases/{state}/{court}/{series}/{volume}/{page}.html
+    // e.g. /cases/california/court-of-appeal/4th/64/1190.html → "64 Cal. App. 4th 1190"
+    // Bluebook derivation needs a {state, court, series} → reporter map;
+    // parsers return the raw path fields regardless so provenance is captured
+    // even for state/court combos not yet in the map.
+    hostMatch: (h) => h === 'law.justia.com',
+    parse: (_url, pathname, host) => {
+      const m = /^\/cases\/([^/]+)\/([^/]+)\/([^/]+)\/(\d+)\/(\d+)\.html?$/.exec(pathname);
+      if (!m) return null;
+      // Reject the year-first shape handled by justia_case (4-digit segment 3).
+      if (/^\d{4}$/.test(m[3])) return null;
+      const [, state, court, series, volume, page] = m;
+      const reporter = stateCourtReporter(state, court, series);
+      return {
+        state,
+        court_slug: court,
+        series,
+        volume,
+        page,
+        bluebook_from_url: reporter ? `${volume} ${reporter} ${page}` : null,
+        source: 'url_parse',
+        host
+      };
+    }
+  },
+  {
+    name: 'justia_state_volumes',
+    // Volumes-index shape with filename-encoded citation:
+    //   /cases/{state}/{court}/volumes/{volume}/{filename}.html
+    // e.g. /cases/massachusetts/supreme-court/volumes/323/323mass79.html → "323 Mass. 79"
+    hostMatch: (h) => h === 'law.justia.com',
+    parse: (_url, pathname, host) => {
+      const m = /^\/cases\/([^/]+)\/([^/]+)\/volumes\/(\d+)\/([^/]+)\.html?$/.exec(pathname);
+      if (!m) return null;
+      const [, state, court, volume, filename] = m;
+      // Filename encoding: {volume}{reporter-slug}{page}, e.g. "323mass79".
+      const enc = /^(\d+)([a-z][a-z0-9]*?)(\d+)$/i.exec(filename);
+      const filenameVolume = enc?.[1];
+      const reporterSlug = enc?.[2];
+      const page = enc?.[3];
+      const reporter = reporterSlug ? slugToReporter(reporterSlug) : null;
+      const citation =
+        reporter && filenameVolume === volume && page
+          ? `${volume} ${reporter} ${page}`
+          : null;
+      return {
+        state,
+        court_slug: court,
+        volume,
+        page: page ?? null,
+        reporter_slug: reporterSlug ?? null,
+        bluebook_from_url: citation,
+        source: 'url_parse',
+        host
+      };
+    }
+  },
+  {
+    name: 'justia_federal_appellate',
+    // Federal appellate reporter shape:
+    //   /cases/federal/appellate-courts/{reporter}/{volume}/{page}[/{opinion-id}[/...]]
+    // e.g. /cases/federal/appellate-courts/F2/841/1281/420797/ → "841 F.2d 1281"
+    // Justia drops the "d" from federal reporter slugs (F2, F3, F4); we
+    // restore it so the derived Bluebook string is right.
+    hostMatch: (h) => h === 'law.justia.com',
+    parse: (_url, pathname, host) => {
+      const m = /^\/cases\/federal\/appellate-courts\/([^/]+)\/(\d+)\/(\d+)(?:\/|$)/.exec(pathname);
+      if (!m) return null;
+      const [, reporterSlug, volume, page] = m;
+      const reporter = federalReporterFromSlug(reporterSlug) ?? slugToReporter(reporterSlug);
+      return {
+        reporter_slug: reporterSlug,
+        volume,
+        page,
+        bluebook_from_url: reporter ? `${volume} ${reporter} ${page}` : null,
+        source: 'url_parse',
+        host
+      };
+    }
+  },
+  {
+    name: 'justia_federal_district',
+    // Federal district court PDFs are keyed by docket, not citation. We
+    // still record the family so parser-hit telemetry reflects known hosts.
+    //   /cases/federal/district-courts/{state}/{court}/{docket}[/{opinion-id}[/{part}]]
+    hostMatch: (h) => h === 'law.justia.com',
+    parse: (_url, pathname, host) => {
+      const m = /^\/cases\/federal\/district-courts\/([^/]+)\/([^/]+)\/([^/]+)(?:\/([^/]+))?(?:\/([^/]+))?\/?$/.exec(pathname);
+      if (!m) return null;
+      const [, state, courtSlug, docket, opinionId, part] = m;
+      return {
+        state,
+        court_slug: courtSlug,
+        docket,
+        opinion_id: opinionId ?? null,
+        part: part ?? null,
+        bluebook_from_url: null,
+        source: 'url_parse',
+        host
+      };
+    }
+  },
+  {
     name: 'justia_supreme_us',
     // e.g. /cases/federal/us/463/1/ or /us/463/1
     hostMatch: (h) => h === 'supreme.justia.com',
@@ -192,10 +297,12 @@ const URL_PARSERS = [
   },
   {
     name: 'findlaw_caselaw',
-    // e.g. caselaw.findlaw.com/{court}/{docket}.html
+    // Two path shapes in the wild:
+    //   caselaw.findlaw.com/{court}/{docket}.html         (legacy)
+    //   caselaw.findlaw.com/court/{court}/{docket}.html   (current default)
     hostMatch: (h) => h === 'caselaw.findlaw.com',
     parse: (_url, pathname, host) => {
-      const m = /^\/([^/]+)\/([^/]+?)\.html?$/.exec(pathname);
+      const m = /^\/(?:court\/)?([^/]+)\/([^/]+?)\.html?$/.exec(pathname);
       if (!m) return null;
       return { court_slug: m[1], docket: m[2], source: 'url_parse', host };
     }
@@ -245,6 +352,53 @@ export function slugToBluebook(slug) {
   const reporterFmt = slugToReporter(reporter);
   if (!reporterFmt) return null;
   return `${volume} ${reporterFmt} ${page}`;
+}
+
+// Justia state-reporter direct index (`justia_state_reporter`) URLs encode
+// the state and the court but not the reporter itself — Bluebook derivation
+// needs a {state, court, series} → reporter map. Seed with the states seen
+// in adapter runs; unknown combos return null so the parser still records
+// provenance but skips `bluebook_from_url`.
+const STATE_COURT_REPORTERS = {
+  california: {
+    'supreme-court': 'Cal.',
+    'court-of-appeal': 'Cal. App.'
+  },
+  'new-york': {
+    'court-of-appeals': 'N.Y.',
+    'supreme-court': 'N.Y.S.',
+    'appellate-division': 'A.D.'
+  },
+  illinois: {
+    'supreme-court': 'Ill.',
+    'appellate-court': 'Ill. App.'
+  },
+  massachusetts: {
+    'supreme-court': 'Mass.',
+    'appeals-court': 'Mass. App. Ct.'
+  }
+};
+
+// Justia federal-appellate URLs use reporter slugs like "F", "F2", "F3",
+// "F4" — dropping the "d" that appears in the Bluebook string ("F.2d",
+// "F.3d", "F. 4th"). Restore it here; return null for anything not federal
+// so the caller can fall back to slugToReporter for other reporters.
+export function federalReporterFromSlug(slug) {
+  if (!slug) return null;
+  const m = /^F(\d)?$/i.exec(slug);
+  if (!m) return null;
+  const series = m[1];
+  if (!series) return 'F.';
+  return series === '4' ? 'F. 4th' : `F.${series}d`;
+}
+
+export function stateCourtReporter(state, court, series) {
+  const base = STATE_COURT_REPORTERS[state]?.[court];
+  if (!base) return null;
+  if (series && /^\d[a-z]{1,3}$/i.test(series)) {
+    return `${base} ${series}`;
+  }
+  return base;
 }
 
 // Convert reporter slugs like "mich", "so2d", "f3d", "n-y" → "Mich.", "So. 2d", "F.3d", "N.Y."
