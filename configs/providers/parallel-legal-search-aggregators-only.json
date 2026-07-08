@@ -1,0 +1,19 @@
+{
+  "_comment": "Aggregators-only variant: natural-language question sent to Parallel with source_policy.include_domains restricted to the curated free legal aggregators (CourtListener, Justia, Google Scholar, OpenJurist, caselaw.findlaw.com). No per-row court-specific domain scoping — every row sends the identical aggregator list, so no court-url-map is required and the adapter is trivially portable. Measures how Parallel performs against public case law when the search is restricted to open aggregators.",
+  "endpoint": "https://api.parallel.ai/v1/search",
+  "api_key_env": "PARALLEL_API_KEY",
+  "query_mode": "question",
+  "domain_scope": "aggregators_only",
+  "search_mode": "advanced",
+  "objective": "Retrieve U.S. case law opinions relevant to the search query.",
+  "top_k": 25,
+  "request_timeout_ms": 60000,
+  "pricing": {
+    "vendor": "parallel",
+    "source": "https://docs.parallel.ai/api-reference/search/search",
+    "source_accessed_at": "2026-07-07",
+    "currency": "USD",
+    "unit": "per_1k_queries",
+    "notes": "Pricing not published on the Search API reference page as of the source_accessed_at date. Contact Parallel for current pricing."
+  }
+}

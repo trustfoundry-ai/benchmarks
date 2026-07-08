@@ -4,6 +4,30 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+### Added
+
+- **`parallel-legal-search` provider adapter.** Wraps [Parallel's
+  `/v1/search`](https://docs.parallel.ai/api-reference/search/search) API. Ships
+  with `domain_scope: aggregators_only` as the default, mirroring the shipped
+  `exa-legal-search` config so the two vendors are directly comparable. Exposes
+  Parallel's `mode` (`turbo` / `basic` / `advanced`) and `objective` fields as
+  config knobs; the shipped config sets `mode: "advanced"` and a legal-scoping
+  `objective`. Same URL-and-excerpt citation-extraction pathway as
+  `exa-legal-search` (via `src/data/citation-extractor.mjs`).
+- **Provider config** `configs/providers/parallel-legal-search-aggregators-only.json`
+  and **benchmark config** `configs/benchmarks/parallel-legal-search-aggregators-only/case-questions-200.json`.
+- **`docs/adapters/parallel-legal-search.md`** — per-adapter README mirroring
+  the Exa doc's structure.
+- **25 new tests** in `test/parallel-legal-search-provider.test.mjs`
+  covering request-body construction, envelope normalization, citation
+  extraction, executeCase full path, API-key redaction, Parallel's 422
+  validation-error surface, and timeout classification.
+
+### Registry
+
+- `defaultRegistry` gains a `parallel-legal-search` provider registration
+  alphabetized between `openai-legal-search` and `trustfoundry-legal-search`.
+
 ## [0.9.1] - 2026-07-07
 
 Post-review hardening pass ahead of design-partner access. No dataset,

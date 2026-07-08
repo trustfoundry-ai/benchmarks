@@ -22,6 +22,7 @@ import { anthropicLegalSearchProviderAdapter } from '../adapters/providers/anthr
 import { courtlistenerSearchProviderAdapter } from '../adapters/providers/courtlistener-search.mjs';
 import { exaLegalSearchProviderAdapter } from '../adapters/providers/exa-legal-search.mjs';
 import { openaiLegalSearchProviderAdapter } from '../adapters/providers/openai-legal-search.mjs';
+import { parallelLegalSearchProviderAdapter } from '../adapters/providers/parallel-legal-search.mjs';
 import { trustfoundryLegalSearchProviderAdapter } from '../adapters/providers/trustfoundry-legal-search.mjs';
 import { trustfoundryLegalSearchScorerAdapter } from '../adapters/scorers/trustfoundry-legal-search.mjs';
 
@@ -50,6 +51,7 @@ defaultRegistry.register('providers', anthropicLegalSearchProviderAdapter);
 defaultRegistry.register('providers', courtlistenerSearchProviderAdapter);
 defaultRegistry.register('providers', exaLegalSearchProviderAdapter);
 defaultRegistry.register('providers', openaiLegalSearchProviderAdapter);
+defaultRegistry.register('providers', parallelLegalSearchProviderAdapter);
 defaultRegistry.register('providers', trustfoundryLegalSearchProviderAdapter);
 defaultRegistry.register('scorers', trustfoundryLegalSearchScorerAdapter);
 
