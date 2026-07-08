@@ -4,14 +4,79 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-07-07
+
+Post-review hardening pass ahead of design-partner access. No dataset,
+scored-metric, or result-bundle changes; every previously-published
+bundle still verifies byte-for-byte.
+
 ### Removed
 
 - **`trustfoundry-citation-lookup` benchmark, scorer, provider config, dataset,
   suite doc, and registry entries** — pulled from the public repo pending
-  full end-to-end validation. The companion `courtlistener-citation-lookup`
+  full end-to-end validation (PR #14). The companion `courtlistener-citation-lookup`
   provider is also unshipped (still private-only). Both will return together
   as a `0.10.0` release once the flow is vetted. Nothing that was published
-  under `results/` referenced this suite, so no result bundles change.
+  under `results/` referenced this suite.
+
+### Fixed
+
+- **`writeArtifacts` — reject absolute artifact paths.**
+  `docs/adapter-contracts.md` documented that the runner rejects `..` segments
+  *and* absolute paths, but the code only checked for `..`. Now enforces both
+  with a resolved-path check so an adapter emitting an absolute artifact path
+  can't write outside the run dir. No in-tree adapter hit this path, so no
+  behavior change for shipped runs.
+- **CourtListener adapter — allowlist response headers captured in audit
+  artifacts.** `raw-responses/*.json` audit artifacts ship inside published
+  bundles. The previous wildcard header capture would have preserved any
+  header CL (or a proxy) chose to emit. Filtered to the small set actually
+  needed for the audit trail (rate-limit family, `Retry-After`, `Date`,
+  `Content-*`).
+
+### Changed
+
+- **Anthropic + OpenAI provider configs pin `temperature: 0`.** Reduces
+  sampling variance between runs. Adapter passthrough was already correct;
+  configs now explicitly set the field, with a `_reproducibility_note` sibling
+  documenting what is and isn't pinned. Vendor stochasticity (model-snapshot
+  floating, tool-use nondeterminism, live web-search index) remains.
+- **CourtListener adapter — file-header comment reworded.** The prior
+  "apples-to-apples" phrasing implied parity across every registered provider;
+  the actual jurisdictional-scope parity is only with the TrustFoundry
+  legal-search provider. Reworded to reflect that.
+
+### Documentation
+
+- **Exa adapter README overhauled.** Adds a Configuration modes table
+  labeling each `(domain_scope, query_mode)` combination as ordinary
+  measurement / diagnostic / sanity-check so the non-headline modes cannot
+  be mistaken for real measurements. Documents each aggregator host and
+  why it's on/off the default list; documents `type: 'auto'` semantics;
+  spells out the strong-hit / loose-hit citation-extraction boundary.
+- **LLM + Exa adapter READMEs reframed as reference implementations.**
+  Removes "publishing evaluation numbers" / "reproduce the qualitative
+  comparison" / "headline number we publish" phrasing. Adds explicit
+  "TrustFoundry is not publishing head-to-head numbers against this
+  adapter" disclaimers. Drops specific per-run quality percentages from
+  prior TrustFoundry runs; keeps cost / latency envelope guidance so
+  evaluators can plan runs.
+- **README reproducibility claim softened.** Previous "reproducible
+  byte-for-byte" language wasn't literally true for LLM-backed adapters.
+  Reworked to describe reproducibility as a layered guarantee (code +
+  config + dataset + captured vendor response), with a new
+  **Reproducibility model** section in `docs/adapter-contracts.md` spelling
+  out what is and isn't pinned at each layer.
+- **Suite README — data provenance paragraph.** Notes that all four
+  datasets are TrustFoundry-generated synthetic queries held out from
+  TrustFoundry's own training set; the bundle publish date marks first
+  public appearance.
+
+### Governance
+
+- **`.github/workflows/ci.yml` — pin least-privilege `permissions:
+  { contents: read }`.** Brings ci.yml in line with `codeql.yml` and
+  `release.yml`, which already had explicit permissions blocks.
 
 ## [0.9.0] - 2026-07-07
 
