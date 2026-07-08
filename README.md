@@ -238,6 +238,15 @@ Current adapters:
 pnpm benchmark adapters
 ```
 
+### Coding-agent skill
+
+If you're using a coding agent to add a new provider adapter, this repository ships a skill that walks a fresh session through the whole checklist — adapter module, provider + benchmark configs, tests, docs, and a one-row smoke against the vendor API — modeled on the five shipped `-legal-search` adapters. The same skill is checked in twice, once per agent convention:
+
+- **Claude Code** — [`.claude/skills/legal-search-adapter/SKILL.md`](.claude/skills/legal-search-adapter/SKILL.md)
+- **OpenAI Codex** — [`.agents/skills/legal-search-adapter/SKILL.md`](.agents/skills/legal-search-adapter/SKILL.md)
+
+The two files are content-identical; each agent picks up its native convention automatically. The skill fires when a session asks to add a case-law retrieval provider (LLM API with web search, search engine, vector DB, legal-tech vendor).
+
 ## Public API
 
 `@trustfoundry-ai/benchmarks-harness` exposes a curated set of named exports from its root barrel. Anything imported from that surface follows semver — additive changes are minor bumps, breaking changes are major bumps.
