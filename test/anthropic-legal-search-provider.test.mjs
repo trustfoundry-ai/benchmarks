@@ -89,6 +89,36 @@ test('buildRequestBody forwards temperature=0 to the outgoing Messages request',
   assert.equal(body.temperature, 0);
 });
 
+test('buildRequestBody drops temperature for Opus 4.7+ (deprecated sampling params)', () => {
+  for (const model of ['claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5-0']) {
+    const body = _internals.buildRequestBody(CASE_ROW, { model, temperature: 0 });
+    assert.equal(
+      Object.hasOwn(body, 'temperature'),
+      false,
+      `${model} should not receive temperature in the request body`
+    );
+  }
+});
+
+test('buildRequestBody still forwards temperature for pre-4.7 Opus, Sonnet, Haiku', () => {
+  for (const model of ['claude-opus-4-5', 'claude-sonnet-5', 'claude-haiku-4-5-20251001']) {
+    const body = _internals.buildRequestBody(CASE_ROW, { model, temperature: 0 });
+    assert.equal(body.temperature, 0, `${model} should still receive temperature=0`);
+  }
+});
+
+test('modelRejectsSamplingParams identifies Opus 4.7+ only', () => {
+  assert.equal(_internals.modelRejectsSamplingParams('claude-opus-4-7'), true);
+  assert.equal(_internals.modelRejectsSamplingParams('claude-opus-4-8'), true);
+  assert.equal(_internals.modelRejectsSamplingParams('claude-opus-5-0'), true);
+  assert.equal(_internals.modelRejectsSamplingParams('claude-opus-4-6'), false);
+  assert.equal(_internals.modelRejectsSamplingParams('claude-opus-4-5'), false);
+  assert.equal(_internals.modelRejectsSamplingParams('claude-sonnet-5'), false);
+  assert.equal(_internals.modelRejectsSamplingParams('claude-haiku-4-5-20251001'), false);
+  assert.equal(_internals.modelRejectsSamplingParams(''), false);
+  assert.equal(_internals.modelRejectsSamplingParams(null), false);
+});
+
 test('buildSystemPrompt instructs the LLM to return the exact JSON envelope shape', () => {
   const system = _internals.buildSystemPrompt();
   assert.match(system, /Return only valid JSON/);

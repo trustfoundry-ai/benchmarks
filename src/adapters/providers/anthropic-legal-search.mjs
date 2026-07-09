@@ -49,6 +49,28 @@ function configuredModel(config = {}) {
   return model.trim();
 }
 
+// Opus 4.7+ (Anthropic's May 2026 API consolidation) rejects `temperature`,
+// `top_p`, and `top_k` — any value returns HTTP 400 `temperature is deprecated
+// for this model`. Older Opus, Sonnet, and Haiku still accept them.
+function modelRejectsSamplingParams(model) {
+  const match = /^claude-opus-(\d+)-(\d+)/i.exec(String(model ?? ''));
+  if (!match) return false;
+  const major = Number(match[1]);
+  const minor = Number(match[2]);
+  if (major > 4) return true;
+  return major === 4 && minor >= 7;
+}
+
+const _samplingDropWarned = new Set();
+function warnOnceDroppedSamplingParam(model, param) {
+  const key = `${model}::${param}`;
+  if (_samplingDropWarned.has(key)) return;
+  _samplingDropWarned.add(key);
+  process.stderr.write(
+    `[anthropic-legal-search] Dropping '${param}' from request: ${model} rejects it (Opus 4.7+ deprecation).\n`
+  );
+}
+
 function configuredTopK(config = {}) {
   return positiveInteger(config.top_k ?? config.topK ?? config.limit, DEFAULT_TOP_K);
 }
@@ -216,7 +238,11 @@ function buildRequestBody(benchmarkCase, config = {}) {
     tools: [buildWebSearchTool(config)]
   };
   if (config.temperature !== undefined && config.temperature !== null) {
-    body.temperature = finiteNumber(config.temperature);
+    if (modelRejectsSamplingParams(body.model)) {
+      warnOnceDroppedSamplingParam(body.model, 'temperature');
+    } else {
+      body.temperature = finiteNumber(config.temperature);
+    }
   }
   if (streamingEnabled(config)) body.stream = true;
   return body;
@@ -960,6 +986,7 @@ export const _internals = {
   buildWebSearchTool,
   configuredModel,
   configuredTopK,
+  modelRejectsSamplingParams,
   extractJsonFromText,
   findWebSearchToolError,
   hasUsableCitation,
