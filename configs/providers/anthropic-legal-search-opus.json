@@ -7,8 +7,7 @@
   "request_timeout_ms": 180000,
   "max_tokens": 10000,
   "top_k": 25,
-  "temperature": 0,
-  "_reproducibility_note": "temperature pinned to 0 to reduce stochasticity between runs. Vendor may still produce non-identical outputs due to model snapshot floating and tool-use nondeterminism.",
+  "_reproducibility_note": "temperature intentionally omitted: Opus 4.7+ rejects temperature, top_p, top_k as sampling params (HTTP 400 'temperature is deprecated for this model'). top_k here only drives the prompt's <result_count>, not an API sampling field. Vendor may still produce non-identical outputs across runs due to model snapshot floating and tool-use nondeterminism.",
   "pricing": {
     "model": "claude-opus-4-8",
     "pricing_level": "Claude API standard pricing",
