@@ -1,0 +1,1147 @@
+{
+  "generated_at": "2026-07-11T17:04:30.875Z",
+  "metadata": {
+    "cutoffs": [
+      1,
+      5
+    ],
+    "headlineCutoff": 1,
+    "mrrDecimalPlaces": 4,
+    "scorer": "citation-lookup",
+    "version": "citation-lookup-v1"
+  },
+  "run": {
+    "benchmark": {
+      "configPath": "configs/benchmarks/citation-lookup/regulations-200.json",
+      "configSha256": "48969d48cd5b8746dece77e48a0049551d69e623b31c2568f6289607bf85240e",
+      "datasetNames": null,
+      "datasetSize": null,
+      "id": "citation-lookup",
+      "materializationVersion": "citation-lookup-data-v1",
+      "promptVersion": null,
+      "queryTransformId": null,
+      "sourceCommit": null,
+      "sourceFiles": [
+        {
+          "path": "data/citation-lookup-regulations-200/dataset.jsonl",
+          "sha256": "6020e2b91ebf9845cee2c6e1638579ba12efc120907c1637dc55a2f1de7a76c7"
+        }
+      ],
+      "sourceRoot": "data/citation-lookup-regulations-200",
+      "splits": null,
+      "version": "citation-lookup-v1"
+    },
+    "harness": {
+      "commit": "c4aa8159ad6f467a9d6ce04c9d24c58e53dfaefe",
+      "name": "@trustfoundry-ai/benchmarks-harness",
+      "originUrl": "https://github.com/trustfoundry-ai/benchmarks.git",
+      "version": "0.10.0"
+    },
+    "provider": {
+      "apiKeyEnv": "TF_API_KEY",
+      "configPath": "configs/providers/trustfoundry-citation-lookup.json",
+      "configSha256": "73a55dce80f4f416da488bde5239ecf3b904501e37fad440fc933b247e32f4f2",
+      "id": "trustfoundry-legal-search",
+      "settings": {
+        "limit": 25,
+        "maxResults": null,
+        "modelType": "citation_search",
+        "requestTimeoutMs": 60000,
+        "stateFilterEnabled": false
+      },
+      "subject": "citation_search",
+      "target": "https://api.trustfoundry.ai/public/v1/search",
+      "version": "trustfoundry-legal-search-provider-v1"
+    },
+    "run_id": "citation-lookup-citation_search-20260711T154257Z",
+    "scheduler": {
+      "caseCount": 219,
+      "parallel": 6,
+      "retries": 0,
+      "shardCount": 1,
+      "shardIndex": 0
+    },
+    "scorer": {
+      "configPath": "configs/scorers/citation-lookup.json",
+      "configSha256": "e39adcc545a52cdf157bc075ae014fcc40da2e94c804280039de455a33de2afb",
+      "id": "citation-lookup",
+      "notes": "Citation-lookup recall scoring. Positives match by document_uuid, cl_cluster_id, or normalized citation string. Negatives (kind=negative) are correct iff the provider returns zero results. Emits ambiguousRate (fraction of positives with status=300 / provider_ambiguous=true).",
+      "version": "citation-lookup-v1"
+    }
+  },
+  "schema_version": "trustfoundry.benchmarks.result.v1",
+  "status": "self-reported",
+  "summary": {
+    "ambiguousRate": 0,
+    "byDatasource": {
+      "ak-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "al-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "ar-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "az-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "ca-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "co-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "ct-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "dc-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "de-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "fl-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "ga-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "hi-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "ia-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "id-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "il-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "in-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "ks-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "ky-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "la-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "ma-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "md-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "me-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "mi-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "mn-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "mo-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "ms-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "mt-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "nc-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "nd-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "ne-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "nh-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "nj-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "nm-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8,
+          "hit@5": 0.8
+        },
+        "mrr": 0.8,
+        "n": 5
+      },
+      "nv-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "ny-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "oh-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "ok-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "or-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "pa-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "ri-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "sc-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 4
+      },
+      "sd-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "tn-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 4
+      },
+      "tx-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "us-ecfr": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8,
+          "hit@5": 0.8
+        },
+        "mrr": 0.8,
+        "n": 5
+      },
+      "ut-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "va-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "vt-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "wa-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "wi-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "wv-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "wy-regs": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      }
+    },
+    "byDifficulty": {
+      "bluebook": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 52
+      },
+      "noisy": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.47435897435897434,
+          "hit@5": 0.47435897435897434
+        },
+        "mrr": 0.4743,
+        "n": 156
+      },
+      "variations": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 11
+      }
+    },
+    "byDocumentType": {
+      "regulation": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.6255707762557078,
+          "hit@5": 0.6255707762557078
+        },
+        "mrr": 0.6255,
+        "n": 219
+      }
+    },
+    "byNegativeCategory": {},
+    "byState": {
+      "AK": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "AL": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "AR": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "AZ": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "CA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "CO": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "CT": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "DC": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "DE": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "FED": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8,
+          "hit@5": 0.8
+        },
+        "mrr": 0.8,
+        "n": 5
+      },
+      "FL": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "GA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "HI": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "IA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "ID": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "IL": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "IN": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "KS": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "KY": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "LA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "MA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "MD": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "ME": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "MI": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "MN": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "MO": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "MS": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "MT": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "NC": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "ND": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "NE": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "NH": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "NJ": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "NM": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8,
+          "hit@5": 0.8
+        },
+        "mrr": 0.8,
+        "n": 5
+      },
+      "NV": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "NY": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "OH": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "OK": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "OR": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "PA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "RI": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "SC": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 4
+      },
+      "SD": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "TN": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 4
+      },
+      "TX": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "UT": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "VA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "VT": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "WA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "WI": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "WV": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "WY": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      }
+    },
+    "execution": {
+      "benchmark": {
+        "configPath": "configs/benchmarks/citation-lookup/regulations-200.json",
+        "configSha256": "48969d48cd5b8746dece77e48a0049551d69e623b31c2568f6289607bf85240e",
+        "datasetNames": null,
+        "datasetSize": null,
+        "id": "citation-lookup",
+        "materializationVersion": "citation-lookup-data-v1",
+        "promptVersion": null,
+        "queryTransformId": null,
+        "sourceCommit": null,
+        "sourceFiles": [
+          {
+            "path": "data/citation-lookup-regulations-200/dataset.jsonl",
+            "sha256": "6020e2b91ebf9845cee2c6e1638579ba12efc120907c1637dc55a2f1de7a76c7"
+          }
+        ],
+        "sourceRoot": "data/citation-lookup-regulations-200",
+        "splits": null,
+        "version": "citation-lookup-v1"
+      },
+      "caseCount": 219,
+      "provider": {
+        "apiKeyEnv": "TF_API_KEY",
+        "configPath": "configs/providers/trustfoundry-citation-lookup.json",
+        "configSha256": "73a55dce80f4f416da488bde5239ecf3b904501e37fad440fc933b247e32f4f2",
+        "id": "trustfoundry-legal-search",
+        "settings": {
+          "limit": 25,
+          "maxResults": null,
+          "modelType": "citation_search",
+          "requestTimeoutMs": 60000,
+          "stateFilterEnabled": false
+        },
+        "subject": "citation_search",
+        "target": "https://api.trustfoundry.ai/public/v1/search",
+        "version": "trustfoundry-legal-search-provider-v1"
+      },
+      "runId": "citation-lookup-citation_search-20260711T154257Z",
+      "scheduler": {
+        "caseCount": 219,
+        "parallel": 6,
+        "retries": 0,
+        "shardCount": 1,
+        "shardIndex": 0
+      },
+      "scorer": {
+        "cutoffs": [
+          1,
+          5
+        ],
+        "headlineCutoff": 1,
+        "id": "citation-lookup",
+        "mrrDecimalPlaces": 4,
+        "version": "citation-lookup-v1"
+      }
+    },
+    "hitAt1": 0.6255707762557078,
+    "hitAt5": 0.6255707762557078,
+    "latency_ms": {
+      "max": 20464,
+      "mean": 1645.4520547945206,
+      "min": 232,
+      "n": 219,
+      "p50": 1271,
+      "p95": 2471.1
+    },
+    "mrr": 0.6255,
+    "negatives": 0,
+    "negatives_overall": {
+      "correct_empty": 0,
+      "fp_rate": 0,
+      "n": 0
+    },
+    "overall": {
+      "ambiguousRate": 0,
+      "hit_at": {
+        "hit@1": 0.6255707762557078,
+        "hit@5": 0.6255707762557078
+      },
+      "mrr": 0.6255,
+      "n": 219
+    },
+    "overallScore": 0.6255707762557078,
+    "positives": 219,
+    "providerFailures": 0,
+    "scored": 219,
+    "supportedScore": 0.6255707762557078,
+    "total": 219
+  }
+}

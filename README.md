@@ -94,13 +94,13 @@ harness code itself was built from this repo at the tagged commit.
 | Suite | Status | Published numbers |
 |---|---|---|
 | `trustfoundry-legal-search` | Numbers published | 8 bundles under [`results/trustfoundry-legal-search/2026-07-05/`](results/trustfoundry-legal-search/2026-07-05/) (200-row and 5k-row × case-questions / key-facts / laws / regs) |
-| `citation-lookup` | Suite defined; publish to `results/` pending | Datasets + adapter + scorer + configs live in-tree; TrustFoundry TF-only summary + row-level scored bundles are checked in under [`trustfoundry-ai/benchmarks-lab`](https://github.com/Trust-Foundry/benchmarks-lab) at `experiments/citation-lookup/2026-07-10-trustfoundry-final/` (statutes+regs refreshed 2026-07-11 with a `variations` tier) |
+| `citation-lookup` | Numbers published | 9 bundles under [`results/citation-lookup/2026-07-11/`](results/citation-lookup/2026-07-11/) (full and 200-row × cases / cases-state / statutes / regulations + negatives) |
 
 "Numbers published" means a scored result bundle exists under [`results/`](results/) with checksummed row-level evidence and passes `pnpm verify:results`.
 
 ## Latest Benchmarks
 
-These are the latest canonical benchmark runs in this repository. Dataset labels link to the raw and scored result bundles used to calculate each row; each checked-in bundle includes `manifest.json`, `checksums.txt`, scored results, and row-level raw evidence. Previous runs (if any) live alongside the latest under the same suite directory — browse `results/trustfoundry-legal-search/` and its date subdirectories to see the historical set.
+These are the latest canonical benchmark runs in this repository. Dataset labels link to the raw and scored result bundles used to calculate each row; each checked-in bundle includes `manifest.json`, `checksums.txt`, scored results, and row-level raw evidence. Previous runs (if any) live alongside the latest under the same suite directory — browse `results/<benchmark>/` and its date subdirectories to see the historical set.
 
 <table>
   <thead>
@@ -171,22 +171,80 @@ Latest full 5k runs (2026-07-05; provider failures 0 for every row):
 
 For full runs with large raw artifacts, raw rows may be stored as `raw.jsonl.gz`; `pnpm benchmark verify-result <bundle>` reads the manifest path directly.
 
-<details>
-<summary>Citation Lookup — TrustFoundry results</summary>
+<table>
+  <thead>
+    <tr>
+      <th colspan="8" align="left">Citation Lookup</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th>Dataset</th>
+      <th>R@1 Bluebook</th>
+      <th>R@1 variations</th>
+      <th>R@1 noisy</th>
+      <th>MRR</th>
+      <th>p50</th>
+      <th>p95</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2026-07-11</td>
+      <td><a href="results/citation-lookup/2026-07-11/cases/full/">cases-full (2,720)</a></td>
+      <td>100.0%</td>
+      <td>—</td>
+      <td>58.6%</td>
+      <td>0.690</td>
+      <td>516 ms</td>
+      <td>1128 ms</td>
+    </tr>
+    <tr>
+      <td>2026-07-11</td>
+      <td><a href="results/citation-lookup/2026-07-11/cases-state/full/">cases-state-full (800)</a></td>
+      <td>100.0%</td>
+      <td>—</td>
+      <td>79.8%</td>
+      <td>0.849</td>
+      <td>627 ms</td>
+      <td>1409 ms</td>
+    </tr>
+    <tr>
+      <td>2026-07-11</td>
+      <td><a href="results/citation-lookup/2026-07-11/statutes/full/">statutes-full (423)</a></td>
+      <td>100.0%</td>
+      <td>100.0%</td>
+      <td>77.3%</td>
+      <td>0.853</td>
+      <td>647 ms</td>
+      <td>2195 ms</td>
+    </tr>
+    <tr>
+      <td>2026-07-11</td>
+      <td><a href="results/citation-lookup/2026-07-11/regulations/full/">regulations-full (377)</a></td>
+      <td>100.0%</td>
+      <td>100.0%</td>
+      <td>47.6%</td>
+      <td>0.629</td>
+      <td>734 ms</td>
+      <td>2091 ms</td>
+    </tr>
+  </tbody>
+</table>
 
-Latest full runs against the four `citation-lookup` datasets. TrustFoundry's `citation_search` mode; 0 provider failures. Cases (federal + state) are 2026-07-10; statutes + regulations are 2026-07-11 (variations tier added). Bundles + row-level evidence live at [`trustfoundry-ai/benchmarks-lab`](https://github.com/Trust-Foundry/benchmarks-lab) under `experiments/citation-lookup/trustfoundry/` (per-slice `scores.json` + `provider-results.jsonl` + `manifest.json`).
+<details>
+<summary>Citation Lookup details</summary>
 
 Difficulty tiers: **Bluebook** = Bluebook canonical shape; **variations** = state-legislature abbreviations the state's own code site publishes (e.g. `N.J.S.A.`, `RSMo`, `OCGA`, `NYCRR`) — both regex-matched deterministically; **noisy** = sloppify-generated user-typed transformations (dropped punctuation, case toggling, character-level typos, spell-outs, section-marker swaps) — exercises the ML predict cascade.
 
-| Dataset | Rows | Recall@1 (Bluebook) | Recall@1 (variations) | Recall@1 (noisy) | Combined MRR | p50 | p95 |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| cases-full | 688 BB + 2,032 noisy | 100.0% | — | 58.6% | 0.690 | 0.52s | 1.13s |
-| cases-state-full | 200 BB + 600 noisy | 100.0% | — | 79.8% | 0.849 | 0.63s | 1.41s |
-| statutes-full | 91 BB + 59 var + 273 noisy | 100.0% | 100.0% | 77.3% | 0.853 | 0.65s | 2.20s |
-| regulations-full | 89 BB + 21 var + 267 noisy | 100.0% | 100.0% | 47.6% | 0.629 | 0.73s | 2.09s |
-| negatives | 50 non-citations | 0 false positives (50/50 empty) | — | — | — | 0.28s | 0.41s |
+Cases (federal + state) don't get a variations tier because case reporters are federal-standardized (F.2d, F.3d, S. Ct., etc.); the state-legislature variant concept only applies to statutes and regulations.
 
-Cases don't get a variations tier because case reporters are federal-standardized (F.2d, F.3d, S. Ct., etc.); the state-legislature variant concept only applies to statutes and regulations. Publishing scored bundles under `results/citation-lookup/` here is on the near-term roadmap; verification against the checked-in datasets works today via the standard `pnpm benchmark` workflow.
+Latest full runs (2026-07-11 for statutes + regulations w/ variations tier; 2026-07-10 for cases + cases-state; 0 provider failures across 4,340 rows):
+
+- Federal cases: R@1 Bluebook 100.0% (688 rows); R@1 noisy 58.6% (2,032 rows); combined MRR 0.690. [full results](results/citation-lookup/2026-07-11/cases/full/); [200-row companion](results/citation-lookup/2026-07-11/cases/200/).
+- State cases: R@1 Bluebook 100.0% (200 rows); R@1 noisy 79.8% (600 rows); combined MRR 0.849. [full results](results/citation-lookup/2026-07-11/cases-state/full/); [200-row companion](results/citation-lookup/2026-07-11/cases-state/200/).
+- Statutes: R@1 Bluebook 100.0% (91 rows); R@1 variations 100.0% (59 rows); R@1 noisy 77.3% (273 rows); combined MRR 0.853. [full results](results/citation-lookup/2026-07-11/statutes/full/); [200-row companion](results/citation-lookup/2026-07-11/statutes/200/).
+- Regulations: R@1 Bluebook 100.0% (89 rows); R@1 variations 100.0% (21 rows); R@1 noisy 47.6% (267 rows); combined MRR 0.629. [full results](results/citation-lookup/2026-07-11/regulations/full/); [200-row companion](results/citation-lookup/2026-07-11/regulations/200/).
+- Negatives: 0/50 false positives (empty result set returned for every synthetic non-citation). [full results](results/citation-lookup/2026-07-11/negatives/).
 
 </details>
 

@@ -1,0 +1,643 @@
+{
+  "generated_at": "2026-07-11T17:04:31.136Z",
+  "metadata": {
+    "cutoffs": [
+      1,
+      5
+    ],
+    "headlineCutoff": 1,
+    "mrrDecimalPlaces": 4,
+    "scorer": "citation-lookup",
+    "version": "citation-lookup-v1"
+  },
+  "run": {
+    "benchmark": {
+      "configPath": "configs/benchmarks/citation-lookup/cases-state-full.json",
+      "configSha256": "43d3e8a24347c8c9c80c91ebf12141b53f2579080433a8fc67d6392c2e315666",
+      "datasetNames": null,
+      "datasetSize": null,
+      "id": "citation-lookup",
+      "materializationVersion": "citation-lookup-data-v1",
+      "promptVersion": null,
+      "queryTransformId": null,
+      "sourceCommit": null,
+      "sourceFiles": [
+        {
+          "path": "data/citation-lookup-cases-state/dataset.jsonl",
+          "sha256": "8feabaca95548c6058482e62eca029e3201d8cf214a21e3dd235029251d9f977"
+        }
+      ],
+      "sourceRoot": "data/citation-lookup-cases-state",
+      "splits": null,
+      "version": "citation-lookup-v1"
+    },
+    "harness": {
+      "commit": "1694d181c84b35b827e0e3a7842e908b5e189812",
+      "name": "@trustfoundry-ai/benchmarks-harness",
+      "originUrl": "https://github.com/trustfoundry-ai/benchmarks.git",
+      "version": "0.10.0"
+    },
+    "provider": {
+      "apiKeyEnv": "TF_API_KEY",
+      "configPath": "configs/providers/trustfoundry-citation-lookup.json",
+      "configSha256": "73a55dce80f4f416da488bde5239ecf3b904501e37fad440fc933b247e32f4f2",
+      "id": "trustfoundry-legal-search",
+      "settings": {
+        "limit": 25,
+        "maxResults": null,
+        "modelType": "citation_search",
+        "requestTimeoutMs": 60000,
+        "stateFilterEnabled": false
+      },
+      "subject": "citation_search",
+      "target": "https://api.trustfoundry.ai/public/v1/search",
+      "version": "trustfoundry-legal-search-provider-v1"
+    },
+    "run_id": "citation-lookup-citation_search-20260710T164203Z",
+    "scheduler": {
+      "caseCount": 800,
+      "parallel": 8,
+      "retries": 0,
+      "shardCount": 1,
+      "shardIndex": 0
+    },
+    "scorer": {
+      "configPath": "configs/scorers/citation-lookup.json",
+      "configSha256": "e39adcc545a52cdf157bc075ae014fcc40da2e94c804280039de455a33de2afb",
+      "id": "citation-lookup",
+      "notes": "Citation-lookup recall scoring. Positives match by document_uuid, cl_cluster_id, or normalized citation string. Negatives (kind=negative) are correct iff the provider returns zero results. Emits ambiguousRate (fraction of positives with status=300 / provider_ambiguous=true).",
+      "version": "citation-lookup-v1"
+    }
+  },
+  "schema_version": "trustfoundry.benchmarks.result.v1",
+  "status": "self-reported",
+  "summary": {
+    "ambiguousRate": 0,
+    "byDatasource": {
+      "courtlistener": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.84875,
+          "hit@5": 0.84875
+        },
+        "mrr": 0.8487,
+        "n": 800
+      }
+    },
+    "byDifficulty": {
+      "bluebook": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 200
+      },
+      "noisy": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.7983333333333333,
+          "hit@5": 0.7983333333333333
+        },
+        "mrr": 0.7983,
+        "n": 600
+      }
+    },
+    "byDocumentType": {
+      "case_law": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.84875,
+          "hit@5": 0.84875
+        },
+        "mrr": 0.8487,
+        "n": 800
+      }
+    },
+    "byNegativeCategory": {},
+    "byState": {
+      "AK": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 8
+      },
+      "AL": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@5": 0.875
+        },
+        "mrr": 0.875,
+        "n": 32
+      },
+      "AR": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.9375,
+          "hit@5": 0.9375
+        },
+        "mrr": 0.9375,
+        "n": 16
+      },
+      "AZ": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 16
+      },
+      "CO": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 16
+      },
+      "CT": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 24
+      },
+      "DC": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@5": 0.875
+        },
+        "mrr": 0.875,
+        "n": 8
+      },
+      "DE": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@5": 0.875
+        },
+        "mrr": 0.875,
+        "n": 16
+      },
+      "FL": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@5": 0.875
+        },
+        "mrr": 0.875,
+        "n": 16
+      },
+      "HI": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 8
+      },
+      "IA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 16
+      },
+      "ID": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.375,
+          "hit@5": 0.375
+        },
+        "mrr": 0.375,
+        "n": 8
+      },
+      "IL": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8333333333333334,
+          "hit@5": 0.8333333333333334
+        },
+        "mrr": 0.8333,
+        "n": 24
+      },
+      "IN": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 16
+      },
+      "KS": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.625,
+          "hit@5": 0.625
+        },
+        "mrr": 0.625,
+        "n": 16
+      },
+      "KY": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.9583333333333334,
+          "hit@5": 0.9583333333333334
+        },
+        "mrr": 0.9583,
+        "n": 24
+      },
+      "LA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 8
+      },
+      "MA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.84375,
+          "hit@5": 0.84375
+        },
+        "mrr": 0.8437,
+        "n": 32
+      },
+      "MD": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.9375,
+          "hit@5": 0.9375
+        },
+        "mrr": 0.9375,
+        "n": 16
+      },
+      "ME": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@5": 0.875
+        },
+        "mrr": 0.875,
+        "n": 8
+      },
+      "MI": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 16
+      },
+      "MN": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@5": 0.875
+        },
+        "mrr": 0.875,
+        "n": 16
+      },
+      "MO": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8125,
+          "hit@5": 0.8125
+        },
+        "mrr": 0.8125,
+        "n": 16
+      },
+      "MS": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8125,
+          "hit@5": 0.8125
+        },
+        "mrr": 0.8125,
+        "n": 16
+      },
+      "NC": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.9375,
+          "hit@5": 0.9375
+        },
+        "mrr": 0.9375,
+        "n": 16
+      },
+      "ND": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 8
+      },
+      "NE": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 8
+      },
+      "NH": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@5": 0.875
+        },
+        "mrr": 0.875,
+        "n": 8
+      },
+      "NJ": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.9583333333333334,
+          "hit@5": 0.9583333333333334
+        },
+        "mrr": 0.9583,
+        "n": 24
+      },
+      "NM": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8125,
+          "hit@5": 0.8125
+        },
+        "mrr": 0.8125,
+        "n": 16
+      },
+      "NV": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 8
+      },
+      "NY": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@5": 0.875
+        },
+        "mrr": 0.875,
+        "n": 64
+      },
+      "OH": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8125,
+          "hit@5": 0.8125
+        },
+        "mrr": 0.8125,
+        "n": 16
+      },
+      "OK": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.9166666666666666,
+          "hit@5": 0.9166666666666666
+        },
+        "mrr": 0.9166,
+        "n": 24
+      },
+      "OR": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 16
+      },
+      "PA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 32
+      },
+      "RI": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.625,
+          "hit@5": 0.625
+        },
+        "mrr": 0.625,
+        "n": 8
+      },
+      "SC": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 16
+      },
+      "SD": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.625,
+          "hit@5": 0.625
+        },
+        "mrr": 0.625,
+        "n": 16
+      },
+      "TN": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 16
+      },
+      "TX": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8333333333333334,
+          "hit@5": 0.8333333333333334
+        },
+        "mrr": 0.8333,
+        "n": 24
+      },
+      "UT": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@5": 0.875
+        },
+        "mrr": 0.875,
+        "n": 16
+      },
+      "VA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8125,
+          "hit@5": 0.8125
+        },
+        "mrr": 0.8125,
+        "n": 16
+      },
+      "VT": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@5": 0.875
+        },
+        "mrr": 0.875,
+        "n": 8
+      },
+      "WA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 16
+      },
+      "WI": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8125,
+          "hit@5": 0.8125
+        },
+        "mrr": 0.8125,
+        "n": 16
+      },
+      "WV": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.875,
+          "hit@5": 0.875
+        },
+        "mrr": 0.875,
+        "n": 8
+      },
+      "WY": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 8
+      }
+    },
+    "execution": {
+      "benchmark": {
+        "configPath": "configs/benchmarks/citation-lookup/cases-state-full.json",
+        "configSha256": "43d3e8a24347c8c9c80c91ebf12141b53f2579080433a8fc67d6392c2e315666",
+        "datasetNames": null,
+        "datasetSize": null,
+        "id": "citation-lookup",
+        "materializationVersion": "citation-lookup-data-v1",
+        "promptVersion": null,
+        "queryTransformId": null,
+        "sourceCommit": null,
+        "sourceFiles": [
+          {
+            "path": "data/citation-lookup-cases-state/dataset.jsonl",
+            "sha256": "8feabaca95548c6058482e62eca029e3201d8cf214a21e3dd235029251d9f977"
+          }
+        ],
+        "sourceRoot": "data/citation-lookup-cases-state",
+        "splits": null,
+        "version": "citation-lookup-v1"
+      },
+      "caseCount": 800,
+      "provider": {
+        "apiKeyEnv": "TF_API_KEY",
+        "configPath": "configs/providers/trustfoundry-citation-lookup.json",
+        "configSha256": "73a55dce80f4f416da488bde5239ecf3b904501e37fad440fc933b247e32f4f2",
+        "id": "trustfoundry-legal-search",
+        "settings": {
+          "limit": 25,
+          "maxResults": null,
+          "modelType": "citation_search",
+          "requestTimeoutMs": 60000,
+          "stateFilterEnabled": false
+        },
+        "subject": "citation_search",
+        "target": "https://api.trustfoundry.ai/public/v1/search",
+        "version": "trustfoundry-legal-search-provider-v1"
+      },
+      "runId": "citation-lookup-citation_search-20260710T164203Z",
+      "scheduler": {
+        "caseCount": 800,
+        "parallel": 8,
+        "retries": 0,
+        "shardCount": 1,
+        "shardIndex": 0
+      },
+      "scorer": {
+        "cutoffs": [
+          1,
+          5
+        ],
+        "headlineCutoff": 1,
+        "id": "citation-lookup",
+        "mrrDecimalPlaces": 4,
+        "version": "citation-lookup-v1"
+      }
+    },
+    "hitAt1": 0.84875,
+    "hitAt5": 0.84875,
+    "latency_ms": {
+      "max": 6942,
+      "mean": 727.125,
+      "min": 202,
+      "n": 800,
+      "p50": 631,
+      "p95": 1405.05
+    },
+    "mrr": 0.8487,
+    "negatives": 0,
+    "negatives_overall": {
+      "correct_empty": 0,
+      "fp_rate": 0,
+      "n": 0
+    },
+    "overall": {
+      "ambiguousRate": 0,
+      "hit_at": {
+        "hit@1": 0.84875,
+        "hit@5": 0.84875
+      },
+      "mrr": 0.8487,
+      "n": 800
+    },
+    "overallScore": 0.84875,
+    "positives": 800,
+    "providerFailures": 0,
+    "scored": 800,
+    "supportedScore": 0.84875,
+    "total": 800
+  }
+}

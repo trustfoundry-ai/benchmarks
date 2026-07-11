@@ -1,0 +1,1147 @@
+{
+  "generated_at": "2026-07-11T17:04:30.773Z",
+  "metadata": {
+    "cutoffs": [
+      1,
+      5
+    ],
+    "headlineCutoff": 1,
+    "mrrDecimalPlaces": 4,
+    "scorer": "citation-lookup",
+    "version": "citation-lookup-v1"
+  },
+  "run": {
+    "benchmark": {
+      "configPath": "configs/benchmarks/citation-lookup/statutes-200.json",
+      "configSha256": "4a5bd1f4987a32fd60c8a58f2c8d159533d26e9cb28868bb613b1773a4ad044a",
+      "datasetNames": null,
+      "datasetSize": null,
+      "id": "citation-lookup",
+      "materializationVersion": "citation-lookup-data-v1",
+      "promptVersion": null,
+      "queryTransformId": null,
+      "sourceCommit": null,
+      "sourceFiles": [
+        {
+          "path": "data/citation-lookup-statutes-200/dataset.jsonl",
+          "sha256": "5ef1396bdd79535f1b7b0bf9ff503f5f15bfb4c92c252cd4ed0a16f3a341af13"
+        }
+      ],
+      "sourceRoot": "data/citation-lookup-statutes-200",
+      "splits": null,
+      "version": "citation-lookup-v1"
+    },
+    "harness": {
+      "commit": "c4aa8159ad6f467a9d6ce04c9d24c58e53dfaefe",
+      "name": "@trustfoundry-ai/benchmarks-harness",
+      "originUrl": "https://github.com/trustfoundry-ai/benchmarks.git",
+      "version": "0.10.0"
+    },
+    "provider": {
+      "apiKeyEnv": "TF_API_KEY",
+      "configPath": "configs/providers/trustfoundry-citation-lookup.json",
+      "configSha256": "73a55dce80f4f416da488bde5239ecf3b904501e37fad440fc933b247e32f4f2",
+      "id": "trustfoundry-legal-search",
+      "settings": {
+        "limit": 25,
+        "maxResults": null,
+        "modelType": "citation_search",
+        "requestTimeoutMs": 60000,
+        "stateFilterEnabled": false
+      },
+      "subject": "citation_search",
+      "target": "https://api.trustfoundry.ai/public/v1/search",
+      "version": "trustfoundry-legal-search-provider-v1"
+    },
+    "run_id": "citation-lookup-citation_search-20260711T154256Z",
+    "scheduler": {
+      "caseCount": 243,
+      "parallel": 6,
+      "retries": 0,
+      "shardCount": 1,
+      "shardIndex": 0
+    },
+    "scorer": {
+      "configPath": "configs/scorers/citation-lookup.json",
+      "configSha256": "e39adcc545a52cdf157bc075ae014fcc40da2e94c804280039de455a33de2afb",
+      "id": "citation-lookup",
+      "notes": "Citation-lookup recall scoring. Positives match by document_uuid, cl_cluster_id, or normalized citation string. Negatives (kind=negative) are correct iff the provider returns zero results. Emits ambiguousRate (fraction of positives with status=300 / provider_ambiguous=true).",
+      "version": "citation-lookup-v1"
+    }
+  },
+  "schema_version": "trustfoundry.benchmarks.result.v1",
+  "status": "self-reported",
+  "summary": {
+    "ambiguousRate": 0,
+    "byDatasource": {
+      "ak-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "al-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "ar-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "az-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "ca-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "co-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "ct-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "dc-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "de-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "fl-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "ga-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "hi-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "ia-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 4
+      },
+      "id-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 4
+      },
+      "il-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "in-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "ks-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "ky-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "la-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "ma-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "md-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "me-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "mi-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "mn-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "mo-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "ms-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "mt-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "nc-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "nd-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.6,
+          "hit@5": 0.6
+        },
+        "mrr": 0.6,
+        "n": 5
+      },
+      "ne-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "nh-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "nj-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "nm-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8,
+          "hit@5": 0.8
+        },
+        "mrr": 0.8,
+        "n": 5
+      },
+      "nv-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "ny-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "oh-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8,
+          "hit@5": 0.8
+        },
+        "mrr": 0.8,
+        "n": 5
+      },
+      "ok-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "or-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "pa-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "ri-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "sc-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "sd-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.6,
+          "hit@5": 0.6
+        },
+        "mrr": 0.6,
+        "n": 5
+      },
+      "tn-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "tx-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "us-usc": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "ut-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "va-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "vt-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "wa-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "wi-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "wv-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "wy-laws": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      }
+    },
+    "byDifficulty": {
+      "bluebook": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 52
+      },
+      "noisy": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 156
+      },
+      "variations": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 35
+      }
+    },
+    "byDocumentType": {
+      "statute": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8395061728395061,
+          "hit@5": 0.8395061728395061
+        },
+        "mrr": 0.8395,
+        "n": 243
+      }
+    },
+    "byNegativeCategory": {},
+    "byState": {
+      "AK": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "AL": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "AR": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "AZ": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "CA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "CO": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "CT": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "DC": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "DE": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "FED": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "FL": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "GA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "HI": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "IA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 4
+      },
+      "ID": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.75,
+          "hit@5": 0.75
+        },
+        "mrr": 0.75,
+        "n": 4
+      },
+      "IL": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "IN": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "KS": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "KY": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "LA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "MA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "MD": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "ME": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "MI": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "MN": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "MO": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "MS": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "MT": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "NC": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "ND": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.6,
+          "hit@5": 0.6
+        },
+        "mrr": 0.6,
+        "n": 5
+      },
+      "NE": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.25,
+          "hit@5": 0.25
+        },
+        "mrr": 0.25,
+        "n": 4
+      },
+      "NH": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "NJ": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "NM": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8,
+          "hit@5": 0.8
+        },
+        "mrr": 0.8,
+        "n": 5
+      },
+      "NV": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "NY": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "OH": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.8,
+          "hit@5": 0.8
+        },
+        "mrr": 0.8,
+        "n": 5
+      },
+      "OK": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "OR": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "PA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "RI": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "SC": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "SD": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.6,
+          "hit@5": 0.6
+        },
+        "mrr": 0.6,
+        "n": 5
+      },
+      "TN": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "TX": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5,
+          "hit@5": 0.5
+        },
+        "mrr": 0.5,
+        "n": 4
+      },
+      "UT": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "VA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "VT": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.4,
+          "hit@5": 0.4
+        },
+        "mrr": 0.4,
+        "n": 5
+      },
+      "WA": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 5
+      },
+      "WI": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "WV": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      },
+      "WY": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 4
+      }
+    },
+    "execution": {
+      "benchmark": {
+        "configPath": "configs/benchmarks/citation-lookup/statutes-200.json",
+        "configSha256": "4a5bd1f4987a32fd60c8a58f2c8d159533d26e9cb28868bb613b1773a4ad044a",
+        "datasetNames": null,
+        "datasetSize": null,
+        "id": "citation-lookup",
+        "materializationVersion": "citation-lookup-data-v1",
+        "promptVersion": null,
+        "queryTransformId": null,
+        "sourceCommit": null,
+        "sourceFiles": [
+          {
+            "path": "data/citation-lookup-statutes-200/dataset.jsonl",
+            "sha256": "5ef1396bdd79535f1b7b0bf9ff503f5f15bfb4c92c252cd4ed0a16f3a341af13"
+          }
+        ],
+        "sourceRoot": "data/citation-lookup-statutes-200",
+        "splits": null,
+        "version": "citation-lookup-v1"
+      },
+      "caseCount": 243,
+      "provider": {
+        "apiKeyEnv": "TF_API_KEY",
+        "configPath": "configs/providers/trustfoundry-citation-lookup.json",
+        "configSha256": "73a55dce80f4f416da488bde5239ecf3b904501e37fad440fc933b247e32f4f2",
+        "id": "trustfoundry-legal-search",
+        "settings": {
+          "limit": 25,
+          "maxResults": null,
+          "modelType": "citation_search",
+          "requestTimeoutMs": 60000,
+          "stateFilterEnabled": false
+        },
+        "subject": "citation_search",
+        "target": "https://api.trustfoundry.ai/public/v1/search",
+        "version": "trustfoundry-legal-search-provider-v1"
+      },
+      "runId": "citation-lookup-citation_search-20260711T154256Z",
+      "scheduler": {
+        "caseCount": 243,
+        "parallel": 6,
+        "retries": 0,
+        "shardCount": 1,
+        "shardIndex": 0
+      },
+      "scorer": {
+        "cutoffs": [
+          1,
+          5
+        ],
+        "headlineCutoff": 1,
+        "id": "citation-lookup",
+        "mrrDecimalPlaces": 4,
+        "version": "citation-lookup-v1"
+      }
+    },
+    "hitAt1": 0.8395061728395061,
+    "hitAt5": 0.8395061728395061,
+    "latency_ms": {
+      "max": 13154,
+      "mean": 1499.3827160493827,
+      "min": 192,
+      "n": 243,
+      "p50": 1218,
+      "p95": 2987.2999999999984
+    },
+    "mrr": 0.8395,
+    "negatives": 0,
+    "negatives_overall": {
+      "correct_empty": 0,
+      "fp_rate": 0,
+      "n": 0
+    },
+    "overall": {
+      "ambiguousRate": 0,
+      "hit_at": {
+        "hit@1": 0.8395061728395061,
+        "hit@5": 0.8395061728395061
+      },
+      "mrr": 0.8395,
+      "n": 243
+    },
+    "overallScore": 0.8395061728395061,
+    "positives": 243,
+    "providerFailures": 0,
+    "scored": 243,
+    "supportedScore": 0.8395061728395061,
+    "total": 243
+  }
+}
