@@ -23,24 +23,36 @@ The public benchmarks in this space measure adjacent capabilities. [LegalBench](
 
 `citation-lookup` measures a different and lower-level capability: when a
 user or downstream system already produces a citation string — Bluebook
-canonical or user-typed noisy variant — does the provider resolve it to
-the correct authority? Every legal-tech agent that generates citations
-also has to *verify* them, and every retrieval system that ranks over
-free-form questions still needs a clean identity path when a citation
-is the query. Existing public tooling (eyecite, CourtListener's citation
-lookup) covers the deterministic Bluebook path well but does not
-systematically measure noisy-variant recovery — the case where the user
-drops periods, spells a state out, swaps section markers, or
-introduces character-level typos. This suite covers all four document
-families (federal cases, state cases, statutes, regulations) with
-identity-based Recall@1 as the primary metric.
+canonical, state-legislature variant, or noisy transformation of either
+— does the provider resolve it to the correct authority? Every
+legal-tech agent that generates citations also has to *verify* them,
+and every retrieval system that ranks over free-form questions still
+needs a clean identity path when a citation is the query.
+
+Existing public tooling narrows quickly. CourtListener's citation-lookup
+endpoint and the open-source `eyecite` library both cover **opinion
+citations only** — statute and regulation lookup falls outside their
+scope, and neither systematically measures noisy-variant recovery. This
+suite covers all four document families (federal cases, state cases,
+statutes, regulations) with identity-based Recall@1 as the primary
+metric.
+
+Noise coverage is also broader than "user typos." Beyond dropped
+punctuation, case toggling, section-marker swaps, character-level
+typos, and spell-outs, the dataset exercises **state-legislature
+variants** that diverge from Bluebook — the abbreviations state
+codifiers actually publish, which users copy verbatim from official
+state sites. Examples: `N.J.S.A.` vs `N.J. Stat. Ann.`, `RSMo` vs
+`Mo. Rev. Stat.`, `KRS` vs `Ky. Rev. Stat. Ann.`, `NYCRR` vs `N.Y.
+Comp. Codes R. & Regs.`. Statutes and regulations especially benefit
+from this coverage; case reporters standardize on Bluebook naturally.
 
 ## Suite status
 
 | Suite | Status | Published numbers |
 |---|---|---|
 | `trustfoundry-legal-search` | Numbers published | 8 bundles under [`results/trustfoundry-legal-search/2026-07-05/`](results/trustfoundry-legal-search/2026-07-05/) (200-row and 5k-row × case-questions / key-facts / laws / regs) |
-| `citation-lookup` | Suite defined; publish to `results/` pending | Datasets + adapter + scorer + configs live in-tree; TrustFoundry TF-only summary + row-level scored bundles are checked in under [`trustfoundry-ai/benchmarks-lab`](https://github.com/Trust-Foundry/benchmarks-lab) at `experiments/citation-lookup/2026-07-10-trustfoundry-final/` |
+| `citation-lookup` | Suite defined; publish to `results/` pending | Datasets + adapter + scorer + configs live in-tree; TrustFoundry TF-only summary + row-level scored bundles are checked in under [`trustfoundry-ai/benchmarks-lab`](https://github.com/Trust-Foundry/benchmarks-lab) at `experiments/citation-lookup/2026-07-10-trustfoundry-final/` (statutes+regs refreshed 2026-07-11 with a `variations` tier) |
 
 "Numbers published" means a scored result bundle exists under [`results/`](results/) with checksummed row-level evidence and passes `pnpm verify:results`.
 
@@ -120,17 +132,19 @@ For full runs with large raw artifacts, raw rows may be stored as `raw.jsonl.gz`
 <details>
 <summary>Citation Lookup — TrustFoundry results</summary>
 
-Latest full runs against the four `citation-lookup` datasets (2026-07-10). TrustFoundry's `citation_search` mode; 0 provider failures across 4,290 total rows. Bundles + row-level evidence live at [`trustfoundry-ai/benchmarks-lab`](https://github.com/Trust-Foundry/benchmarks-lab) under `experiments/citation-lookup/trustfoundry/2026-07-10-final/` (per-slice `scores.json` + `provider-results.jsonl` + `manifest.json`).
+Latest full runs against the four `citation-lookup` datasets. TrustFoundry's `citation_search` mode; 0 provider failures. Cases (federal + state) are 2026-07-10; statutes + regulations are 2026-07-11 (variations tier added). Bundles + row-level evidence live at [`trustfoundry-ai/benchmarks-lab`](https://github.com/Trust-Foundry/benchmarks-lab) under `experiments/citation-lookup/trustfoundry/` (per-slice `scores.json` + `provider-results.jsonl` + `manifest.json`).
 
-| Dataset | Rows | Recall@1 (Bluebook) | Recall@1 (noisy) | Combined MRR | p50 | p95 |
-|---|---:|---:|---:|---:|---:|---:|
-| cases-full | 688 BB + 2,032 noisy | 100.0% | 58.6% | 0.690 | 0.52s | 1.13s |
-| cases-state-full | 200 BB + 600 noisy | 100.0% | 79.8% | 0.849 | 0.63s | 1.41s |
-| statutes-full | 91 BB + 273 noisy | 100.0% | 77.3% | 0.830 | 0.51s | 0.81s |
-| regulations-full | 89 BB + 267 noisy | 100.0% | 47.6% | 0.607 | 0.53s | 0.90s |
-| negatives | 50 non-citations | 0 false positives (50/50 empty) | — | — | 0.28s | 0.41s |
+Difficulty tiers: **Bluebook** = Bluebook canonical shape; **variations** = state-legislature abbreviations the state's own code site publishes (e.g. `N.J.S.A.`, `RSMo`, `OCGA`, `NYCRR`) — both regex-matched deterministically; **noisy** = sloppify-generated user-typed transformations (dropped punctuation, case toggling, character-level typos, spell-outs, section-marker swaps) — exercises the ML predict cascade.
 
-Publishing scored bundles under `results/citation-lookup/` here is on the near-term roadmap; verification against the checked-in datasets works today via the standard `pnpm benchmark` workflow.
+| Dataset | Rows | Recall@1 (Bluebook) | Recall@1 (variations) | Recall@1 (noisy) | Combined MRR | p50 | p95 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| cases-full | 688 BB + 2,032 noisy | 100.0% | — | 58.6% | 0.690 | 0.52s | 1.13s |
+| cases-state-full | 200 BB + 600 noisy | 100.0% | — | 79.8% | 0.849 | 0.63s | 1.41s |
+| statutes-full | 91 BB + 59 var + 273 noisy | 100.0% | 100.0% | 77.3% | 0.853 | 0.65s | 2.20s |
+| regulations-full | 89 BB + 21 var + 267 noisy | 100.0% | 100.0% | 47.6% | 0.629 | 0.73s | 2.09s |
+| negatives | 50 non-citations | 0 false positives (50/50 empty) | — | — | — | 0.28s | 0.41s |
+
+Cases don't get a variations tier because case reporters are federal-standardized (F.2d, F.3d, S. Ct., etc.); the state-legislature variant concept only applies to statutes and regulations. Publishing scored bundles under `results/citation-lookup/` here is on the near-term roadmap; verification against the checked-in datasets works today via the standard `pnpm benchmark` workflow.
 
 </details>
 
