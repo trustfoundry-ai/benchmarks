@@ -19,11 +19,28 @@ TrustFoundry publishes evaluation numbers about its own product. This harness is
 
 The public benchmarks in this space measure adjacent capabilities. [LegalBench](https://hazyresearch.stanford.edu/legalbench/) measures LLM legal-reasoning on small self-contained tasks with no external retrieval. [Harvey LAB](https://www.harvey.ai/blog/introducing-the-legal-agentic-benchmark-lab-a-benchmark-for-long-running-legal-work) measures long-running agentic workflows over customer documents without requiring actual legal authority as input. Neither measures a search engine's ability to *find, interpret, and surface specific legal authority* — a capability foundational to every legal-tech agent (research, drafting). This suite fills that gap across four document families: case opinions, case key facts, statutes, and regulations. The test data is question-answer style rather than keyword-based or citation-based, mirroring how lawyers and legal agents actually reach for authority — a materially harder and more valuable target than keyword matching or exact citation lookup. We have not seen it benchmarked publicly by anyone else.
 
+### Why a citation-lookup benchmark, alongside
+
+`citation-lookup` measures a different and lower-level capability: when a
+user or downstream system already produces a citation string — Bluebook
+canonical or user-typed noisy variant — does the provider resolve it to
+the correct authority? Every legal-tech agent that generates citations
+also has to *verify* them, and every retrieval system that ranks over
+free-form questions still needs a clean identity path when a citation
+is the query. Existing public tooling (eyecite, CourtListener's citation
+lookup) covers the deterministic Bluebook path well but does not
+systematically measure noisy-variant recovery — the case where the user
+drops periods, spells a state out, swaps section markers, or
+introduces character-level typos. This suite covers all four document
+families (federal cases, state cases, statutes, regulations) with
+identity-based Recall@1 as the primary metric.
+
 ## Suite status
 
 | Suite | Status | Published numbers |
 |---|---|---|
 | `trustfoundry-legal-search` | Numbers published | 8 bundles under [`results/trustfoundry-legal-search/2026-07-05/`](results/trustfoundry-legal-search/2026-07-05/) (200-row and 5k-row × case-questions / key-facts / laws / regs) |
+| `citation-lookup` | Suite defined; publish to `results/` pending | Datasets + adapter + scorer + configs live in-tree; TrustFoundry TF-only summary + row-level scored bundles are checked in under [`trustfoundry-ai/benchmarks-lab`](https://github.com/Trust-Foundry/benchmarks-lab) at `experiments/citation-lookup/2026-07-10-trustfoundry-final/` |
 
 "Numbers published" means a scored result bundle exists under [`results/`](results/) with checksummed row-level evidence and passes `pnpm verify:results`.
 
@@ -100,9 +117,27 @@ Latest full 5k runs (2026-07-05; provider failures 0 for every row):
 
 For full runs with large raw artifacts, raw rows may be stored as `raw.jsonl.gz`; `pnpm benchmark verify-result <bundle>` reads the manifest path directly.
 
+<details>
+<summary>Citation Lookup — TrustFoundry results</summary>
+
+Latest full runs against the four `citation-lookup` datasets (2026-07-10). TrustFoundry's `citation_search` mode; 0 provider failures across 4,290 total rows. Bundles + row-level evidence live at [`trustfoundry-ai/benchmarks-lab`](https://github.com/Trust-Foundry/benchmarks-lab) under `experiments/citation-lookup/trustfoundry/2026-07-10-final/` (per-slice `scores.json` + `provider-results.jsonl` + `manifest.json`).
+
+| Dataset | Rows | Recall@1 (Bluebook) | Recall@1 (noisy) | Combined MRR | p50 | p95 |
+|---|---:|---:|---:|---:|---:|---:|
+| cases-full | 688 BB + 2,032 noisy | 100.0% | 58.6% | 0.690 | 0.52s | 1.13s |
+| cases-state-full | 200 BB + 600 noisy | 100.0% | 79.8% | 0.849 | 0.63s | 1.41s |
+| statutes-full | 91 BB + 273 noisy | 100.0% | 77.3% | 0.830 | 0.51s | 0.81s |
+| regulations-full | 89 BB + 267 noisy | 100.0% | 47.6% | 0.607 | 0.53s | 0.90s |
+| negatives | 50 non-citations | 0 false positives (50/50 empty) | — | — | 0.28s | 0.41s |
+
+Publishing scored bundles under `results/citation-lookup/` here is on the near-term roadmap; verification against the checked-in datasets works today via the standard `pnpm benchmark` workflow.
+
+</details>
+
 ## Suites
 
 - [TrustFoundry Legal Search](suites/trustfoundry-legal-search/README.md): legal search recall over public 5,000-row case-question, key-fact, law, and regulation datasets.
+- [Citation Lookup](suites/citation-lookup/README.md): identity-based Recall@1 for citation strings — Bluebook canonical + sloppify-generated noisy variants — across federal cases, state cases, statutes, and regulations.
 
 ## Setup
 
@@ -172,7 +207,7 @@ The image stamps the source commit it was built from into `$HARNESS_COMMIT_SHA`,
 - `bin/` and `src/`: the benchmark CLI and harness framework.
 - `configs/`: benchmark, provider, and scorer configuration.
 - `data/`: public benchmark datasets.
-- `suites/trustfoundry-legal-search/`: suite-specific *documentation* only. Suite-scoped adapters live under `src/adapters/`.
+- `suites/trustfoundry-legal-search/`, `suites/citation-lookup/`: suite-specific *documentation* only. Suite-scoped adapters live under `src/adapters/`.
 - `results/`: published result bundles, organized as `results/<benchmark>/<date>/<type>/<size>/`. Each benchmark also has a `results/<benchmark>/latest.json` pointer that names the currently-published bundle for each `(type, size)` — stable URL for external consumers who don't want to guess the date.
 - `agent-skills/`: optional agent workflow instructions.
 - `Dockerfile`, `entrypoint.sh`: reproducible container image (see "Running the harness in a container" above).
