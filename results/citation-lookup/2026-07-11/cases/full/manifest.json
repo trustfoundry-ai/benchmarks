@@ -1,0 +1,37 @@
+{
+  "artifacts": {
+    "raw": {
+      "path": "raw.jsonl",
+      "rows": 2720,
+      "sha256": "541a3b604f250941492793db126c30fa09c03bf3e94c0c4ee1d5e05f8e0104d7"
+    },
+    "result": {
+      "path": "result.json",
+      "sha256": "a2d93115a59419bbfb09a79f8399ecd5425c17528ffc7810ae2a1bfe9d88bb3a"
+    }
+  },
+  "generated_at": "2026-07-11T17:04:31.030Z",
+  "schema_version": "trustfoundry.benchmarks.result-manifest.v1",
+  "source_run_id": "citation-lookup-citation_search-20260710T163902Z",
+  "status": "self-reported",
+  "verification_inputs": {
+    "benchmark_config": {
+      "path": "configs/benchmarks/citation-lookup/cases-full.json",
+      "sha256": "46bbaea372cc55bec28f24b8d7afcc76d513a1ad1ccae9a653649b35ad0da3e3"
+    },
+    "data_files": [
+      {
+        "path": "data/citation-lookup-cases/dataset.jsonl",
+        "sha256": "b803df1af9dde9e4b5319a426427cbeed027c0efa54f7bdda20b8eef7323d99e"
+      }
+    ],
+    "provider_config": {
+      "path": "configs/providers/trustfoundry-citation-lookup.json",
+      "sha256": "73a55dce80f4f416da488bde5239ecf3b904501e37fad440fc933b247e32f4f2"
+    },
+    "scorer_config": {
+      "path": "configs/scorers/citation-lookup.json",
+      "sha256": "e39adcc545a52cdf157bc075ae014fcc40da2e94c804280039de455a33de2afb"
+    }
+  }
+}

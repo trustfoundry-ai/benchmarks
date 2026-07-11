@@ -167,7 +167,7 @@ you shuffle, seed the shuffle from the config.
 
 ### Reference implementation
 
-[`../src/adapters/benchmarks/trustfoundry-citation-lookup.mjs`](../src/adapters/benchmarks/trustfoundry-citation-lookup.mjs)
+[`../src/adapters/benchmarks/citation-lookup.mjs`](../src/adapters/benchmarks/citation-lookup.mjs)
 loads JSONL from disk with declarative filtering, size caps, and
 per-record skip reasons. It's the smallest fully-featured example.
 
@@ -229,7 +229,7 @@ schema-version bump.
 
 - [`../src/adapters/scorers/trustfoundry-legal-search.mjs`](../src/adapters/scorers/trustfoundry-legal-search.mjs)
   — recall / hit@K / MRR for search-style benchmarks.
-- [`../src/adapters/scorers/trustfoundry-citation-lookup.mjs`](../src/adapters/scorers/trustfoundry-citation-lookup.mjs)
+- [`../src/adapters/scorers/citation-lookup.mjs`](../src/adapters/scorers/citation-lookup.mjs)
   — extraction + citation-normalization + hit@K composite.
 
 ## Artifact schemas

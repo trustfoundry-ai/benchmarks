@@ -1,0 +1,25 @@
+{
+  "_comment": [
+    "Citation-lookup scorer config.",
+    "",
+    "cutoffs=[1,5]. Citation-lookup matches on document_uuid / cluster_id /",
+    "normalized citation string — outcomes are effectively binary at rank 1",
+    "for most rows (either the API resolved to the expected document, or it",
+    "didn't). We report hit@5 as a supporting cushion for the small fraction",
+    "of rows where the expected doc falls to rank 2-5 due to citation-string",
+    "ambiguity. Larger K values (10, 25) add noise without signal here.",
+    "",
+    "headline_cutoff=1 — the headline metric is 'did the correct document",
+    "rank first for a citation the user typed?'.",
+    "",
+    "api_request_limit is forwarded by the runner into providerConfig.limit",
+    "when the provider config doesn't set one. TrustFoundry's public API",
+    "caps limit at 25; CourtListener citation-lookup returns all candidate",
+    "clusters regardless."
+  ],
+  "id": "citation-lookup",
+  "api_request_limit": 25,
+  "cutoffs": [1, 5],
+  "headline_cutoff": 1,
+  "mrr_decimal_places": 4
+}

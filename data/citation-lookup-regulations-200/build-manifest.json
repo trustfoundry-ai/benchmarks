@@ -1,0 +1,19 @@
+{
+  "kind": "regulations",
+  "subset_size": 200,
+  "source_dataset": "data/citation-lookup-regulations/dataset.jsonl",
+  "source_dataset_sha256": "6406a6d17bb65fc4f80b1331a0e9b8822031156b8b6715156b95107c3a91d5cf",
+  "tier_counts": {
+    "bluebook_available": 85,
+    "noisy_available": 255,
+    "bluebook_sampled": 85,
+    "noisy_sampled": 115
+  },
+  "seeds": {
+    "bluebook": 7774,
+    "noisy": 7775
+  },
+  "sampling": "stratified-by-authority_identifier, largest-remainder rounding, mulberry32 shuffle",
+  "variation_excluded": 0,
+  "generated_at": "2026-07-08T20:15:32.733Z"
+}

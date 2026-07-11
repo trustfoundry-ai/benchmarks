@@ -1,0 +1,19 @@
+{
+  "kind": "cases",
+  "subset_size": 200,
+  "source_dataset": "data/citation-lookup-cases/dataset.jsonl",
+  "source_dataset_sha256": "b803df1af9dde9e4b5319a426427cbeed027c0efa54f7bdda20b8eef7323d99e",
+  "tier_counts": {
+    "bluebook_available": 688,
+    "noisy_available": 2032,
+    "bluebook_sampled": 100,
+    "noisy_sampled": 100
+  },
+  "seeds": {
+    "bluebook": 7770,
+    "noisy": 7771
+  },
+  "sampling": "stratified-by-authority_identifier, largest-remainder rounding, mulberry32 shuffle",
+  "variation_excluded": 0,
+  "generated_at": "2026-07-08T20:15:32.726Z"
+}

@@ -1,0 +1,16 @@
+{
+  "$comment": "Stable pointer to the currently-published citation-lookup bundle for each (type, size). Update alongside any new dated result bundle. Verified by scripts/verify-result-bundles.mjs.",
+  "benchmark": "citation-lookup",
+  "updated": "2026-07-11",
+  "bundles": {
+    "cases/200": "2026-07-11/cases/200",
+    "cases/full": "2026-07-11/cases/full",
+    "cases-state/200": "2026-07-11/cases-state/200",
+    "cases-state/full": "2026-07-11/cases-state/full",
+    "statutes/200": "2026-07-11/statutes/200",
+    "statutes/full": "2026-07-11/statutes/full",
+    "regulations/200": "2026-07-11/regulations/200",
+    "regulations/full": "2026-07-11/regulations/full",
+    "negatives": "2026-07-11/negatives"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "_comment": "Citation-lookup case_law — full dataset (2,720 rows: 688 bluebook + 2,032 noisy).",
+  "benchmarkId": "citation-lookup",
+  "datasetPath": "data/citation-lookup-cases/dataset.jsonl",
+  "datasetLabel": "citation-lookup-cases",
+  "scorer": "citation-lookup"
+}

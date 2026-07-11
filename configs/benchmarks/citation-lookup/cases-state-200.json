@@ -1,0 +1,7 @@
+{
+  "_comment": "Citation-lookup state cases — 200-row subset (top 50 state authorities x 1 canonical each, 3:1 noisy:bluebook).",
+  "benchmarkId": "citation-lookup",
+  "datasetPath": "data/citation-lookup-cases-state-200/dataset.jsonl",
+  "datasetLabel": "citation-lookup-cases-state-200",
+  "scorer": "citation-lookup"
+}

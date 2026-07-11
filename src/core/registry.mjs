@@ -17,13 +17,19 @@
  * (string, unique within its kind) and `version` (string). See the
  * factories in `src/core/contracts/index.mjs` for the full contract.
  */
+import { citationLookupBenchmarkAdapter } from '../adapters/benchmarks/citation-lookup.mjs';
 import { trustfoundryLegalSearchBenchmarkAdapter } from '../adapters/benchmarks/trustfoundry-legal-search.mjs';
 import { anthropicLegalSearchProviderAdapter } from '../adapters/providers/anthropic-legal-search.mjs';
+import { courtlistenerCitationLookupProviderAdapter } from '../adapters/providers/courtlistener-citation-lookup.mjs';
 import { courtlistenerSearchProviderAdapter } from '../adapters/providers/courtlistener-search.mjs';
 import { exaLegalSearchProviderAdapter } from '../adapters/providers/exa-legal-search.mjs';
+import { harveyLabBenchmarkAdapter } from '../adapters/benchmarks/harvey-lab.mjs';
 import { openaiLegalSearchProviderAdapter } from '../adapters/providers/openai-legal-search.mjs';
 import { parallelLegalSearchProviderAdapter } from '../adapters/providers/parallel-legal-search.mjs';
 import { trustfoundryLegalSearchProviderAdapter } from '../adapters/providers/trustfoundry-legal-search.mjs';
+import { trustfoundryWorkflowProviderAdapter } from '../adapters/providers/trustfoundry-workflow.mjs';
+import { citationLookupScorerAdapter } from '../adapters/scorers/citation-lookup.mjs';
+import { harveyLabScorerAdapter } from '../adapters/scorers/harvey-lab.mjs';
 import { trustfoundryLegalSearchScorerAdapter } from '../adapters/scorers/trustfoundry-legal-search.mjs';
 
 export function createRegistry() {
@@ -46,13 +52,19 @@ export function createRegistry() {
 }
 
 export const defaultRegistry = createRegistry();
+defaultRegistry.register('benchmarks', citationLookupBenchmarkAdapter);
+defaultRegistry.register('benchmarks', harveyLabBenchmarkAdapter);
 defaultRegistry.register('benchmarks', trustfoundryLegalSearchBenchmarkAdapter);
 defaultRegistry.register('providers', anthropicLegalSearchProviderAdapter);
+defaultRegistry.register('providers', courtlistenerCitationLookupProviderAdapter);
 defaultRegistry.register('providers', courtlistenerSearchProviderAdapter);
 defaultRegistry.register('providers', exaLegalSearchProviderAdapter);
 defaultRegistry.register('providers', openaiLegalSearchProviderAdapter);
 defaultRegistry.register('providers', parallelLegalSearchProviderAdapter);
 defaultRegistry.register('providers', trustfoundryLegalSearchProviderAdapter);
+defaultRegistry.register('providers', trustfoundryWorkflowProviderAdapter);
+defaultRegistry.register('scorers', citationLookupScorerAdapter);
+defaultRegistry.register('scorers', harveyLabScorerAdapter);
 defaultRegistry.register('scorers', trustfoundryLegalSearchScorerAdapter);
 
 // Backwards-compat alias — existing public callers import `registry`.

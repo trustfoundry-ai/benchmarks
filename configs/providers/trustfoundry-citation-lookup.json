@@ -1,0 +1,9 @@
+{
+  "_comment": "TrustFoundry public API search provider for citation-lookup. Uses model_type=citation_search and disables the geo state filter (citation resolution is inherently jurisdiction-agnostic — the citation string identifies the jurisdiction).",
+  "provider": "trustfoundry-legal-search",
+  "endpoint": "https://api.trustfoundry.ai/public/v1/search",
+  "api_key_env": "TF_API_KEY",
+  "request_timeout_ms": 60000,
+  "model_type": "citation_search",
+  "state_filter_enabled": false
+}

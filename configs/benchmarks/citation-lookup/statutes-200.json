@@ -1,0 +1,7 @@
+{
+  "_comment": "Citation-lookup statute — deterministic 200-row subset (89 bluebook + 111 noisy — statutes has fewer than 100 bluebook rows so the deficit is filled from noisy). Stratified by authority.",
+  "benchmarkId": "citation-lookup",
+  "datasetPath": "data/citation-lookup-statutes-200/dataset.jsonl",
+  "datasetLabel": "citation-lookup-statutes-200",
+  "scorer": "citation-lookup"
+}

@@ -1,0 +1,220 @@
+{
+  "generated_at": "2026-07-11T17:04:31.029Z",
+  "metadata": {
+    "cutoffs": [
+      1,
+      5
+    ],
+    "headlineCutoff": 1,
+    "mrrDecimalPlaces": 4,
+    "scorer": "citation-lookup",
+    "version": "citation-lookup-v1"
+  },
+  "run": {
+    "benchmark": {
+      "configPath": "configs/benchmarks/citation-lookup/cases-full.json",
+      "configSha256": "46bbaea372cc55bec28f24b8d7afcc76d513a1ad1ccae9a653649b35ad0da3e3",
+      "datasetNames": null,
+      "datasetSize": null,
+      "id": "citation-lookup",
+      "materializationVersion": "citation-lookup-data-v1",
+      "promptVersion": null,
+      "queryTransformId": null,
+      "sourceCommit": null,
+      "sourceFiles": [
+        {
+          "path": "data/citation-lookup-cases/dataset.jsonl",
+          "sha256": "b803df1af9dde9e4b5319a426427cbeed027c0efa54f7bdda20b8eef7323d99e"
+        }
+      ],
+      "sourceRoot": "data/citation-lookup-cases",
+      "splits": null,
+      "version": "citation-lookup-v1"
+    },
+    "harness": {
+      "commit": "1694d181c84b35b827e0e3a7842e908b5e189812",
+      "name": "@trustfoundry-ai/benchmarks-harness",
+      "originUrl": "https://github.com/trustfoundry-ai/benchmarks.git",
+      "version": "0.10.0"
+    },
+    "provider": {
+      "apiKeyEnv": "TF_API_KEY",
+      "configPath": "configs/providers/trustfoundry-citation-lookup.json",
+      "configSha256": "73a55dce80f4f416da488bde5239ecf3b904501e37fad440fc933b247e32f4f2",
+      "id": "trustfoundry-legal-search",
+      "settings": {
+        "limit": 25,
+        "maxResults": null,
+        "modelType": "citation_search",
+        "requestTimeoutMs": 60000,
+        "stateFilterEnabled": false
+      },
+      "subject": "citation_search",
+      "target": "https://api.trustfoundry.ai/public/v1/search",
+      "version": "trustfoundry-legal-search-provider-v1"
+    },
+    "run_id": "citation-lookup-citation_search-20260710T163902Z",
+    "scheduler": {
+      "caseCount": 2720,
+      "parallel": 8,
+      "retries": 0,
+      "shardCount": 1,
+      "shardIndex": 0
+    },
+    "scorer": {
+      "configPath": "configs/scorers/citation-lookup.json",
+      "configSha256": "e39adcc545a52cdf157bc075ae014fcc40da2e94c804280039de455a33de2afb",
+      "id": "citation-lookup",
+      "notes": "Citation-lookup recall scoring. Positives match by document_uuid, cl_cluster_id, or normalized citation string. Negatives (kind=negative) are correct iff the provider returns zero results. Emits ambiguousRate (fraction of positives with status=300 / provider_ambiguous=true).",
+      "version": "citation-lookup-v1"
+    }
+  },
+  "schema_version": "trustfoundry.benchmarks.result.v1",
+  "status": "self-reported",
+  "summary": {
+    "ambiguousRate": 0,
+    "byDatasource": {
+      "courtlistener": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.6904411764705882,
+          "hit@5": 0.6904411764705882
+        },
+        "mrr": 0.6904,
+        "n": 2720
+      }
+    },
+    "byDifficulty": {
+      "bluebook": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 1,
+          "hit@5": 1
+        },
+        "mrr": 1,
+        "n": 688
+      },
+      "noisy": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.5856299212598425,
+          "hit@5": 0.5856299212598425
+        },
+        "mrr": 0.5856,
+        "n": 2032
+      }
+    },
+    "byDocumentType": {
+      "case_law": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.6904411764705882,
+          "hit@5": 0.6904411764705882
+        },
+        "mrr": 0.6904,
+        "n": 2720
+      }
+    },
+    "byNegativeCategory": {},
+    "byState": {
+      "FED": {
+        "ambiguousRate": 0,
+        "hit_at": {
+          "hit@1": 0.6904411764705882,
+          "hit@5": 0.6904411764705882
+        },
+        "mrr": 0.6904,
+        "n": 2720
+      }
+    },
+    "execution": {
+      "benchmark": {
+        "configPath": "configs/benchmarks/citation-lookup/cases-full.json",
+        "configSha256": "46bbaea372cc55bec28f24b8d7afcc76d513a1ad1ccae9a653649b35ad0da3e3",
+        "datasetNames": null,
+        "datasetSize": null,
+        "id": "citation-lookup",
+        "materializationVersion": "citation-lookup-data-v1",
+        "promptVersion": null,
+        "queryTransformId": null,
+        "sourceCommit": null,
+        "sourceFiles": [
+          {
+            "path": "data/citation-lookup-cases/dataset.jsonl",
+            "sha256": "b803df1af9dde9e4b5319a426427cbeed027c0efa54f7bdda20b8eef7323d99e"
+          }
+        ],
+        "sourceRoot": "data/citation-lookup-cases",
+        "splits": null,
+        "version": "citation-lookup-v1"
+      },
+      "caseCount": 2720,
+      "provider": {
+        "apiKeyEnv": "TF_API_KEY",
+        "configPath": "configs/providers/trustfoundry-citation-lookup.json",
+        "configSha256": "73a55dce80f4f416da488bde5239ecf3b904501e37fad440fc933b247e32f4f2",
+        "id": "trustfoundry-legal-search",
+        "settings": {
+          "limit": 25,
+          "maxResults": null,
+          "modelType": "citation_search",
+          "requestTimeoutMs": 60000,
+          "stateFilterEnabled": false
+        },
+        "subject": "citation_search",
+        "target": "https://api.trustfoundry.ai/public/v1/search",
+        "version": "trustfoundry-legal-search-provider-v1"
+      },
+      "runId": "citation-lookup-citation_search-20260710T163902Z",
+      "scheduler": {
+        "caseCount": 2720,
+        "parallel": 8,
+        "retries": 0,
+        "shardCount": 1,
+        "shardIndex": 0
+      },
+      "scorer": {
+        "cutoffs": [
+          1,
+          5
+        ],
+        "headlineCutoff": 1,
+        "id": "citation-lookup",
+        "mrrDecimalPlaces": 4,
+        "version": "citation-lookup-v1"
+      }
+    },
+    "hitAt1": 0.6904411764705882,
+    "hitAt5": 0.6904411764705882,
+    "latency_ms": {
+      "max": 7129,
+      "mean": 613.5047794117647,
+      "min": 194,
+      "n": 2720,
+      "p50": 522,
+      "p95": 1123.199999999999
+    },
+    "mrr": 0.6904,
+    "negatives": 0,
+    "negatives_overall": {
+      "correct_empty": 0,
+      "fp_rate": 0,
+      "n": 0
+    },
+    "overall": {
+      "ambiguousRate": 0,
+      "hit_at": {
+        "hit@1": 0.6904411764705882,
+        "hit@5": 0.6904411764705882
+      },
+      "mrr": 0.6904,
+      "n": 2720
+    },
+    "overallScore": 0.6904411764705882,
+    "positives": 2720,
+    "providerFailures": 0,
+    "scored": 2720,
+    "supportedScore": 0.6904411764705882,
+    "total": 2720
+  }
+}

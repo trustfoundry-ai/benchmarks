@@ -1,35 +1,106 @@
-# TrustFoundry Benchmarks
+# TrustFoundry Legal Benchmarks
 
-> **Status: Under active development (pre-1.0).**
-> Current release: **0.8.0**. This harness is being iterated on in
-> the open. Contracts, artifact schemas, and adapters may change
-> between minor versions until v1.0. Individual benchmark suites
-> carry their own maturity status — see the
-> [suite status](#suite-status) table below.
+> **Pre-1.0.** The harness is under active development. Adapter
+> contracts and artifact schemas may change between minor versions
+> until v1.0. Individual benchmark suites carry their own maturity
+> status — see the [suite status](#suite-status) table below.
 
-This repository contains public benchmark harnesses for metrics TrustFoundry runs against its system. The goal is to make selected evaluations reproducible and extensible: you can rerun the same benchmark against TrustFoundry, inspect the row-level evidence behind the scores, or add another provider adapter for comparison.
+Public, reproducible benchmarks for evaluating legal-tech systems on
+capabilities that matter to lawyers and legal-AI agents in production:
+finding the right piece of legal authority for a natural-language
+question, and resolving citation strings to the underlying documents.
+The legal-tech space is moving fast, and there's no shared public
+yardstick for these operationally-critical tasks. This repository
+publishes datasets, provider adapters, and scorers behind stable
+contracts so any vendor with a comparable capability can rerun the
+same rows against the same match logic and produce directly-comparable
+numbers.
 
 ## Why this exists
 
-### Transparency and governance for published metrics
+### An open yardstick for legal-tech capabilities
 
-TrustFoundry publishes evaluation numbers about its own product. This harness is how we make those numbers reproducible under identical inputs — the run `manifest.json` pins the harness commit, config bytes, and dataset digests, and every published bundle carries per-file checksums for the row-level evidence. An auditor rerunning against a TrustFoundry API key can compare their bundle to ours row-for-row. Vendor stochasticity (LLM sampling, tool-use nondeterminism, model-snapshot floating) means two runs won't be byte-identical, but the manifest captures the axes so distributions remain directly comparable. See [Manifest And Reproducibility](#manifest-and-reproducibility) for the mechanism, [`docs/adapter-contracts.md`](docs/adapter-contracts.md#reproducibility-model) for what "reproducible" means at each layer, and [Verifying releases](#verifying-releases) for how to check that the harness code itself was built from this repo at the tagged commit.
+The existing public benchmarks in this space measure adjacent things.
+[LegalBench](https://hazyresearch.stanford.edu/legalbench/) measures
+LLM legal-reasoning on small self-contained tasks with no external
+retrieval. [Harvey LAB](https://www.harvey.ai/blog/introducing-the-legal-agentic-benchmark-lab-a-benchmark-for-long-running-legal-work)
+measures long-running agentic workflows over customer documents
+without requiring actual legal authority as input. Neither measures
+whether a system actually *finds* the right piece of legal authority
+in response to a real question, or whether it *resolves* a citation
+string to the corresponding document — capabilities that every
+legal-tech research, drafting, or verification workflow depends on.
+TrustFoundry runs these evaluations against its own system anyway.
+Publishing them in an open, reproducible form is a bet that vendors,
+buyers, and researchers all benefit from a common reference. If you
+build in this space, you can rerun any of these benchmarks against
+your endpoint and produce numbers on the same footing.
 
-### Why a legal-search benchmark, specifically
+### `trustfoundry-legal-search` — retrieval quality
 
-The public benchmarks in this space measure adjacent capabilities. [LegalBench](https://hazyresearch.stanford.edu/legalbench/) measures LLM legal-reasoning on small self-contained tasks with no external retrieval. [Harvey LAB](https://www.harvey.ai/blog/introducing-the-legal-agentic-benchmark-lab-a-benchmark-for-long-running-legal-work) measures long-running agentic workflows over customer documents without requiring actual legal authority as input. Neither measures a search engine's ability to *find, interpret, and surface specific legal authority* — a capability foundational to every legal-tech agent (research, drafting). This suite fills that gap across four document families: case opinions, case key facts, statutes, and regulations. The test data is question-answer style rather than keyword-based or citation-based, mirroring how lawyers and legal agents actually reach for authority — a materially harder and more valuable target than keyword matching or exact citation lookup. We have not seen it benchmarked publicly by anyone else.
+Measures a search engine's ability to *find, interpret, and surface
+specific legal authority* for a natural-language question. Covers four
+document families: case opinions, case key facts, statutes, and
+regulations. The test data is question–answer style rather than
+keyword-based or citation-based, mirroring how lawyers and legal
+agents actually reach for authority — a materially harder and more
+valuable target than keyword matching or exact citation lookup. We
+have not seen this benchmarked publicly by anyone else.
+
+### `citation-lookup` — identity resolution
+
+Measures a lower-level, upstream capability: when a user or downstream
+system already produces a citation string — Bluebook canonical,
+state-legislature variant, or noisy transformation of either — does
+the provider resolve it to the correct authority? Every legal-tech
+agent that generates citations also has to *verify* them, and every
+retrieval system that ranks over free-form questions still needs a
+clean identity path when a citation is the query.
+
+Available public tooling for this task is narrower than one might
+expect. Systematic coverage of statute + regulation citations (not
+just case opinions) and of user-typed noisy variants (not just
+clean Bluebook input) is where existing options tend to fall short.
+This suite covers all four document families (federal cases, state
+cases, statutes, regulations) with identity-based Recall@1 as the
+primary metric.
+
+Noise coverage is broader than "user typos." Beyond dropped
+punctuation, case toggling, section-marker swaps, character-level
+typos, and spell-outs, the dataset exercises **state-legislature
+variants** that diverge from Bluebook — the abbreviations state
+codifiers actually publish, which users copy verbatim from official
+state sites. Examples: `N.J.S.A.` vs `N.J. Stat. Ann.`, `RSMo` vs
+`Mo. Rev. Stat.`, `KRS` vs `Ky. Rev. Stat. Ann.`, `NYCRR` vs `N.Y.
+Comp. Codes R. & Regs.`. Statutes and regulations especially benefit
+from this coverage; case reporters standardize on Bluebook naturally.
+
+### Reproducibility and transparency
+
+Vendor stochasticity (LLM sampling, tool-use nondeterminism,
+model-snapshot floating) means no two runs are byte-identical. The
+manifest captures the axes so distributions stay directly comparable:
+`manifest.json` pins the harness commit, config bytes, and dataset
+digests, and every published bundle carries per-file checksums for
+the row-level evidence. See
+[Manifest And Reproducibility](#manifest-and-reproducibility) for the
+mechanism, [`docs/adapter-contracts.md`](docs/adapter-contracts.md#reproducibility-model)
+for what "reproducible" means at each layer, and
+[Verifying releases](#verifying-releases) for how to check that the
+harness code itself was built from this repo at the tagged commit.
 
 ## Suite status
 
 | Suite | Status | Published numbers |
 |---|---|---|
 | `trustfoundry-legal-search` | Numbers published | 8 bundles under [`results/trustfoundry-legal-search/2026-07-05/`](results/trustfoundry-legal-search/2026-07-05/) (200-row and 5k-row × case-questions / key-facts / laws / regs) |
+| `citation-lookup` | Numbers published | 9 bundles under [`results/citation-lookup/2026-07-11/`](results/citation-lookup/2026-07-11/) (full and 200-row × cases / cases-state / statutes / regulations + negatives) |
 
 "Numbers published" means a scored result bundle exists under [`results/`](results/) with checksummed row-level evidence and passes `pnpm verify:results`.
 
 ## Latest Benchmarks
 
-These are the latest canonical benchmark runs in this repository. Dataset labels link to the raw and scored result bundles used to calculate each row; each checked-in bundle includes `manifest.json`, `checksums.txt`, scored results, and row-level raw evidence. Previous runs (if any) live alongside the latest under the same suite directory — browse `results/trustfoundry-legal-search/` and its date subdirectories to see the historical set.
+These are the latest canonical benchmark runs in this repository. Dataset labels link to the raw and scored result bundles used to calculate each row; each checked-in bundle includes `manifest.json`, `checksums.txt`, scored results, and row-level raw evidence. Previous runs (if any) live alongside the latest under the same suite directory — browse `results/<benchmark>/` and its date subdirectories to see the historical set.
 
 <table>
   <thead>
@@ -100,9 +171,87 @@ Latest full 5k runs (2026-07-05; provider failures 0 for every row):
 
 For full runs with large raw artifacts, raw rows may be stored as `raw.jsonl.gz`; `pnpm benchmark verify-result <bundle>` reads the manifest path directly.
 
+<table>
+  <thead>
+    <tr>
+      <th colspan="8" align="left">Citation Lookup</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th>Dataset</th>
+      <th>R@1 Bluebook</th>
+      <th>R@1 variations</th>
+      <th>R@1 noisy</th>
+      <th>MRR</th>
+      <th>p50</th>
+      <th>p95</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2026-07-11</td>
+      <td><a href="results/citation-lookup/2026-07-11/cases/full/">cases-full (2,720)</a></td>
+      <td>100.0%</td>
+      <td>—</td>
+      <td>58.6%</td>
+      <td>0.690</td>
+      <td>516 ms</td>
+      <td>1128 ms</td>
+    </tr>
+    <tr>
+      <td>2026-07-11</td>
+      <td><a href="results/citation-lookup/2026-07-11/cases-state/full/">cases-state-full (800)</a></td>
+      <td>100.0%</td>
+      <td>—</td>
+      <td>79.8%</td>
+      <td>0.849</td>
+      <td>627 ms</td>
+      <td>1409 ms</td>
+    </tr>
+    <tr>
+      <td>2026-07-11</td>
+      <td><a href="results/citation-lookup/2026-07-11/statutes/full/">statutes-full (423)</a></td>
+      <td>100.0%</td>
+      <td>100.0%</td>
+      <td>77.3%</td>
+      <td>0.853</td>
+      <td>647 ms</td>
+      <td>2195 ms</td>
+    </tr>
+    <tr>
+      <td>2026-07-11</td>
+      <td><a href="results/citation-lookup/2026-07-11/regulations/full/">regulations-full (377)</a></td>
+      <td>100.0%</td>
+      <td>100.0%</td>
+      <td>47.6%</td>
+      <td>0.629</td>
+      <td>734 ms</td>
+      <td>2091 ms</td>
+    </tr>
+  </tbody>
+</table>
+
+<details>
+<summary>Citation Lookup details</summary>
+
+Difficulty tiers: **Bluebook** = Bluebook canonical shape; **variations** = state-legislature abbreviations the state's own code site publishes (e.g. `N.J.S.A.`, `RSMo`, `OCGA`, `NYCRR`) — both regex-matched deterministically; **noisy** = sloppify-generated user-typed transformations (dropped punctuation, case toggling, character-level typos, spell-outs, section-marker swaps) — exercises the ML predict cascade.
+
+Cases (federal + state) don't get a variations tier because case reporters are federal-standardized (F.2d, F.3d, S. Ct., etc.); the state-legislature variant concept only applies to statutes and regulations.
+
+Latest full runs (2026-07-11 for statutes + regulations w/ variations tier; 2026-07-10 for cases + cases-state; 0 provider failures across 4,340 rows):
+
+- Federal cases: R@1 Bluebook 100.0% (688 rows); R@1 noisy 58.6% (2,032 rows); combined MRR 0.690. [full results](results/citation-lookup/2026-07-11/cases/full/); [200-row companion](results/citation-lookup/2026-07-11/cases/200/).
+- State cases: R@1 Bluebook 100.0% (200 rows); R@1 noisy 79.8% (600 rows); combined MRR 0.849. [full results](results/citation-lookup/2026-07-11/cases-state/full/); [200-row companion](results/citation-lookup/2026-07-11/cases-state/200/).
+- Statutes: R@1 Bluebook 100.0% (91 rows); R@1 variations 100.0% (59 rows); R@1 noisy 77.3% (273 rows); combined MRR 0.853. [full results](results/citation-lookup/2026-07-11/statutes/full/); [200-row companion](results/citation-lookup/2026-07-11/statutes/200/).
+- Regulations: R@1 Bluebook 100.0% (89 rows); R@1 variations 100.0% (21 rows); R@1 noisy 47.6% (267 rows); combined MRR 0.629. [full results](results/citation-lookup/2026-07-11/regulations/full/); [200-row companion](results/citation-lookup/2026-07-11/regulations/200/).
+- Negatives: 0/50 false positives (empty result set returned for every synthetic non-citation). [full results](results/citation-lookup/2026-07-11/negatives/).
+
+</details>
+
 ## Suites
 
 - [TrustFoundry Legal Search](suites/trustfoundry-legal-search/README.md): legal search recall over public 5,000-row case-question, key-fact, law, and regulation datasets.
+- [Citation Lookup](suites/citation-lookup/README.md): identity-based Recall@1 for citation strings — Bluebook canonical + sloppify-generated noisy variants — across federal cases, state cases, statutes, and regulations.
 
 ## Setup
 
@@ -172,7 +321,7 @@ The image stamps the source commit it was built from into `$HARNESS_COMMIT_SHA`,
 - `bin/` and `src/`: the benchmark CLI and harness framework.
 - `configs/`: benchmark, provider, and scorer configuration.
 - `data/`: public benchmark datasets.
-- `suites/trustfoundry-legal-search/`: suite-specific *documentation* only. Suite-scoped adapters live under `src/adapters/`.
+- `suites/trustfoundry-legal-search/`, `suites/citation-lookup/`: suite-specific *documentation* only. Suite-scoped adapters live under `src/adapters/`.
 - `results/`: published result bundles, organized as `results/<benchmark>/<date>/<type>/<size>/`. Each benchmark also has a `results/<benchmark>/latest.json` pointer that names the currently-published bundle for each `(type, size)` — stable URL for external consumers who don't want to guess the date.
 - `agent-skills/`: optional agent workflow instructions.
 - `Dockerfile`, `entrypoint.sh`: reproducible container image (see "Running the harness in a container" above).

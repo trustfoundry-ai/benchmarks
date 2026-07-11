@@ -4,6 +4,79 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+Ships the second benchmark suite — `citation-lookup` — as first-class
+published numbers alongside `trustfoundry-legal-search`. Datasets,
+adapter, scorer, provider configs, and a second provider adapter land
+together with 9 verified TrustFoundry result bundles. Root README is
+reframed around the general legal-tech benchmarking mission rather
+than TrustFoundry-platform-specific evaluations.
+
+### Added
+
+- **`citation-lookup` benchmark suite.** New
+  `src/adapters/benchmarks/citation-lookup.mjs` loader +
+  `src/adapters/scorers/citation-lookup.mjs` identity-based Recall@1 /
+  Recall@5 / MRR scorer. Match keys: `document_uuid`, `cl_cluster_id`,
+  and normalized citation strings. Full suite docs at
+  [`suites/citation-lookup/README.md`](suites/citation-lookup/README.md).
+- **Five citation-lookup datasets** with matching full + 200-row configs:
+  `cases` (2,720 rows), `cases-state` (800), `statutes` (423),
+  `regulations` (377), `negatives` (50). All under
+  `data/citation-lookup-*/dataset.jsonl`.
+- **New `variations` difficulty tier** on statutes + regulations. Tests
+  state-legislature abbreviations that state code sites actually publish
+  (`N.J.S.A.`, `RSMo`, `KRS`, `OCGA`, `NYCRR`, `MCL`, `RCW`, `V.T.C.A.`,
+  and 25+ others). Both Bluebook and variations forms are regex-
+  recognized; TF hits 100% Recall@1 on every variations row across all
+  four datasets. Cases carry bluebook + noisy only — case reporters are
+  federal-standardized.
+- **`courtlistener-citation-lookup` provider adapter.** Wraps
+  CourtListener v4 `/api/rest/v4/citation-lookup/` — a distinct endpoint
+  from the opinion-search adapter — with auth-tier rate-limit detection,
+  checkpointing, and quota-aware backoff. Ships
+  `configs/providers/courtlistener-citation-lookup.json`.
+- **9 published result bundles** under
+  [`results/citation-lookup/2026-07-11/`](results/citation-lookup/2026-07-11/):
+  full and 200-row × {cases, cases-state, statutes, regulations} +
+  negatives. TF `citation_search` mode: 100% Bluebook Recall@1 (1,068
+  rows), 100% variations Recall@1 (80 rows), 48–80% noisy Recall@1
+  depending on document family, 0/50 false positives on negatives, 0
+  provider failures across all bundles. Every bundle verifies
+  byte-for-byte via `pnpm verify:results`.
+
+### Changed
+
+- **Root README reframed.** Title is now "TrustFoundry Legal Benchmarks."
+  Opening paragraph and "Why this exists" section restructured to lead
+  with the open-benchmark-for-legal-tech mission, with per-benchmark
+  rationales as subsections. Latest Benchmarks section now carries a
+  Citation Lookup table at the same level as TrustFoundry Legal Search
+  (previously buried in a details twistie). Removed the hardcoded
+  harness-version disclaimer that went stale each release.
+- **Suite status table** now includes `citation-lookup` marked
+  "Numbers published" with 9 bundles.
+- **`docs/adapters/README.md`** — adapter set now includes a
+  citation-resolution category covering the citation-lookup provider
+  surface.
+- **`suites/citation-lookup/README.md`** — dataset table now documents
+  all 5 datasets (adds `cases-state`), 3-tier difficulty taxonomy with
+  concrete state-variant examples, updated row counts (91+59+273 for
+  statutes, 89+21+267 for regs), and a note that adapter scope varies
+  by supported input type.
+
+### Fixed
+
+- **NJ statutes bluebook row shape.** The pre-existing bluebook query
+  for the NJ canonical was `N.J.S.A. 17:12B-138` (state variant);
+  corrected to Bluebook `N.J. Stat. Ann. § 17:12B-138`. The state
+  variant now surfaces as a `variations`-tier row.
+- **MO regulations bluebook row shape.** Two MO CSR canonicals had a
+  hybrid `15 Mo. Code Regs. Ann. 60-7.040` shape as their bluebook
+  query; corrected to `Mo. Code Regs. Ann. tit. 15, § 60-7.040`.
+- **`docs/adapter-contracts.md`** — stale
+  `trustfoundry-citation-lookup.mjs` filename references corrected to
+  the actual `citation-lookup.mjs` filenames after the rename in PR #14.
+
 ## [0.10.0] - 2026-07-08
 
 Fifth vendor provider adapter shipped (`parallel-legal-search`), plus a
