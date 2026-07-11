@@ -2,9 +2,10 @@
 
 Each file in this directory describes one shipped provider adapter — what it wraps, how the harness talks to it, and what to expect when you run the benchmark against it.
 
-The adapter set groups into two categories:
+The adapter set groups into three categories:
 
 - **Legal-specific search engines** — [`trustfoundry-legal-search`](trustfoundry-legal-search.md), [`courtlistener-search`](courtlistener-search.md). These are search backends purpose-built for U.S. case law. Both TrustFoundry and CourtListener maintain their own corpora, court taxonomies, and rankers tuned for legal retrieval.
 - **General-purpose LLMs and web search, adapted for legal** — [`anthropic-legal-search`](anthropic-legal-search.md), [`openai-legal-search`](openai-legal-search.md), [`exa-legal-search`](exa-legal-search.md), [`parallel-legal-search`](parallel-legal-search.md). These adapters wrap a general LLM's built-in web-search tool (Anthropic, OpenAI) or a general semantic web-search API (Exa, Parallel), coax it into returning ranked case-law citations, and hand those to the same scorer. They exist so evaluators can run those options against the same benchmark rows and scorer as everything else in this repo. TrustFoundry is not publishing head-to-head numbers against them; they're provided for evaluators to draw their own conclusions from.
+- **Citation resolution** — `trustfoundry-legal-search` (with the `citation_search` provider config at [`configs/providers/trustfoundry-citation-lookup.json`](../../configs/providers/trustfoundry-citation-lookup.json)) and `courtlistener-citation-lookup` (a distinct CourtListener v4 endpoint from the opinion-search adapter above). Both serve the [`citation-lookup`](../../suites/citation-lookup/README.md) suite — identity-based Recall@1 for citation strings a user or downstream system produced. CL's citation-lookup endpoint (and the open-source `eyecite` library it's built on) covers opinion citations only; statutes and regulations are TrustFoundry-only in the current shipped set.
 
 If you're implementing a new adapter, see [`docs/adapter-contracts.md`](../adapter-contracts.md) for the contract and [`src/core/contracts/README.md`](../../src/core/contracts/README.md) for the adapter-authoring guide.
