@@ -1,43 +1,71 @@
-# TrustFoundry Benchmarks
+# TrustFoundry Legal Benchmarks
 
-> **Status: Under active development (pre-1.0).**
-> Current release: **0.8.0**. This harness is being iterated on in
-> the open. Contracts, artifact schemas, and adapters may change
-> between minor versions until v1.0. Individual benchmark suites
-> carry their own maturity status — see the
-> [suite status](#suite-status) table below.
+> **Pre-1.0.** The harness is under active development. Adapter
+> contracts and artifact schemas may change between minor versions
+> until v1.0. Individual benchmark suites carry their own maturity
+> status — see the [suite status](#suite-status) table below.
 
-This repository contains public benchmark harnesses for metrics TrustFoundry runs against its system. The goal is to make selected evaluations reproducible and extensible: you can rerun the same benchmark against TrustFoundry, inspect the row-level evidence behind the scores, or add another provider adapter for comparison.
+Public, reproducible benchmarks for evaluating legal-tech systems on
+capabilities that matter to lawyers and legal-AI agents in production:
+finding the right piece of legal authority for a natural-language
+question, and resolving citation strings to the underlying documents.
+The legal-tech space is moving fast, and there's no shared public
+yardstick for these operationally-critical tasks. This repository
+publishes datasets, provider adapters, and scorers behind stable
+contracts so any vendor with a comparable capability can rerun the
+same rows against the same match logic and produce directly-comparable
+numbers.
 
 ## Why this exists
 
-### Transparency and governance for published metrics
+### An open yardstick for legal-tech capabilities
 
-TrustFoundry publishes evaluation numbers about its own product. This harness is how we make those numbers reproducible under identical inputs — the run `manifest.json` pins the harness commit, config bytes, and dataset digests, and every published bundle carries per-file checksums for the row-level evidence. An auditor rerunning against a TrustFoundry API key can compare their bundle to ours row-for-row. Vendor stochasticity (LLM sampling, tool-use nondeterminism, model-snapshot floating) means two runs won't be byte-identical, but the manifest captures the axes so distributions remain directly comparable. See [Manifest And Reproducibility](#manifest-and-reproducibility) for the mechanism, [`docs/adapter-contracts.md`](docs/adapter-contracts.md#reproducibility-model) for what "reproducible" means at each layer, and [Verifying releases](#verifying-releases) for how to check that the harness code itself was built from this repo at the tagged commit.
+The existing public benchmarks in this space measure adjacent things.
+[LegalBench](https://hazyresearch.stanford.edu/legalbench/) measures
+LLM legal-reasoning on small self-contained tasks with no external
+retrieval. [Harvey LAB](https://www.harvey.ai/blog/introducing-the-legal-agentic-benchmark-lab-a-benchmark-for-long-running-legal-work)
+measures long-running agentic workflows over customer documents
+without requiring actual legal authority as input. Neither measures
+whether a system actually *finds* the right piece of legal authority
+in response to a real question, or whether it *resolves* a citation
+string to the corresponding document — capabilities that every
+legal-tech research, drafting, or verification workflow depends on.
+TrustFoundry runs these evaluations against its own system anyway.
+Publishing them in an open, reproducible form is a bet that vendors,
+buyers, and researchers all benefit from a common reference. If you
+build in this space, you can rerun any of these benchmarks against
+your endpoint and produce numbers on the same footing.
 
-### Why a legal-search benchmark, specifically
+### `trustfoundry-legal-search` — retrieval quality
 
-The public benchmarks in this space measure adjacent capabilities. [LegalBench](https://hazyresearch.stanford.edu/legalbench/) measures LLM legal-reasoning on small self-contained tasks with no external retrieval. [Harvey LAB](https://www.harvey.ai/blog/introducing-the-legal-agentic-benchmark-lab-a-benchmark-for-long-running-legal-work) measures long-running agentic workflows over customer documents without requiring actual legal authority as input. Neither measures a search engine's ability to *find, interpret, and surface specific legal authority* — a capability foundational to every legal-tech agent (research, drafting). This suite fills that gap across four document families: case opinions, case key facts, statutes, and regulations. The test data is question-answer style rather than keyword-based or citation-based, mirroring how lawyers and legal agents actually reach for authority — a materially harder and more valuable target than keyword matching or exact citation lookup. We have not seen it benchmarked publicly by anyone else.
+Measures a search engine's ability to *find, interpret, and surface
+specific legal authority* for a natural-language question. Covers four
+document families: case opinions, case key facts, statutes, and
+regulations. The test data is question–answer style rather than
+keyword-based or citation-based, mirroring how lawyers and legal
+agents actually reach for authority — a materially harder and more
+valuable target than keyword matching or exact citation lookup. We
+have not seen this benchmarked publicly by anyone else.
 
-### Why a citation-lookup benchmark, alongside
+### `citation-lookup` — identity resolution
 
-`citation-lookup` measures a different and lower-level capability: when a
-user or downstream system already produces a citation string — Bluebook
-canonical, state-legislature variant, or noisy transformation of either
-— does the provider resolve it to the correct authority? Every
-legal-tech agent that generates citations also has to *verify* them,
-and every retrieval system that ranks over free-form questions still
-needs a clean identity path when a citation is the query.
+Measures a lower-level, upstream capability: when a user or downstream
+system already produces a citation string — Bluebook canonical,
+state-legislature variant, or noisy transformation of either — does
+the provider resolve it to the correct authority? Every legal-tech
+agent that generates citations also has to *verify* them, and every
+retrieval system that ranks over free-form questions still needs a
+clean identity path when a citation is the query.
 
-Existing public tooling narrows quickly. CourtListener's citation-lookup
-endpoint and the open-source `eyecite` library both cover **opinion
-citations only** — statute and regulation lookup falls outside their
-scope, and neither systematically measures noisy-variant recovery. This
-suite covers all four document families (federal cases, state cases,
-statutes, regulations) with identity-based Recall@1 as the primary
-metric.
+Existing public tooling narrows quickly. CourtListener's citation-
+lookup endpoint and the open-source `eyecite` library both cover
+**opinion citations only** — statute and regulation lookup falls
+outside their scope, and neither systematically measures noisy-variant
+recovery. This suite covers all four document families (federal
+cases, state cases, statutes, regulations) with identity-based
+Recall@1 as the primary metric.
 
-Noise coverage is also broader than "user typos." Beyond dropped
+Noise coverage is broader than "user typos." Beyond dropped
 punctuation, case toggling, section-marker swaps, character-level
 typos, and spell-outs, the dataset exercises **state-legislature
 variants** that diverge from Bluebook — the abbreviations state
@@ -46,6 +74,20 @@ state sites. Examples: `N.J.S.A.` vs `N.J. Stat. Ann.`, `RSMo` vs
 `Mo. Rev. Stat.`, `KRS` vs `Ky. Rev. Stat. Ann.`, `NYCRR` vs `N.Y.
 Comp. Codes R. & Regs.`. Statutes and regulations especially benefit
 from this coverage; case reporters standardize on Bluebook naturally.
+
+### Reproducibility and transparency
+
+Vendor stochasticity (LLM sampling, tool-use nondeterminism,
+model-snapshot floating) means no two runs are byte-identical. The
+manifest captures the axes so distributions stay directly comparable:
+`manifest.json` pins the harness commit, config bytes, and dataset
+digests, and every published bundle carries per-file checksums for
+the row-level evidence. See
+[Manifest And Reproducibility](#manifest-and-reproducibility) for the
+mechanism, [`docs/adapter-contracts.md`](docs/adapter-contracts.md#reproducibility-model)
+for what "reproducible" means at each layer, and
+[Verifying releases](#verifying-releases) for how to check that the
+harness code itself was built from this repo at the tagged commit.
 
 ## Suite status
 
