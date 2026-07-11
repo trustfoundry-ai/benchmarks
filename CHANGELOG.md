@@ -6,9 +6,9 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 Ships the second benchmark suite — `citation-lookup` — as first-class
 published numbers alongside `trustfoundry-legal-search`. Datasets,
-adapter, scorer, provider configs, and CourtListener provider adapter
-land together with 9 verified TrustFoundry result bundles. Root README
-is reframed around the general legal-tech benchmarking mission rather
+adapter, scorer, provider configs, and a second provider adapter land
+together with 9 verified TrustFoundry result bundles. Root README is
+reframed around the general legal-tech benchmarking mission rather
 than TrustFoundry-platform-specific evaluations.
 
 ### Added
@@ -26,14 +26,14 @@ than TrustFoundry-platform-specific evaluations.
 - **New `variations` difficulty tier** on statutes + regulations. Tests
   state-legislature abbreviations that state code sites actually publish
   (`N.J.S.A.`, `RSMo`, `KRS`, `OCGA`, `NYCRR`, `MCL`, `RCW`, `V.T.C.A.`,
-  and 25+ others). Both Bluebook and variations resolve through
-  eyecite-ttf's deterministic regex path; TF hits 100% Recall@1 on every
-  variations row across all four datasets. Cases carry bluebook + noisy
-  only — case reporters are federal-standardized.
-- **`courtlistener-citation-lookup` provider adapter.** Wraps CourtListener
-  v4 `/api/rest/v4/citation-lookup/` — a distinct endpoint from CL's
-  opinion-search API — with auth-tier rate-limit detection, checkpointing,
-  and quota-aware backoff. Ships
+  and 25+ others). Both Bluebook and variations forms are regex-
+  recognized; TF hits 100% Recall@1 on every variations row across all
+  four datasets. Cases carry bluebook + noisy only — case reporters are
+  federal-standardized.
+- **`courtlistener-citation-lookup` provider adapter.** Wraps
+  CourtListener v4 `/api/rest/v4/citation-lookup/` — a distinct endpoint
+  from the opinion-search adapter — with auth-tier rate-limit detection,
+  checkpointing, and quota-aware backoff. Ships
   `configs/providers/courtlistener-citation-lookup.json`.
 - **9 published result bundles** under
   [`results/citation-lookup/2026-07-11/`](results/citation-lookup/2026-07-11/):
@@ -61,8 +61,8 @@ than TrustFoundry-platform-specific evaluations.
 - **`suites/citation-lookup/README.md`** — dataset table now documents
   all 5 datasets (adds `cases-state`), 3-tier difficulty taxonomy with
   concrete state-variant examples, updated row counts (91+59+273 for
-  statutes, 89+21+267 for regs), and framing note that CL's citation-
-  lookup endpoint + open-source `eyecite` cover opinions only.
+  statutes, 89+21+267 for regs), and a note that adapter scope varies
+  by supported input type.
 
 ### Fixed
 

@@ -57,13 +57,13 @@ agent that generates citations also has to *verify* them, and every
 retrieval system that ranks over free-form questions still needs a
 clean identity path when a citation is the query.
 
-Existing public tooling narrows quickly. CourtListener's citation-
-lookup endpoint and the open-source `eyecite` library both cover
-**opinion citations only** — statute and regulation lookup falls
-outside their scope, and neither systematically measures noisy-variant
-recovery. This suite covers all four document families (federal
-cases, state cases, statutes, regulations) with identity-based
-Recall@1 as the primary metric.
+Available public tooling for this task is narrower than one might
+expect. Systematic coverage of statute + regulation citations (not
+just case opinions) and of user-typed noisy variants (not just
+clean Bluebook input) is where existing options tend to fall short.
+This suite covers all four document families (federal cases, state
+cases, statutes, regulations) with identity-based Recall@1 as the
+primary metric.
 
 Noise coverage is broader than "user typos." Beyond dropped
 punctuation, case toggling, section-marker swaps, character-level

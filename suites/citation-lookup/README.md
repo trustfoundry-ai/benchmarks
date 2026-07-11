@@ -1,6 +1,6 @@
 # Citation Lookup
 
-This suite measures how well citation-lookup APIs resolve a user-entered citation string to the correct underlying document. Each row carries a query string — a Bluebook canonical, a state-legislature variant, or a noisy sloppify transformation — and the identifiers of the expected document. The suite is provider-agnostic — any adapter that returns ranked candidate documents can be scored on the same rows with the same match logic.
+This suite measures how well citation-lookup APIs resolve a user-entered citation string to the correct underlying document. Each row carries a query string — a Bluebook canonical, a state-legislature variant, or a noisy transformation — and the identifiers of the expected document. The suite is provider-agnostic — any adapter that returns ranked candidate documents can be scored on the same rows with the same match logic.
 
 The point is to make one number comparable across providers: **did the correct document rank first for a citation the user typed exactly as it appears in the wild?**
 
@@ -11,7 +11,7 @@ The point is to make one number comparable across providers: **did the correct d
 | `trustfoundry-legal-search` (via [`configs/providers/trustfoundry-citation-lookup.json`](../../configs/providers/trustfoundry-citation-lookup.json)) | TrustFoundry public search API with `model_type=citation_search` and the geo state filter disabled | cases, cases-state, statutes, regulations, negatives |
 | `courtlistener-citation-lookup` | CourtListener v4 `/api/rest/v4/citation-lookup/` — a dedicated citation-parse endpoint distinct from CL's opinion search | cases, cases-state, negatives |
 
-CourtListener's citation-lookup endpoint (and the open-source `eyecite` library it's built on) only covers case law, so statutes and regulations are TrustFoundry-only.
+Adapter scope varies: some adapters accept only case-citation inputs, so the statutes + regulations datasets require an adapter that supports those (e.g. `trustfoundry-legal-search`). See each adapter's own doc for the exact scope.
 
 ## Datasets
 
@@ -34,7 +34,7 @@ The 200-row subsets are deterministic — build them locally with `node scripts/
 Each positive row is tagged with one of three tiers:
 
 - **`bluebook`** — the citation string is Bluebook-canonical (as it would appear in a well-edited brief).
-- **`variations`** — a state-legislature abbreviation that the state's own code site publishes (e.g. `N.J.S.A. 17:12B-138` for `N.J. Stat. Ann. § 17:12B-138`, `RSMo § 566.030` for `Mo. Rev. Stat. § 566.030`, `2 CCR § 20204` for `Cal. Code Regs. tit. 2, § 20204`, `NYCRR tit. 11, § 54.12` for `N.Y. Comp. Codes R. & Regs. tit. 11, § 54.12`). Statutes + regulations only — case reporters are federal-standardized so cases don't carry this tier. These forms are regex-recognized by eyecite-ttf; a lookup provider that resolves the Bluebook shape should resolve the state variant too.
+- **`variations`** — a state-legislature abbreviation that the state's own code site publishes (e.g. `N.J.S.A. 17:12B-138` for `N.J. Stat. Ann. § 17:12B-138`, `RSMo § 566.030` for `Mo. Rev. Stat. § 566.030`, `2 CCR § 20204` for `Cal. Code Regs. tit. 2, § 20204`, `NYCRR tit. 11, § 54.12` for `N.Y. Comp. Codes R. & Regs. tit. 11, § 54.12`). Statutes + regulations only — case reporters are federal-standardized so cases don't carry this tier. A lookup provider that resolves the Bluebook shape should resolve the state variant too, since both forms are canonically recognized by public citation-parsing tooling.
 - **`noisy`** — a common user-input perturbation is applied to the Bluebook citation: casing changes, section-marker substitution or removal, whitespace mangling, dropped periods, OCR-style character noise, and similar. One perturbation per row. This is the mode users type in the wild.
 
 Negatives are unlabeled — they carry a `negative_category` (`phone`, `date_iso`, `address`, `digits_only`, `single_word_non_reporter`, …) so the false-positive rate can be stratified.
