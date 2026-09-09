@@ -1,0 +1,9 @@
+{
+  "_comment": "TrustFoundry public API search provider for case-name lookup. model_type=case_name is the dedicated case-name lookup lane; it returns a ranked, deduplicated page of the closest matching case names rather than a single exact answer. state_filter_enabled=true because case-name search requires a jurisdiction: the API rejects a case_name request with no `state`, exactly as it does for the four question-shaped model types.",
+  "provider": "trustfoundry-legal-search",
+  "endpoint": "https://api.trustfoundry.ai/public/v1/search",
+  "api_key_env": "TF_API_KEY",
+  "request_timeout_ms": 60000,
+  "model_type": "case_name",
+  "state_filter_enabled": true
+}

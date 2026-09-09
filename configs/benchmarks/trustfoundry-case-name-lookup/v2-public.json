@@ -1,0 +1,15 @@
+{
+  "_comment": [
+    "THE PUBLISHED SET. 15 categories x 295 pairs x 2 arms = 8,850 rows: 4,425 distinct gold cases, each queried twice -- once under a perturbed caption, once as its own unperturbed control.",
+    "",
+    "Equal allocation is deliberate: it makes the macro-average and the pooled rate the same number, so there is no weighting choice to defend and no way to move the headline by re-weighting. It is a chosen allocation, not an observed user distribution, and therefore not a forecast of production accuracy.",
+    "",
+    "Run it freely -- that is the point. It was measured once while clean to produce the published number, and after publication it drifts into a tuning set as people iterate against it. That is the normal lifecycle of a published benchmark, not a defect.",
+    "",
+    "Pair it with v2-negatives.json. A recall number reported without the invariant population is the half that flatters."
+  ],
+  "benchmarkId": "trustfoundry-case-name-lookup",
+  "datasetPath": "data/trustfoundry-case-name-lookup/v2-public.jsonl",
+  "datasetLabel": "trustfoundry-case-name-lookup-v2-public",
+  "scorer": "trustfoundry-case-name-lookup"
+}

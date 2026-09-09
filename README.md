@@ -24,12 +24,13 @@ The public benchmarks in this space measure adjacent capabilities. [LegalBench](
 | Suite | Status | Published numbers |
 |---|---|---|
 | `trustfoundry-legal-search` | Numbers published | 8 bundles under [`results/trustfoundry-legal-search/2026-07-05/`](results/trustfoundry-legal-search/2026-07-05/) (200-row and 5k-row × case-questions / key-facts / laws / regs) |
+| `trustfoundry-case-name-lookup` | Numbers published | 2 bundles under [`results/trustfoundry-case-name-lookup/2026-09-09/`](results/trustfoundry-case-name-lookup/2026-09-09/) (8,850-row public set, 50-row negatives set) |
 
 "Numbers published" means a scored result bundle exists under [`results/`](results/) with checksummed row-level evidence and passes `pnpm verify:results`.
 
 ## Latest Benchmarks
 
-These are the latest canonical benchmark runs in this repository. Dataset labels link to the raw and scored result bundles used to calculate each row; each checked-in bundle includes `manifest.json`, `checksums.txt`, scored results, and row-level raw evidence. Previous runs (if any) live alongside the latest under the same suite directory — browse `results/trustfoundry-legal-search/` and its date subdirectories to see the historical set.
+These are the latest canonical benchmark runs in this repository. Dataset labels link to the raw and scored result bundles each row's score is computed from; each checked-in bundle includes `manifest.json`, `checksums.txt`, scored results, and row-level raw evidence. Every dated run lives alongside the others under the same suite directory — browse `results/trustfoundry-legal-search/` or `results/trustfoundry-case-name-lookup/` and their date subdirectories for the full set.
 
 <table>
   <thead>
@@ -98,11 +99,52 @@ Latest full 5k runs (2026-07-05; provider failures 0 for every row):
 
 </details>
 
+<table>
+  <thead>
+    <tr>
+      <th colspan="7" align="left">TrustFoundry Case-Name Lookup</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th>Dataset</th>
+      <th>hit@1</th>
+      <th>hit@10</th>
+      <th>MRR</th>
+      <th>Latency (p50)</th>
+      <th>Latency (p95)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2026-09-09</td>
+      <td><a href="results/trustfoundry-case-name-lookup/2026-09-09/public/8850/">8850 case-name queries</a></td>
+      <td>0.9331</td>
+      <td>0.9584</td>
+      <td>0.9437</td>
+      <td>406 ms</td>
+      <td>511 ms</td>
+    </tr>
+  </tbody>
+</table>
+
+<details>
+<summary>TrustFoundry Case-Name Lookup details</summary>
+
+Latest full run (2026-09-09; provider failures 0 for every row; latency measured at 4 concurrent requests):
+
+- Public set: hit@1 0.9331 (macro-averaged across 15 categories, 295 pairs each); hit@3 0.9544; hit@5 0.9584; hit@10 0.9584; MRR 0.9437; wrong-name rate 0.0943; latency p50 406 ms, p95 511 ms. [Results](results/trustfoundry-case-name-lookup/2026-09-09/public/8850/).
+- Negatives set: 50 fabricated case names, false-positive rate 0.84. [Results](results/trustfoundry-case-name-lookup/2026-09-09/negatives/50/).
+
+See the suite's [Published numbers](suites/trustfoundry-case-name-lookup/README.md#published-numbers) section for the per-category breakdown and the paired perturbed/control comparison.
+
+</details>
+
 For full runs with large raw artifacts, raw rows may be stored as `raw.jsonl.gz`; `pnpm benchmark verify-result <bundle>` reads the manifest path directly.
 
 ## Suites
 
 - [TrustFoundry Legal Search](suites/trustfoundry-legal-search/README.md): legal search recall over public 5,000-row case-question, key-fact, law, and regulation datasets.
+- [TrustFoundry Case-Name Lookup](suites/trustfoundry-case-name-lookup/README.md): can a backend find a case when the user knows its name but not its citation? 8,850 rows across 15 categories of name variation — misspellings, abbreviations, reversed parties, a single party — each equally weighted and each paired against its own unperturbed control.
 
 ## Setup
 

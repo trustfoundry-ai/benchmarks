@@ -332,3 +332,58 @@ test('raw row round-trip: old-style rows without cl_cluster_id reconstruct as nu
   const { cases } = reconstructFromRawRows(rawRows);
   assert.equal(cases[0].metadata.expected.cl_cluster_id, null);
 });
+
+test('raw row round-trip carries adapter-declared expected fields', () => {
+  // The fixed `expected` block is shaped for single-citation gold. A suite whose
+  // gold does not fit that shape declares `publishedExpectedFields`, and those
+  // must survive publication or a re-score of the bundle rebuilds every row with
+  // no gold. That failure is silent -- every metric simply reads 0 -- which is
+  // why this is a test rather than a comment.
+  const benchmarkCase = {
+    caseId: 'c-1',
+    prompt: 'Roe v. Wade',
+    metadata: {
+      expected: {
+        kind: 'positive',
+        gold_citations: [{ canonical_citation: '410 U.S. 113', alternates: ['93 S. Ct. 705'] }],
+        case_name: 'Roe v. Wade',
+        name_transform: 'party_misspell',
+        tier: 'qualified',
+        secret_internal_field: 'must-not-be-published'
+      }
+    }
+  };
+
+  const [row] = buildRawRows({
+    cases: [benchmarkCase],
+    providerResults: [{ caseId: 'c-1', status: 'completed' }],
+    caseScores: [{ caseId: 'c-1', status: 'scored' }],
+    publishedExpectedFields: ['gold_citations', 'case_name', 'name_transform', 'tier']
+  });
+
+  assert.deepEqual(row.expected.gold_citations, benchmarkCase.metadata.expected.gold_citations);
+  assert.equal(row.expected.case_name, 'Roe v. Wade');
+  assert.equal(row.expected.name_transform, 'party_misspell');
+  assert.equal(row.expected.tier, 'qualified');
+
+  // Undeclared fields are NOT published. The declaration is an allowlist, not a
+  // convenience -- `metadata.expected` can hold internal identifiers, and a
+  // published bundle is a public artifact.
+  assert.equal(row.expected.secret_internal_field, undefined);
+
+  const { cases: restoredCases } = reconstructFromRawRows([row]);
+  const restored = restoredCases[0].metadata.expected;
+  assert.deepEqual(restored.gold_citations, benchmarkCase.metadata.expected.gold_citations);
+  assert.equal(restored.case_name, 'Roe v. Wade');
+  assert.equal(restored.name_transform, 'party_misspell');
+  assert.equal(restored.tier, 'qualified');
+});
+
+test('raw row round-trip: no declaration publishes no extra fields (regression)', () => {
+  const [row] = buildRawRows({
+    cases: [{ caseId: 'c-2', prompt: 'q', metadata: { expected: { kind: 'positive', gold_citations: [] } } }],
+    providerResults: [{ caseId: 'c-2', status: 'completed' }],
+    caseScores: [{ caseId: 'c-2', status: 'scored' }]
+  });
+  assert.equal(row.expected.gold_citations, undefined);
+});

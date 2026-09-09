@@ -38,8 +38,7 @@ if (!bundles.length) {
 for (const bundle of bundles) {
   const verification = await verifyResultBundle({
     repoRoot,
-    bundleDir: bundle,
-    verifyInputs: false
+    bundleDir: bundle
   });
   console.log(`verified ${verification.bundleDir} (${verification.rows} rows)`);
 }

@@ -422,12 +422,20 @@ export declare function buildRawRow(args: {
   benchmarkCase: BenchmarkCase;
   providerResult: CaseResult;
   caseScore: CaseScore | null;
+  /**
+   * Keys to copy from `benchmarkCase.metadata.expected` into the published
+   * row's `expected` block. An allowlist, not a convenience: `metadata.expected`
+   * can hold internal identifiers and a published bundle is a public artifact.
+   * Declared by the benchmark adapter as `publishedExpectedFields`.
+   */
+  publishedExpectedFields?: string[];
 }): RawRow;
 
 export declare function buildRawRows(args: {
   cases: BenchmarkCase[];
   providerResults: CaseResult[];
   caseScores: CaseScore[];
+  publishedExpectedFields?: string[];
 }): RawRow[];
 
 export declare function reconstructPairFromRawRow(row: RawRow): {

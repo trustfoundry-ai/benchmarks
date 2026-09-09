@@ -115,7 +115,18 @@ function normalizedResults(providerResult) {
 // `metadata.document_type`, `metadata.difficulty`, `metadata.kind`,
 // `metadata.negative_category`, `metadata.geo_level_2`, and
 // `expected.kind` / `expected.negative_category` for citation-lookup.
-export function buildRawRow({ benchmarkCase, providerResult, caseScore }) {
+export function buildRawRow({
+  benchmarkCase,
+  providerResult,
+  caseScore,
+  publishedExpectedFields = []
+}) {
+  const expectedSource = benchmarkCase.metadata?.expected ?? {};
+  const publishedExpected = {};
+  for (const field of publishedExpectedFields) {
+    if (expectedSource[field] !== undefined) publishedExpected[field] = expectedSource[field];
+  }
+
   const parsed = safeParseJson(providerResult?.finalOutputText) ?? {};
   return {
     schema_version: 'trustfoundry.benchmarks.raw-row.v1',
@@ -139,6 +150,14 @@ export function buildRawRow({ benchmarkCase, providerResult, caseScore }) {
       geo_level_2: benchmarkCase.metadata?.geo_level_2 ?? null
     },
     expected: {
+      // Suite-declared fields first, so the fixed block below always wins on a
+      // name collision. A benchmark adapter declares `publishedExpectedFields`
+      // when its gold does not fit the fixed shape -- case-name gold, for
+      // instance, is a target CAPTION plus the category, arm, and
+      // jurisdiction a per-category table is built from, not a single
+      // citation. Without this, re-scoring a published bundle rebuilds every
+      // row with no gold.
+      ...publishedExpected,
       document_uuid: benchmarkCase.metadata?.document_uuid ?? null,
       canonical_citation: benchmarkCase.metadata?.expected?.canonical_citation ?? null,
       alternates: benchmarkCase.metadata?.expected?.alternates ?? [],
@@ -183,14 +202,20 @@ export function buildRawRow({ benchmarkCase, providerResult, caseScore }) {
 
 // Backward-compat array form. Prefer streaming via buildRawRow + a writer
 // when row counts are large.
-export function buildRawRows({ cases, providerResults, caseScores }) {
+export function buildRawRows({
+  cases,
+  providerResults,
+  caseScores,
+  publishedExpectedFields = []
+}) {
   const providerByCase = new Map(providerResults.map((row) => [row.caseId, row]));
   const scoreByCase = new Map(caseScores.map((score) => [score.caseId, score]));
   return cases.map((benchmarkCase) =>
     buildRawRow({
       benchmarkCase,
       providerResult: providerByCase.get(benchmarkCase.caseId) ?? null,
-      caseScore: scoreByCase.get(benchmarkCase.caseId) ?? null
+      caseScore: scoreByCase.get(benchmarkCase.caseId) ?? null,
+      publishedExpectedFields
     })
   );
 }
@@ -227,6 +252,10 @@ export function reconstructPairFromRawRow(row) {
       state: row.expected?.state ?? row.request?.state ?? null,
       document_uuid: row.expected?.document_uuid ?? null,
       expected: {
+        // Anything the producing adapter declared via `publishedExpectedFields`
+        // rides through here. Spread FIRST so the explicitly-mapped fields below
+        // remain authoritative.
+        ...(row.expected ?? {}),
         kind: expectedKind,
         canonical_citation: row.expected?.canonical_citation ?? null,
         alternates: row.expected?.alternates ?? [],
@@ -358,12 +387,29 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
     }
   }
 
+  // A benchmark adapter may declare which of its `expected` fields must survive
+  // into a published bundle. Resolution is best-effort: a bundle can be
+  // published for a benchmark whose adapter is not registered in this process,
+  // and that should not be fatal -- it just means no extra fields are carried.
+  let publishedExpectedFields = [];
+  try {
+    const benchmarkAdapter = getAdapter('benchmarks', manifest?.benchmark?.id);
+    publishedExpectedFields = benchmarkAdapter?.publishedExpectedFields ?? [];
+  } catch {
+    publishedExpectedFields = [];
+  }
+
   const scorer = getAdapter('scorers', resolveScorerId({ manifest }));
   const scoreResult = await scorer.scoreStream({
     manifest,
     pairs: providerPairs(),
     onCaseScored: async ({ benchmarkCase, providerResult, caseScore }) => {
-      const rawRow = buildRawRow({ benchmarkCase, providerResult, caseScore });
+      const rawRow = buildRawRow({
+        benchmarkCase,
+        providerResult,
+        caseScore,
+        publishedExpectedFields
+      });
       await rawWriter.write(rawRow);
       rowCount += 1;
     }
