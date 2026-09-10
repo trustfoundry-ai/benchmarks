@@ -130,8 +130,8 @@ test('mergeRuns concatenates cases and results, then re-scores', async () => {
     assert.equal(result.chunkCount, 2);
     assert.equal(result.scores.summary.total, 5);
     assert.equal(result.scores.summary.scored, 5);
-    // hitAt1 is a fraction 0..1, not a count. All 5 cases hit at rank 1 → 1.0.
-    assert.equal(result.scores.summary.hitAt1, 1);
+    // hit@1 is a fraction 0..1, not a count. All 5 cases hit at rank 1 → 1.0.
+    assert.equal(result.scores.summary.overall.hit_at['hit@1'], 1);
     const mergedManifest = JSON.parse(
       await fs.readFile(path.join(outDir, 'manifest.json'), 'utf8')
     );
@@ -220,7 +220,7 @@ test('mergeRuns dedupes by caseId with last-wins (retry replaces failure)', asyn
     });
     assert.equal(result.caseCount, 1);
     assert.equal(result.scores.summary.providerFailures, 0);
-    assert.equal(result.scores.summary.hitAt1, 1); // 1 case, 100% hit rate
+    assert.equal(result.scores.summary.overall.hit_at['hit@1'], 1); // 1 case, 100% hit rate
   } finally {
     await fs.rm(tmp, { recursive: true, force: true });
   }

@@ -53,7 +53,8 @@ the scores look.
 
 With that confirmed, compare your `runs/<label>/scores.json` summary against
 the bundle's `result.json` summary. `summary.overall.hit_at['hit@1']` and
-`summary.overallScore` (the headline score) are the numbers to check first.
+`summary.headline` (the macro- and pooled-averaged hit rate at the scorer's
+headline cutoff, with a Wilson interval) are the numbers to check first.
 
 ## Two things to assert on your own run
 

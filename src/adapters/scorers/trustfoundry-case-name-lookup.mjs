@@ -654,7 +654,7 @@ function macroHeadline(byAxis, cutoff) {
   const hits = Object.values(perCategory).reduce((sum, e) => sum + e[`hit@${cutoff}`] * e.n, 0);
   const macro = rates.length ? rates.reduce((a, b) => a + b, 0) / rates.length : 0;
   return {
-    metric: `macro_hit_at_${cutoff}`,
+    metric: `hit@${cutoff}`,
     macro,
     pooled: totalN ? hits / totalN : 0,
     n_categories: rates.length,
@@ -849,7 +849,6 @@ function buildSummary(caseScores, { manifest, cutoffs, headlineCutoff }) {
     ...aggregatePositives(headlinePositives, cutoffs),
     all_axes: aggregatePositives(positives, cutoffs)
   };
-  const headlineScore = overall.hit_at[`hit@${headlineCutoff}`] ?? 0;
 
   const total = caseScores.length;
   const summary = {
@@ -866,9 +865,6 @@ function buildSummary(caseScores, { manifest, cutoffs, headlineCutoff }) {
     // between "scored" and "failed" without a call site needing to know
     // which one.
     notApplicable: total - scored.length - failed.length,
-    overallScore: headlineScore,
-    supportedScore: headlineScore,
-    mrr: overall.mrr,
     execution: {
       runId: manifest?.runId ?? manifest?.run_id ?? null,
       benchmark: manifest?.benchmark ?? null,
@@ -914,10 +910,6 @@ function buildSummary(caseScores, { manifest, cutoffs, headlineCutoff }) {
   // letting the rate silently read as computed over every row.
   summary.wrong_name = wrongNameRateFields(headlinePositives);
 
-  for (const k of cutoffs) {
-    summary[`hitAt${k}`] = overall.hit_at[`hit@${k}`];
-    summary[`dedupedHitAt${k}`] = overall.deduped_hit_at[`hit@${k}`];
-  }
   return summary;
 }
 

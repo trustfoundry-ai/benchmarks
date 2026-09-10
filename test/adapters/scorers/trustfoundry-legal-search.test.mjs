@@ -121,11 +121,11 @@ test('scores by expected document UUID or citation and reports hit@k/MRR', async
   assert.equal(scores.caseScores[0].hitRank, 2);
   assert.equal(scores.caseScores[1].hitRank, 1);
   assert.equal(scores.caseScores[2].hitRank, 6);
-  assert.equal(scores.summary.hitAt1, 1 / 3);
-  assert.equal(scores.summary.hitAt5, 2 / 3);
-  assert.equal(scores.summary.hitAt10, 1);
-  assert.equal(scores.summary.hitAt25, 1);
-  assert.equal(scores.summary.mrr, 0.5555);
+  assert.equal(scores.summary.overall.hit_at['hit@1'], 1 / 3);
+  assert.equal(scores.summary.overall.hit_at['hit@5'], 2 / 3);
+  assert.equal(scores.summary.overall.hit_at['hit@10'], 1);
+  assert.equal(scores.summary.overall.hit_at['hit@25'], 1);
+  assert.equal(scores.summary.overall.mrr, 0.5555);
   assert.deepEqual(scores.summary.server_response_duration_ms, {
     n: 3,
     min: 80,
@@ -310,12 +310,12 @@ test('scoreStream honors manifest.scorer.settings.cutoffs and headline_cutoff', 
   assert.equal(scores.caseScores[0].hitAt50, true);
   assert.equal(scores.caseScores[0].hitAt10, false);
   assert.equal(scores.caseScores[0].hitAt100, true);
-  assert.equal(scores.summary.hitAt100, 1);
-  assert.equal(scores.summary.hitAt50, 1);
-  assert.equal(scores.summary.hitAt10, 0.5);
-  // hitAt5, hitAt25 not requested → not present
-  assert.equal('hitAt5' in scores.summary, false);
-  assert.equal('hitAt25' in scores.summary, false);
+  assert.equal(scores.summary.overall.hit_at['hit@100'], 1);
+  assert.equal(scores.summary.overall.hit_at['hit@50'], 1);
+  assert.equal(scores.summary.overall.hit_at['hit@10'], 0.5);
+  // hit@5, hit@25 not requested → not present
+  assert.equal('hit@5' in scores.summary.overall.hit_at, false);
+  assert.equal('hit@25' in scores.summary.overall.hit_at, false);
 });
 
 test('config argument overrides manifest.scorer.settings (private-runner path)', async () => {
@@ -447,4 +447,47 @@ test('summary.headline reports macro, pooled and a Wilson interval', () => {
   assert.equal(summary.headline.macro, 0.5);
   assert.ok(summary.headline.ci95[0] < 0.5 && summary.headline.ci95[1] > 0.5);
   assert.ok('laws' in summary.headline.per_category);
+});
+
+test('the summary carries no legacy top-level hit keys', () => {
+  const scores = [
+    {
+      status: 'scored',
+      validGold: true,
+      datasetName: 'laws',
+      hitRank: 1,
+      reciprocalRank: 1,
+      resultCount: 3
+    }
+  ];
+  const summary = scorerInternals.buildSummary(scores, { cutoffs: [1, 5, 10, 25], headlineCutoff: 1 });
+  for (const key of ['hitAt1', 'hitAt3', 'hitAt5', 'hitAt10', 'hitAt25', 'overallScore', 'supportedScore']) {
+    assert.equal(key in summary, false, `legacy key '${key}' is still emitted`);
+  }
+  assert.ok(summary.overall.hit_at['hit@1'] !== undefined);
+});
+
+test('breakdowns use snake_case keys', () => {
+  const scores = [
+    {
+      status: 'scored',
+      validGold: true,
+      datasetName: 'laws',
+      docType: 'case',
+      field: 'questions',
+      modelType: 'case_question',
+      split: 'test',
+      state: 'MI',
+      hitRank: 1,
+      reciprocalRank: 1,
+      resultCount: 3
+    }
+  ];
+  const summary = scorerInternals.buildSummary(scores, { cutoffs: [1, 5, 10, 25], headlineCutoff: 1 });
+  for (const key of ['by_dataset', 'by_doc_type', 'by_field', 'by_model_type', 'by_split', 'by_state']) {
+    assert.ok(key in summary, `missing ${key}`);
+  }
+  for (const key of ['byDataset', 'byDocType', 'byField', 'byModelType', 'bySplit', 'byState']) {
+    assert.equal(key in summary, false, `camelCase ${key} still emitted`);
+  }
 });

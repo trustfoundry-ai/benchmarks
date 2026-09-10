@@ -473,6 +473,6 @@ test('Claude-normalized Bluebook citation output scores with trustfoundry-legal-
   });
 
   assert.equal(scores.caseScores[0].hitRank, 1);
-  assert.equal(scores.summary.hitAt1, 1);
-  assert.equal(scores.summary.hitAt25, 1);
+  assert.equal(scores.summary.overall.hit_at['hit@1'], 1);
+  assert.equal(scores.summary.overall.hit_at['hit@25'], 1);
 });

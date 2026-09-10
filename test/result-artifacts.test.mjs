@@ -103,7 +103,7 @@ test('publishes and verifies result bundles, then detects edited summaries', asy
   const resultPath = path.join(outDir, 'result.json');
   const manifestPath = path.join(outDir, 'manifest.json');
   const result = await readJson(resultPath);
-  result.summary.hitAt1 = 0;
+  result.summary.overall.hit_at['hit@1'] = 0;
   await writeJson(resultPath, result);
   const manifest = await readJson(manifestPath);
   manifest.artifacts.result.sha256 = await sha256File(resultPath);

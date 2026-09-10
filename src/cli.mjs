@@ -100,15 +100,16 @@ function printAdapters() {
 }
 
 function runSummaryLine(summary) {
+  const hitAt = summary.overall?.hit_at ?? {};
   return {
     total: summary.total,
     scored: summary.scored,
     providerFailures: summary.providerFailures,
-    hitAt1: summary.hitAt1,
-    hitAt5: summary.hitAt5,
-    hitAt10: summary.hitAt10,
-    hitAt25: summary.hitAt25,
-    mrr: summary.mrr,
+    hit_at: hitAt,
+    mrr: summary.overall?.mrr ?? null,
+    ...(summary.headline
+      ? { headline: { macro: summary.headline.macro, pooled: summary.headline.pooled, ci95: summary.headline.ci95 } }
+      : {}),
     ...(summary.latency_ms ? { latency_ms: summary.latency_ms } : {}),
     ...(summary.server_response_duration_ms
       ? { server_response_duration_ms: summary.server_response_duration_ms }

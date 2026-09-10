@@ -203,7 +203,7 @@ Both entry points return:
   `'unscorable'` and `'provider_failure'` rows so downstream analysis
   keeps row alignment.
 - `summary` — the scorer-defined summary. Common fields:
-  `overallScore`, `supportedScore`, `headline{}` (metric bundle),
+  `overall{}` (`hit_at{}` / `mrr`), `headline{}` (metric bundle),
   `latency_ms{}` (percentiles), `execution{}` (runtime counters).
 - `metadata` — scorer id/version plus scorer-specific parameters
   (`cutoffs`, `headline_cutoff`, `extractionVersion`, ...). Anything
