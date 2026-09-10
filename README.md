@@ -1,11 +1,11 @@
 # TrustFoundry Benchmarks
 
 > **Status: Under active development (pre-1.0).**
-> Current release: **0.8.0**. This harness is being iterated on in
-> the open. Contracts, artifact schemas, and adapters may change
-> between minor versions until v1.0. Individual benchmark suites
-> carry their own maturity status — see the
-> [suite status](#suite-status) table below.
+> Latest release: **0.10.0** — see the [CHANGELOG](CHANGELOG.md) for what
+> has landed since. This harness is being iterated on in the open.
+> Contracts, artifact schemas, and adapters may change between minor
+> versions until v1.0. Individual benchmark suites carry their own
+> maturity status — see the [suite status](#suite-status) table below.
 
 This repository contains public benchmark harnesses for metrics TrustFoundry runs against its system. The goal is to make selected evaluations reproducible and extensible: you can rerun the same benchmark against TrustFoundry, inspect the row-level evidence behind the scores, or add another provider adapter for comparison.
 
