@@ -4,6 +4,7 @@ import {
   splitCitationList
 } from '../../core/citations.mjs';
 import { validateScorerCutoffsMatchImplementation } from '../../core/scorer-validators.mjs';
+import { wilsonInterval } from '../../core/stats.mjs';
 
 const VERSION = 'trustfoundry-legal-search-v1';
 const DEFAULT_CUTOFFS = [1, 5, 10, 25];
@@ -431,6 +432,40 @@ function grouped(caseScores, key, cutoffs, headlineCutoff) {
   return out;
 }
 
+// A macro-averaged headline over `datasetName` (`case-questions`, `key-facts`,
+// `laws`, `regs`), with a Wilson interval on the pooled rate -- the same
+// shape the case-name scorer's headline reports, so a reader compares the
+// two suites without learning a second convention.
+function buildHeadline(validSuccess, headlineCutoff) {
+  const metric = `hit@${headlineCutoff}`;
+  const byCategory = new Map();
+  for (const item of validSuccess) {
+    const key = item.datasetName ?? 'all';
+    if (!byCategory.has(key)) byCategory.set(key, []);
+    byCategory.get(key).push(item);
+  }
+  const per_category = {};
+  const rates = [];
+  let hits = 0;
+  for (const key of [...byCategory.keys()].sort()) {
+    const rows = byCategory.get(key);
+    const k = rows.filter((item) => Number.isFinite(item.hitRank) && item.hitRank <= headlineCutoff).length;
+    hits += k;
+    rates.push(k / rows.length);
+    per_category[key] = { n: rows.length, [metric]: k / rows.length, ci95: wilsonInterval(k, rows.length) };
+  }
+  const n = validSuccess.length;
+  return {
+    metric,
+    macro: rates.length ? rates.reduce((a, b) => a + b, 0) / rates.length : 0,
+    pooled: n ? hits / n : 0,
+    per_category,
+    ci95: wilsonInterval(hits, n),
+    n_categories: rates.length,
+    n_rows: n
+  };
+}
+
 function buildSummary(caseScores, { manifest = null, cutoffs, headlineCutoff } = {}) {
   const validSuccess = caseScores.filter((item) => item.status === 'scored' && item.validGold);
   const strict = caseScores.filter((item) => item.validGold);
@@ -454,6 +489,7 @@ function buildSummary(caseScores, { manifest = null, cutoffs, headlineCutoff } =
     },
     quality: qualityCounts(caseScores),
     latency_ms: latencySummary(successfulScores),
+    headline: buildHeadline(validSuccess, headlineCutoff),
     overall: aggregate(validSuccess, cutoffs),
     strict_overall: aggregate(strict, cutoffs),
     per_state: aggregateByState(validSuccess, cutoffs),

@@ -417,3 +417,34 @@ test('latency summary excludes provider failures and reports failure latency sep
     max: 180000
   });
 });
+
+test('summary.headline reports macro, pooled and a Wilson interval', () => {
+  const scores = [
+    {
+      status: 'scored',
+      validGold: true,
+      datasetName: 'laws',
+      hitRank: 1,
+      reciprocalRank: 1,
+      resultCount: 3,
+      hit_at: {}
+    },
+    {
+      status: 'scored',
+      validGold: true,
+      datasetName: 'laws',
+      hitRank: null,
+      reciprocalRank: 0,
+      resultCount: 3,
+      hit_at: {}
+    }
+  ];
+  const summary = scorerInternals.buildSummary(scores, { cutoffs: [1, 5, 10, 25], headlineCutoff: 1 });
+  assert.equal(summary.headline.metric, 'hit@1');
+  assert.equal(summary.headline.n_rows, 2);
+  assert.equal(summary.headline.n_categories, 1);
+  assert.equal(summary.headline.pooled, 0.5);
+  assert.equal(summary.headline.macro, 0.5);
+  assert.ok(summary.headline.ci95[0] < 0.5 && summary.headline.ci95[1] > 0.5);
+  assert.ok('laws' in summary.headline.per_category);
+});
