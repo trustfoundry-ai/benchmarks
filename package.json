@@ -52,6 +52,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "verify:results": "node scripts/verify-result-bundles.mjs",
     "check:provenance": "node scripts/check-bundle-provenance.mjs",
+    "check:smoke": "node scripts/check-smoke-baseline.mjs",
     "generate:readme": "node scripts/generate-readme-tables.mjs"
   },
   "engines": {
