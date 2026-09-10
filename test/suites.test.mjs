@@ -17,6 +17,11 @@ const schemaPath = path.join(
   'src/core/contracts/suite-manifest.schema.json'
 );
 
+// The repo's own suites/ and configs/benchmarks/ trees, used only by the
+// tests below that deliberately assert against real, committed content
+// (as opposed to every other test in this file, which builds fixtures).
+const repoRoot = packageRoot;
+
 async function withTempDir(runner) {
   const dir = await mkdtemp(path.join(tmpdir(), 'suites-test-'));
   try {
@@ -343,4 +348,76 @@ test('every path a fixture suite manifest names exists once touched', async () =
     }
     await resolveTarget({ repoRoot, suiteId: 'trustfoundry-demo-suite', targetId: 'demo-50' });
   });
+});
+
+// ---- real suite manifests ----
+//
+// Unlike every test above, these two assert against this repo's actual
+// suites/ and configs/benchmarks/ trees on purpose: their whole job is
+// inventory consistency between the two, which a fixture can't stand in for.
+
+test('listSuites against the real repo root returns both suites with their expected target ids', async () => {
+  const suites = await listSuites({ repoRoot });
+  const byId = Object.fromEntries(suites.map((suite) => [suite.id, suite]));
+
+  assert.deepEqual(
+    Object.keys(byId['trustfoundry-legal-search'].targets).sort(),
+    [
+      'case-questions-200',
+      'case-questions-5k',
+      'key-facts-200',
+      'key-facts-5k',
+      'laws-200',
+      'laws-5k',
+      'regs-200',
+      'regs-5k'
+    ]
+  );
+  assert.deepEqual(
+    Object.keys(byId['trustfoundry-case-name-lookup'].targets).sort(),
+    ['negatives-50', 'public-8850']
+  );
+});
+
+test('every benchmark config is claimed by exactly one suite target', async () => {
+  const { readdir } = await import('node:fs/promises');
+  const path = await import('node:path');
+  const suites = await listSuites({ repoRoot });
+
+  const claimed = new Map();
+  for (const suite of suites) {
+    for (const [targetId, target] of Object.entries(suite.targets)) {
+      const prior = claimed.get(target.benchmark);
+      assert.equal(
+        prior,
+        undefined,
+        `${target.benchmark} claimed by both ${prior} and ${suite.id}/${targetId}`
+      );
+      claimed.set(target.benchmark, `${suite.id}/${targetId}`);
+    }
+  }
+
+  // Vendor adapter examples are deliberately unclaimed; they are not suites.
+  const VENDOR_EXAMPLES = [
+    'anthropic-legal-search',
+    'exa-legal-search-aggregators-only',
+    'openai-legal-search',
+    'parallel-legal-search-aggregators-only',
+    'parallel-legal-search-primary-only'
+  ];
+
+  const benchRoot = path.join(repoRoot, 'configs', 'benchmarks');
+  for (const dir of await readdir(benchRoot)) {
+    if (VENDOR_EXAMPLES.includes(dir)) continue;
+    for (const file of await readdir(path.join(benchRoot, dir))) {
+      if (!file.endsWith('.json')) continue;
+      const rel = `configs/benchmarks/${dir}/${file}`;
+      assert.ok(
+        claimed.has(rel),
+        `${rel} is not claimed by any suite target. Either add it to a suite ` +
+          'manifest as a target, or, if it is an adapter example rather than a ' +
+          "suite, add its directory to this test's VENDOR_EXAMPLES allowlist."
+      );
+    }
+  }
 });

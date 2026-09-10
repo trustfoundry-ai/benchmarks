@@ -1,0 +1,16 @@
+{
+  "$comment": "Targets for the legal-search suite. Target ids are the identifier used by the CLI (--target), the container (BENCHMARK_CONFIG), the published bundle directory, and the latest.json key.",
+  "id": "trustfoundry-legal-search",
+  "title": "TrustFoundry Legal Search",
+  "status": "published",
+  "targets": {
+    "case-questions-200": { "benchmark": "configs/benchmarks/trustfoundry-legal-search/case-questions-200.json", "provider": "configs/providers/trustfoundry-legal-search.json", "scorer": "configs/scorers/trustfoundry-legal-search.json", "rows": 200, "tier": "smoke" },
+    "case-questions-5k": { "benchmark": "configs/benchmarks/trustfoundry-legal-search/case-questions-5k.json", "provider": "configs/providers/trustfoundry-legal-search.json", "scorer": "configs/scorers/trustfoundry-legal-search.json", "rows": 5000, "tier": "full", "headline": true },
+    "key-facts-200": { "benchmark": "configs/benchmarks/trustfoundry-legal-search/key-facts-200.json", "provider": "configs/providers/trustfoundry-legal-search.json", "scorer": "configs/scorers/trustfoundry-legal-search.json", "rows": 200, "tier": "smoke" },
+    "key-facts-5k": { "benchmark": "configs/benchmarks/trustfoundry-legal-search/key-facts-5k.json", "provider": "configs/providers/trustfoundry-legal-search.json", "scorer": "configs/scorers/trustfoundry-legal-search.json", "rows": 5000, "tier": "full", "headline": true },
+    "laws-200": { "benchmark": "configs/benchmarks/trustfoundry-legal-search/laws-200.json", "provider": "configs/providers/trustfoundry-legal-search.json", "scorer": "configs/scorers/trustfoundry-legal-search.json", "rows": 200, "tier": "smoke" },
+    "laws-5k": { "benchmark": "configs/benchmarks/trustfoundry-legal-search/laws-5k.json", "provider": "configs/providers/trustfoundry-legal-search.json", "scorer": "configs/scorers/trustfoundry-legal-search.json", "rows": 5000, "tier": "full", "headline": true },
+    "regs-200": { "benchmark": "configs/benchmarks/trustfoundry-legal-search/regs-200.json", "provider": "configs/providers/trustfoundry-legal-search.json", "scorer": "configs/scorers/trustfoundry-legal-search.json", "rows": 200, "tier": "smoke" },
+    "regs-5k": { "benchmark": "configs/benchmarks/trustfoundry-legal-search/regs-5k.json", "provider": "configs/providers/trustfoundry-legal-search.json", "scorer": "configs/scorers/trustfoundry-legal-search.json", "rows": 5000, "tier": "full", "headline": true }
+  }
+}
