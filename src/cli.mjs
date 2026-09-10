@@ -10,6 +10,7 @@ import {
   scoreRun
 } from './core/runner.mjs';
 import { defaultRegistry } from './core/registry.mjs';
+import { listSuites, parseTargetRef, resolveTarget } from './core/suites.mjs';
 
 // Operational defaults for the shipped CLI. The framework core has no
 // hardcoded default adapter; this CLI is the layer that names the
@@ -17,17 +18,20 @@ import { defaultRegistry } from './core/registry.mjs';
 // convenience. Consumers who wire their own adapter register it and
 // pass explicit --benchmark-config / --provider-config / --scorer-config
 // paths.
-const DEFAULT_BENCHMARK_CONFIG = 'configs/benchmarks/trustfoundry-legal-search/case-questions-200.json';
-const DEFAULT_PROVIDER_CONFIG = 'configs/providers/trustfoundry-legal-search.json';
-const DEFAULT_SCORER_CONFIG = 'configs/scorers/trustfoundry-legal-search.json';
-const DEFAULT_OUT_DIR = 'runs/trustfoundry-legal-search-case-questions-200';
+export const DEFAULT_BENCHMARK_CONFIG = 'configs/benchmarks/trustfoundry-legal-search/case-questions-200.json';
+export const DEFAULT_PROVIDER_CONFIG = 'configs/providers/trustfoundry-legal-search.json';
+export const DEFAULT_SCORER_CONFIG = 'configs/scorers/trustfoundry-legal-search.json';
+export const DEFAULT_OUT_DIR = 'runs/trustfoundry-legal-search-case-questions-200';
 
 function printHelp() {
   console.log(`TrustFoundry benchmarks
 
 Commands:
   adapters
-  run [--benchmark ID] [--provider ID] [--scorer ID]
+  targets
+  resolve-target <suite>/<target> [--json]
+  run [--target <suite>/<target>]
+      [--benchmark ID] [--provider ID] [--scorer ID]
       [--benchmark-config PATH] [--provider-config PATH] [--scorer-config PATH]
       [--out DIR] [--parallel N] [--limit N] [--offset N] [--run-id ID]
       [--shard-index N] [--shard-count N] [--retries N]
@@ -118,20 +122,82 @@ function runSummaryLine(summary) {
   };
 }
 
+// Resolves a `<suite>/<target>` reference to the config triple a run needs.
+// Shared by `resolve-target` and by `run --target`: both want the same
+// fail-fast behavior `resolveTarget` gives (unknown ids and missing config
+// paths both throw with the valid alternatives named), as opposed to
+// `listSuites`, which tolerates a missing config path because `targets` is
+// a listing, not a precondition check.
+async function resolveTargetOption(ref) {
+  const { suiteId, targetId } = parseTargetRef(ref);
+  const { target } = await resolveTarget({ repoRoot: repoRoot(), suiteId, targetId });
+  return {
+    benchmarkConfig: target.benchmark,
+    providerConfig: target.provider,
+    scorerConfig: target.scorer,
+    rows: target.rows,
+    bundle: targetId
+  };
+}
+
+async function resolveTargetCommand(positionals, options) {
+  const ref = positionals[0];
+  if (!ref) throw new Error('resolve-target requires <suite>/<target>');
+  const resolved = await resolveTargetOption(ref);
+  if (options.json) {
+    console.log(JSON.stringify(resolved, null, 2));
+    return;
+  }
+  for (const [key, value] of Object.entries(resolved)) console.log(`${key}=${value}`);
+}
+
+async function targetsCommand() {
+  for (const suite of await listSuites({ repoRoot: repoRoot() })) {
+    console.log(`${suite.id}  (${suite.status})`);
+    for (const [targetId, target] of Object.entries(suite.targets)) {
+      const tags = [target.tier, target.headline ? 'headline' : null].filter(Boolean).join(', ');
+      console.log(`  ${suite.id}/${targetId}  ${target.rows} rows${tags ? `  [${tags}]` : ''}`);
+    }
+  }
+}
+
+// Pure precedence resolution for `run`'s config triple and out dir, split
+// out from runCommand so it can be unit-tested without executeRun (no
+// network, no benchmark execution): given the raw CLI `options` and the
+// already-resolved `--target` (or `null` when none was given), it decides
+// what wins. `stringOption(...)` is what tells "flag given" apart from
+// "flag absent" — an explicit flag is always a non-empty string, so it
+// always outranks a value the registry resolved from `--target`, which in
+// turn outranks the operational default. Passing no target and no flags
+// reproduces today's DEFAULT_* / DEFAULT_OUT_DIR behavior unchanged.
+export function resolveRunConfig(options, resolved) {
+  return {
+    outDir: options.out ?? (resolved ? `runs/${resolved.bundle}` : DEFAULT_OUT_DIR),
+    benchmarkConfigPath:
+      stringOption(options['benchmark-config']) ?? resolved?.benchmarkConfig ?? DEFAULT_BENCHMARK_CONFIG,
+    providerConfigPath:
+      stringOption(options['provider-config']) ?? resolved?.providerConfig ?? DEFAULT_PROVIDER_CONFIG,
+    scorerConfigPath:
+      stringOption(options['scorer-config']) ?? resolved?.scorerConfig ?? DEFAULT_SCORER_CONFIG
+  };
+}
+
 async function runCommand(options) {
-  const out = options.out ?? DEFAULT_OUT_DIR;
+  const targetRef = stringOption(options.target);
+  const resolved = targetRef ? await resolveTargetOption(targetRef) : null;
+  const { outDir, benchmarkConfigPath, providerConfigPath, scorerConfigPath } = resolveRunConfig(
+    options,
+    resolved
+  );
   const result = await executeRun({
     repoRoot: repoRoot(),
-    outDir: out,
+    outDir,
     benchmarkId: stringOption(options.benchmark),
     providerId: stringOption(options.provider),
     scorerId: stringOption(options.scorer),
-    benchmarkConfigPath:
-      stringOption(options['benchmark-config']) ?? DEFAULT_BENCHMARK_CONFIG,
-    providerConfigPath:
-      stringOption(options['provider-config']) ?? DEFAULT_PROVIDER_CONFIG,
-    scorerConfigPath:
-      stringOption(options['scorer-config']) ?? DEFAULT_SCORER_CONFIG,
+    benchmarkConfigPath,
+    providerConfigPath,
+    scorerConfigPath,
     limit: numberOption(options.limit, null),
     offset: numberOption(options.offset, null),
     parallel: numberOption(options.parallel, 4),
@@ -287,6 +353,8 @@ export async function main(args) {
     return;
   }
   if (command === 'adapters') return printAdapters();
+  if (command === 'targets') return targetsCommand();
+  if (command === 'resolve-target') return resolveTargetCommand(positionals, options);
   if (command === 'run') return runCommand(options);
   if (command === 'score') return scoreCommand(options);
   if (command === 'publish-result') return publishResultCommand(options);
