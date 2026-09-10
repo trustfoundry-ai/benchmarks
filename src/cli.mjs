@@ -1,6 +1,7 @@
 import path from 'node:path';
 
 import { publishResultBundle, verifyResultBundle } from './core/artifacts.mjs';
+import { compareInputs } from './core/comparable.mjs';
 import { readJson, readJsonl, writeJson, exists } from './core/fs.mjs';
 import { retryFailedRun } from './core/retry-failed.mjs';
 import {
@@ -39,6 +40,7 @@ Commands:
   retry-failed --run DIR --out DIR [--parallel N] [--retries N] [--force]
   retry-misses --run DIR --out DIR [--parallel N] [--retries N] [--force]
   report --run DIR
+  comparable <a> <b>
 
 Defaults:
   benchmark-config ${DEFAULT_BENCHMARK_CONFIG}
@@ -335,6 +337,36 @@ async function reportCommand(options) {
   console.log(JSON.stringify(report, null, 2));
 }
 
+// Loads the `{ benchmark, scorer }` input record `compareInputs` expects
+// from either a run directory (manifest.json) or a published bundle
+// (result.json's `run`). A published bundle's own manifest.json is the
+// *bundle* manifest and has no `benchmark` key, so the fall-through to
+// result.json's `run` is what makes this work for both shapes.
+async function loadComparableInputs(dir) {
+  const manifestPath = path.join(dir, 'manifest.json');
+  if (await exists(manifestPath)) {
+    const doc = await readJson(manifestPath);
+    if (doc.benchmark) return doc;
+  }
+  return (await readJson(path.join(dir, 'result.json'))).run;
+}
+
+async function comparableCommand(positionals) {
+  const [left, right] = positionals;
+  if (!left || !right) throw new Error('comparable requires two run directories or bundles');
+  const { comparable, differences } = compareInputs(
+    await loadComparableInputs(left),
+    await loadComparableInputs(right)
+  );
+  if (comparable) {
+    console.log(`comparable: ${left} and ${right} share benchmark, dataset and scorer inputs`);
+    return;
+  }
+  console.error(`NOT comparable: ${left} and ${right} differ in ${differences.length} input(s)`);
+  for (const d of differences) console.error(`  ${d.field}\n    a: ${d.a}\n    b: ${d.b}`);
+  process.exitCode = 1;
+}
+
 export async function main(args) {
   const command = args[0] ?? 'help';
   const { options, positionals } = parseArgs(args.slice(1));
@@ -353,5 +385,6 @@ export async function main(args) {
   if (command === 'retry-failed') return retryFailedCommand(options);
   if (command === 'retry-misses') return retryFailedCommand(options, { selection: 'misses' });
   if (command === 'report') return reportCommand(options);
+  if (command === 'comparable') return comparableCommand(positionals);
   throw new Error(`Unknown command: ${command}`);
 }
