@@ -155,6 +155,56 @@ async function resolveDatasetPath(config, repoRoot) {
   return abs;
 }
 
+/**
+ * Select whole pairs from each category, walking a category's pairs with a
+ * fixed stride from a fixed offset. Striding rather than taking a contiguous
+ * block: both are unbiased in expectation, but a contiguous block inherits one
+ * block's luck while a strided sample averages across the file. Both arms of a
+ * selected pair always travel together, because the paired-control comparison
+ * is meaningless with one arm missing.
+ *
+ * A category that cannot supply `pairsPerCategory` pairs at this stride/offset
+ * throws rather than silently returning fewer -- the suite's equal-allocation
+ * checks exist to catch unequal per-category counts, and by the time they
+ * catch it a run has already spent provider calls.
+ */
+function selectPairsPerCategory(allCases, { pairsPerCategory, stride, offset }) {
+  const pairOrder = new Map();
+  const byPair = new Map();
+  for (const item of allCases) {
+    const expected = item.metadata?.expected ?? {};
+    const category = expected.name_transform ?? 'uncategorized';
+    const pairId = expected.pair_id ?? item.caseId;
+    if (!byPair.has(pairId)) {
+      byPair.set(pairId, []);
+      if (!pairOrder.has(category)) pairOrder.set(category, []);
+      pairOrder.get(category).push(pairId);
+    }
+    byPair.get(pairId).push(item);
+  }
+
+  const selected = new Set();
+  for (const [category, pairs] of pairOrder) {
+    let taken = 0;
+    let index = offset;
+    for (; index < pairs.length && taken < pairsPerCategory; index += stride) {
+      selected.add(pairs[index]);
+      taken += 1;
+    }
+    if (taken < pairsPerCategory) {
+      throw new Error(
+        `trustfoundry-case-name-lookup: category '${category}' has ${pairs.length} pairs, ` +
+          `which cannot supply pairsPerCategory=${pairsPerCategory} at stride=${stride} ` +
+          `offset=${offset} -- only ${taken} pair(s) were reachable before the walk needed ` +
+          `index ${index} (>= ${pairs.length}).`
+      );
+    }
+  }
+  return allCases.filter((item) =>
+    selected.has(item.metadata?.expected?.pair_id ?? item.caseId)
+  );
+}
+
 function summaryFor(cases) {
   const byTier = {};
   const byKind = {};
@@ -208,7 +258,26 @@ export const caseNameLookupBenchmarkAdapter = {
     const allCases = rows.map((row, index) => buildCase(row, { index, datasetLabel }));
     const offset = Number.isInteger(config.offset) && config.offset > 0 ? config.offset : 0;
     const limit = Number.isInteger(config.limit) ? config.limit : null;
-    const cases = limit === null ? allCases.slice(offset) : allCases.slice(offset, offset + limit);
+    const pairsPerCategory = Number.isInteger(config.pairsPerCategory) ? config.pairsPerCategory : null;
+
+    if (pairsPerCategory !== null && limit !== null) {
+      throw new Error(
+        'trustfoundry-case-name-lookup: pairsPerCategory and limit are mutually exclusive — ' +
+          'limit slices the flat file, which is grouped by category, so it would return one ' +
+          "category's pairs and nothing else."
+      );
+    }
+
+    let cases;
+    if (pairsPerCategory === null) {
+      cases = limit === null ? allCases.slice(offset) : allCases.slice(offset, offset + limit);
+    } else {
+      cases = selectPairsPerCategory(allCases, {
+        pairsPerCategory,
+        stride: Number.isInteger(config.stride) && config.stride > 0 ? config.stride : 1,
+        offset
+      });
+    }
 
     return {
       benchmark: {
@@ -243,5 +312,6 @@ export const _internals = {
   normalizedGeoLevel2,
   flattenGoldAnswers,
   resolveDatasetPath,
-  summaryFor
+  summaryFor,
+  selectPairsPerCategory
 };

@@ -217,3 +217,99 @@ test('loadCases offset/limit slice the same way as citation-lookup.mjs', async (
   assert.equal(result.cases[0].metadata.datasetIndex, 2);
   assert.equal(result.cases[2].metadata.datasetIndex, 4);
 });
+
+test('pairsPerCategory selects whole pairs from every category', async () => {
+  const repoRoot = new URL('../../../', import.meta.url).pathname;
+  const { cases } = await caseNameLookupBenchmarkAdapter.loadCases({
+    repoRoot,
+    config: {
+      datasetPath: 'data/trustfoundry-case-name-lookup/v2-public.jsonl',
+      datasetLabel: 'v2-public-1050',
+      pairsPerCategory: 35,
+      stride: 8,
+      offset: 0
+    }
+  });
+
+  assert.equal(cases.length, 1050, '15 categories x 35 pairs x 2 arms');
+
+  const byCategory = new Map();
+  for (const item of cases) {
+    const key = item.metadata.expected.name_transform;
+    byCategory.set(key, (byCategory.get(key) ?? 0) + 1);
+  }
+  assert.equal(byCategory.size, 15);
+  for (const [key, count] of byCategory) {
+    assert.equal(count, 70, `${key} has ${count} rows, expected 70`);
+  }
+
+  const arms = new Map();
+  for (const item of cases) {
+    const pair = item.metadata.expected.pair_id;
+    arms.set(pair, (arms.get(pair) ?? 0) + 1);
+  }
+  for (const [pair, count] of arms) {
+    assert.equal(count, 2, `pair ${pair} has ${count} arms, expected both`);
+  }
+});
+
+test('pairsPerCategory selection is deterministic across runs', async () => {
+  const repoRoot = new URL('../../../', import.meta.url).pathname;
+  const config = {
+    datasetPath: 'data/trustfoundry-case-name-lookup/v2-public.jsonl',
+    datasetLabel: 'v2-public-1050',
+    pairsPerCategory: 35,
+    stride: 8,
+    offset: 0
+  };
+
+  const first = await caseNameLookupBenchmarkAdapter.loadCases({ repoRoot, config });
+  const second = await caseNameLookupBenchmarkAdapter.loadCases({ repoRoot, config });
+
+  assert.deepEqual(
+    first.cases.map((item) => item.caseId),
+    second.cases.map((item) => item.caseId)
+  );
+});
+
+test('pairsPerCategory and limit cannot be combined', async () => {
+  const repoRoot = new URL('../../../', import.meta.url).pathname;
+  await assert.rejects(
+    caseNameLookupBenchmarkAdapter.loadCases({
+      repoRoot,
+      config: {
+        datasetPath: 'data/trustfoundry-case-name-lookup/v2-public.jsonl',
+        pairsPerCategory: 35,
+        limit: 100
+      }
+    }),
+    /pairsPerCategory.*limit/
+  );
+});
+
+test('selectPairsPerCategory throws when a category cannot supply the requested pairs', () => {
+  const { selectPairsPerCategory } = _internals;
+  const allCases = [
+    {
+      caseId: 'a-1',
+      metadata: { expected: { name_transform: 'thin_category', pair_id: 'p1' } }
+    },
+    {
+      caseId: 'a-2',
+      metadata: { expected: { name_transform: 'thin_category', pair_id: 'p1' } }
+    },
+    {
+      caseId: 'a-3',
+      metadata: { expected: { name_transform: 'thin_category', pair_id: 'p2' } }
+    },
+    {
+      caseId: 'a-4',
+      metadata: { expected: { name_transform: 'thin_category', pair_id: 'p2' } }
+    }
+  ];
+
+  assert.throws(
+    () => selectPairsPerCategory(allCases, { pairsPerCategory: 5, stride: 1, offset: 0 }),
+    /thin_category.*2 pairs.*pairsPerCategory=5.*stride=1.*offset=0/s
+  );
+});
