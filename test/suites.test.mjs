@@ -7,6 +7,8 @@ import { test } from 'node:test';
 
 import { listSuites, parseTargetRef, resolveTarget } from '../src/core/suites.mjs';
 import { exists } from '../src/core/fs.mjs';
+import { getScorerAdapter } from '../src/core/registry.mjs';
+import { scorerAdapterId } from '../src/core/runner.mjs';
 
 // These tests build their own fixture manifests under a temp directory
 // rather than asserting against `suites/` in this repo: suite manifests
@@ -393,6 +395,35 @@ test('resolveTarget succeeds for every real target in every real suite', async (
   for (const suite of suites) {
     for (const targetId of Object.keys(suite.targets)) {
       await resolveTarget({ repoRoot, suiteId: suite.id, targetId });
+    }
+  }
+});
+
+test('every real target resolves to a registered scorer adapter', async () => {
+  // The test above proves a target's three config paths exist. It does not
+  // prove the runner can decide WHICH scorer adapter to run, because that id
+  // lives in the configs' contents rather than in their paths: `scorerAdapterId`
+  // reads the benchmark config's `scorer` first and the scorer config's `id`
+  // last, and there is no shipped default. A suite whose configs set neither
+  // therefore passes every path-level check and throws only once a run is
+  // already under way, after provider calls have been spent. Calling the
+  // runner's own resolver keeps this assertion from drifting away from that
+  // precedence, and looking the result up in the registry means a typo'd or
+  // unregistered id fails here too.
+  const suites = await listSuites({ repoRoot });
+  for (const suite of suites) {
+    for (const [targetId, target] of Object.entries(suite.targets)) {
+      const benchmarkConfig = JSON.parse(
+        await readFile(path.join(repoRoot, target.benchmark), 'utf8')
+      );
+      const scorerConfig = JSON.parse(
+        await readFile(path.join(repoRoot, target.scorer), 'utf8')
+      );
+      const id = scorerAdapterId(benchmarkConfig, scorerConfig);
+      assert.ok(
+        getScorerAdapter(id),
+        `${suite.id}/${targetId} names scorer '${id}', which is not registered`
+      );
     }
   }
 });
