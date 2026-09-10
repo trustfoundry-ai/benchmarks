@@ -182,13 +182,13 @@ docker run --rm \
   ttf-benchmarks
 ```
 
-Run all four model types at full 5k and upload each verified bundle (cloud-agnostic destination — dispatched by URI scheme):
+Run every target in a suite at once and upload each verified bundle (cloud-agnostic destination — dispatched by URI scheme):
 
 ```bash
 # Google Cloud Storage
 docker run --rm \
   -e TF_API_KEY=$TF_API_KEY \
-  -e BENCHMARK_CONFIG=all-5k \
+  -e BENCHMARK_CONFIG=trustfoundry-legal-search/all \
   -e OUTPUT_BUNDLE_URI=gs://your-bucket/your-prefix \
   -v $HOME/.config/gcloud:/root/.config/gcloud \
   ttf-benchmarks
@@ -203,11 +203,17 @@ docker run --rm \
 ```
 
 The entrypoint reads:
-- `BENCHMARK_CONFIG` — a config path under `configs/benchmarks/` without the `.json` extension (e.g. `trustfoundry-legal-search/key-facts-5k`), or one of the convenience aliases `all-200` / `all-5k` which expand to every matching config in sequence. Default: `trustfoundry-legal-search/case-questions-5k`.
+- `BENCHMARK_CONFIG` — a target reference `<suite>/<target>`, or `all` to run every
+  target in sequence, or `<suite>/all` for one suite's targets. Run
+  `pnpm benchmark targets` for the full list. Default:
+  `trustfoundry-legal-search/case-questions-5k`.
 - `RUN_LABEL` — short tag baked into the run ID. Default `manual`.
 - `OUTPUT_BUNDLE_URI` — if unset, bundles stay on the container filesystem only. Supported schemes: `gs://` (via the bundled `gcloud` SDK), `file://` or an absolute path (local `cp`). To add another cloud, extend the `upload_bundle` dispatch in `entrypoint.sh`.
+- `DRY_RUN` — resolve and print every target that would run, then exit without running anything.
 
-The image stamps the source commit it was built from into `$HARNESS_COMMIT_SHA`, and uploaded paths take the shape `${OUTPUT_BUNDLE_URI}/<benchmark-family>/<sha7>/<run-leaf>/`.
+Every target's benchmark, provider, and scorer config paths are resolved through the suite registry (`suites/<suite>/suite.json`), so adding a suite or a target needs no change to the entrypoint itself.
+
+The image stamps the source commit it was built from into `$HARNESS_COMMIT_SHA`, and uploaded paths take the shape `${OUTPUT_BUNDLE_URI}/<suite>/<sha7>/<date>-<run-label>-<target>/`.
 
 ## Repository Layout
 

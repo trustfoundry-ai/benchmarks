@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 #
-# Container entrypoint for the TrustFoundry Legal Search benchmark suite.
+# Container entrypoint for the TrustFoundry benchmark suites.
 #
 # Inputs (all via env):
 #   TF_API_KEY         required — TrustFoundry public-search API key
-#   BENCHMARK_CONFIG   optional — a config path from configs/benchmarks/
-#                                 (relative path without .json), or one of the
-#                                 convenience aliases below.
+#   BENCHMARK_CONFIG   optional — which target(s) to run. One of:
+#                                   <suite>/<target>  a single target
+#                                   <suite>/all       every target in one suite
+#                                   all               every target in every suite
+#                                 Run `pnpm benchmark targets` for the full,
+#                                 current list of suites and targets.
 #                                 (default: trustfoundry-legal-search/case-questions-5k)
-#                                 Aliases:
-#                                   all-200 — run every *-200 config in sequence
-#                                   all-5k  — run every *-5k config in sequence
 #   RUN_LABEL          optional — short label baked into the run ID (default: manual)
 #   OUTPUT_BUNDLE_URI  optional — destination prefix for verified bundles.
 #                                 Cloud-agnostic; dispatched by URI scheme:
@@ -18,13 +18,19 @@
 #                                   file://  → local cp -r
 #                                   /abs/path → local cp -r (treated as file://)
 #                                 Each bundle lands under
-#                                   $OUTPUT_BUNDLE_URI/<benchmark-family>/<sha7>/<leaf>/
+#                                   $OUTPUT_BUNDLE_URI/<suite>/<sha7>/<date>-<run-label>-<target>/
 #                                 If unset, bundles stay on the container filesystem.
+#   DRY_RUN            optional — resolve and print every target that would
+#                                 run, then exit without running anything.
 #   HARNESS_COMMIT_SHA   set    — public benchmarks commit the image was
 #                                 built from; stamped into output paths.
 #
+# Every target's benchmark, provider, and scorer config paths come from the
+# suite registry (`suites/<suite>/suite.json`, read through `resolve-target`),
+# so adding a suite or a target needs no change to this script.
+#
 # Behavior: runs `pnpm benchmark run` + `publish-result` + `verify-result`
-# once per resolved config, sequentially.
+# once per resolved target, sequentially.
 
 set -euo pipefail
 
@@ -32,60 +38,51 @@ set -euo pipefail
 : "${BENCHMARK_CONFIG:=trustfoundry-legal-search/case-questions-5k}"
 : "${RUN_LABEL:=manual}"
 : "${OUTPUT_BUNDLE_URI:=}"
+: "${DRY_RUN:=}"
 : "${HARNESS_COMMIT_SHA:=unknown}"
 
 PARALLEL_C=4
 SHA7=${HARNESS_COMMIT_SHA:0:7}
 DATE=$(date -u +%Y-%m-%d)
 
-# Benchmark family hardcoded for this suite. Future suites (legal-judgment,
-# etc.) ship as separate Dockerfiles + entrypoints with their own family.
-BENCHMARK_FAMILY=trustfoundry-legal-search
-PROVIDER_CFG=configs/providers/trustfoundry-legal-search.json
+# The full `targets` listing, captured once. Used both to build `all` /
+# `<suite>/all` and, on a resolution failure below, to show every valid
+# target so a typo's error message doesn't leave the reader guessing.
+targets_output=$(node bin/benchmarks.mjs targets)
+mapfile -t ALL_TARGET_IDS < <(printf '%s\n' "$targets_output" | awk '/^  /{print $1}')
 
-# Configs are discovered from disk so this list stays in sync with the
-# committed configs/benchmarks/ tree instead of drifting whenever a new
-# config is added. Only *-200.json and *-5k.json are surfaced — these are
-# the size suffixes the all-200 / all-5k aliases refer to.
-ALL_CONFIGS=()
-while IFS= read -r cfg_path; do
-  # Strip leading "configs/benchmarks/" and trailing ".json" to get the
-  # logical id the rest of this script (and the GHA dropdown) uses.
-  cfg_id="${cfg_path#configs/benchmarks/}"
-  cfg_id="${cfg_id%.json}"
-  ALL_CONFIGS+=("$cfg_id")
-done < <(find configs/benchmarks -type f \( -name '*-200.json' -o -name '*-5k.json' \) | sort)
+print_valid_targets() {
+  echo "Valid targets:" >&2
+  printf '%s\n' "$targets_output" >&2
+}
 
-if [ "${#ALL_CONFIGS[@]}" -eq 0 ]; then
-  echo "No *-200.json / *-5k.json configs found under configs/benchmarks/" >&2
-  exit 2
-fi
-
-declare -a CONFIGS_TO_RUN=()
+declare -a TARGETS=()
 case "$BENCHMARK_CONFIG" in
-  all-200)
-    for cfg in "${ALL_CONFIGS[@]}"; do
-      [[ "$cfg" == *-200 ]] && CONFIGS_TO_RUN+=("$cfg")
-    done
+  all)
+    TARGETS=("${ALL_TARGET_IDS[@]}")
     ;;
-  all-5k)
-    for cfg in "${ALL_CONFIGS[@]}"; do
-      [[ "$cfg" == *-5k ]] && CONFIGS_TO_RUN+=("$cfg")
+  */all)
+    suite="${BENCHMARK_CONFIG%/all}"
+    for id in "${ALL_TARGET_IDS[@]}"; do
+      [[ "$id" == "${suite}/"* ]] && TARGETS+=("$id")
     done
+    if [ "${#TARGETS[@]}" -eq 0 ]; then
+      echo "Unknown suite '${suite}'." >&2
+      print_valid_targets
+      exit 1
+    fi
     ;;
   *)
-    found=0
-    for cfg in "${ALL_CONFIGS[@]}"; do
-      [[ "$cfg" == "$BENCHMARK_CONFIG" ]] && { found=1; break; }
-    done
-    if [ "$found" -ne 1 ]; then
-      echo "Unknown BENCHMARK_CONFIG: '$BENCHMARK_CONFIG'" >&2
-      echo "Valid: all-200, all-5k, ${ALL_CONFIGS[*]}" >&2
-      exit 2
-    fi
-    CONFIGS_TO_RUN+=("$BENCHMARK_CONFIG")
+    TARGETS=("$BENCHMARK_CONFIG")
     ;;
 esac
+
+echo "benchmarks entrypoint"
+echo "  HARNESS_COMMIT_SHA=${HARNESS_COMMIT_SHA}"
+echo "  BENCHMARK_CONFIG=${BENCHMARK_CONFIG}"
+echo "  RUN_LABEL=${RUN_LABEL}"
+echo "  OUTPUT_BUNDLE_URI=${OUTPUT_BUNDLE_URI:-(unset — local only)}"
+echo "  Resolved targets: ${TARGETS[*]}"
 
 # Dispatches an upload of a local directory's contents to a destination URI,
 # choosing the appropriate tool based on the URI scheme.
@@ -114,44 +111,48 @@ upload_bundle() {
   esac
 }
 
-echo "benchmarks entrypoint"
-echo "  HARNESS_COMMIT_SHA=${HARNESS_COMMIT_SHA}"
-echo "  BENCHMARK_CONFIG=${BENCHMARK_CONFIG}"
-echo "  RUN_LABEL=${RUN_LABEL}"
-echo "  OUTPUT_BUNDLE_URI=${OUTPUT_BUNDLE_URI:-(unset — local only)}"
-echo "  Resolved configs: ${CONFIGS_TO_RUN[*]}"
-
-for cfg in "${CONFIGS_TO_RUN[@]}"; do
-  bench_cfg_path="configs/benchmarks/${cfg}.json"
-  if [ ! -f "$bench_cfg_path" ]; then
-    echo "Benchmark config not found: $bench_cfg_path" >&2
-    exit 2
+for target in "${TARGETS[@]}"; do
+  # resolve-target is the single source of truth for whether a target is
+  # runnable — its config paths are checked against disk, not just the
+  # manifest. On failure it prints an actionable message of its own to
+  # stderr and prints nothing to stdout; this script adds the full target
+  # listing after it rather than trying to parse or improve on its prose.
+  if ! resolved_json=$(node bin/benchmarks.mjs resolve-target "$target" --json); then
+    echo >&2
+    print_valid_targets
+    exit 1
   fi
 
-  # Pattern: trustfoundry-legal-search/<type>-<size>
-  # where <type> is case-questions|key-facts|laws|regs and
-  # <size> is 200|5k.
-  if [[ "$cfg" =~ ^trustfoundry-legal-search/(.+)-(200|5k)$ ]]; then
-    type_slug="${BASH_REMATCH[1]}"
-    size="${BASH_REMATCH[2]}"
-  else
-    echo "Cannot parse config name '$cfg' (expected trustfoundry-legal-search/<type>-<size>)" >&2
-    exit 2
-  fi
-
-  # Bundle path layout: results/<benchmark>/<date>/<type>/<size>/
-  # Provider identity lives inside the bundle's manifest, not the
-  # path.
-  run_dir_leaf="${cfg#trustfoundry-legal-search/}"
-  run_dir="runs/trustfoundry-legal-search-${run_dir_leaf}"
-  bundle_dir="results/trustfoundry-legal-search/${DATE}/${type_slug}/${size}"
+  fields=$(printf '%s' "$resolved_json" | node -e '
+    let body = "";
+    process.stdin.on("data", (chunk) => { body += chunk; });
+    process.stdin.on("end", () => {
+      const r = JSON.parse(body);
+      process.stdout.write([r.benchmarkConfig, r.providerConfig, r.scorerConfig, r.bundle].join("\t"));
+    });
+  ')
+  IFS=$'\t' read -r bench_cfg prov_cfg scorer_cfg bundle <<<"$fields"
+  suite="${target%%/*}"
 
   echo
-  echo "=== ${cfg} ==="
+  echo "=== ${target} ==="
+  echo "  benchmark=${bench_cfg}"
+  echo "  provider=${prov_cfg}"
+  echo "  scorer=${scorer_cfg}"
+
+  if [ -n "$DRY_RUN" ]; then
+    continue
+  fi
+
+  run_dir="runs/${suite}-${bundle}"
+  # Flat layout: results/<suite>/<date>/<bundle>/ — `bundle` is the
+  # target id itself, so it is already unique within its suite.
+  bundle_dir="results/${suite}/${DATE}/${bundle}"
 
   pnpm benchmark run \
-    --benchmark-config "$bench_cfg_path" \
-    --provider-config "$PROVIDER_CFG" \
+    --benchmark-config "$bench_cfg" \
+    --provider-config "$prov_cfg" \
+    --scorer-config "$scorer_cfg" \
     --out "$run_dir" \
     --parallel "$PARALLEL_C" \
     --force
@@ -164,11 +165,12 @@ for cfg in "${CONFIGS_TO_RUN[@]}"; do
   pnpm benchmark verify-result "$bundle_dir"
 
   if [ -n "$OUTPUT_BUNDLE_URI" ]; then
-    # Encode the model type into the leaf dir so multiple sibling bundles
-    # from one all-200/all-5k run cluster under <benchmark-family>/<sha7>/
-    # without colliding.
-    upload_leaf="${DATE}-${RUN_LABEL}-${size}-${type_slug}"
-    dest="${OUTPUT_BUNDLE_URI%/}/${BENCHMARK_FAMILY}/${SHA7}/${upload_leaf}/"
+    # <suite> in the parent segment plus <bundle> (the target id, unique
+    # within its suite) in the leaf keeps two targets from colliding
+    # whether they come from the same suite or different ones in an
+    # `all` / `<suite>/all` run.
+    upload_leaf="${DATE}-${RUN_LABEL}-${bundle}"
+    dest="${OUTPUT_BUNDLE_URI%/}/${suite}/${SHA7}/${upload_leaf}/"
     echo "uploading ${bundle_dir}/ -> ${dest}"
     upload_bundle "$bundle_dir" "$dest"
   fi
