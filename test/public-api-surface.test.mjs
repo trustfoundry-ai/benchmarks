@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
 import * as publicApi from '../src/index.mjs';
@@ -114,4 +117,33 @@ test('every declared public export is defined (no undefined slots)', () => {
       `public export '${name}' is undefined — did a re-export path break?`
     );
   }
+});
+
+// `src/index.d.mts` is the package's published `types` entry point
+// (see package.json's `"types"` field and the `"."` export condition), and
+// its own header says it is kept in lockstep with this runtime barrel. A
+// value declared with `export declare function/const/class` in that file
+// is a runtime binding a TypeScript consumer expects to import with types;
+// `export interface` / `export type` are pure type-level exports that have
+// no runtime counterpart and are intentionally excluded from this
+// comparison. Both sides below are derived — the runtime side from the
+// barrel itself, the declared side from the .d.mts file's own text — so
+// nothing here is a third hardcoded list that could itself drift.
+test('src/index.d.mts declares exactly the runtime barrel\'s exports', async () => {
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const dts = await readFile(path.join(root, 'src/index.d.mts'), 'utf8');
+  const declared = new Set();
+  for (const match of dts.matchAll(/^export declare (?:function|const|class) (\w+)/gm)) {
+    declared.add(match[1]);
+  }
+  assert.ok(declared.size > 0, 'no `export declare` bindings found — the parse regex may be stale');
+
+  const runtime = new Set(Object.keys(publicApi));
+  const missingFromTypes = [...runtime].filter((name) => !declared.has(name)).sort();
+  const missingFromRuntime = [...declared].filter((name) => !runtime.has(name)).sort();
+  assert.deepEqual(
+    { missingFromTypes, missingFromRuntime },
+    { missingFromTypes: [], missingFromRuntime: [] },
+    'src/index.d.mts and src/index.mjs disagree on the exported name set'
+  );
 });

@@ -399,6 +399,50 @@ export declare function assertCompatibleManifest(
   options?: { requireResume?: boolean }
 ): void;
 
+export declare function gitRevision(cwd: string | null | undefined): Promise<string | null>;
+export declare function gitDirty(cwd: string | null | undefined): Promise<boolean | null>;
+
+// ---- Suite registry ----
+
+export interface SuiteTarget {
+  benchmark: string;
+  provider: string;
+  scorer: string;
+  rows: number;
+  /**
+   * The target id itself — the directory leaf a published result bundle
+   * lives under (`results/<suite>/<date>/<target>/`). Derived from the
+   * target's own key, not an authored manifest field.
+   */
+  bundle: string;
+  headline?: boolean;
+  tier?: 'smoke' | 'full';
+}
+
+export interface Suite {
+  id: string;
+  title: string;
+  status: 'experimental' | 'published' | 'deprecated';
+  dir: string;
+  targets: Record<string, SuiteTarget>;
+}
+
+export declare function listSuites(args: { repoRoot: string }): Promise<Suite[]>;
+
+export declare function parseTargetRef(ref: string): { suiteId: string; targetId: string };
+
+export interface ResolveTargetArgs {
+  repoRoot: string;
+  suiteId: string;
+  targetId: string;
+}
+export interface ResolveTargetResult {
+  suite: Suite;
+  targetId: string;
+  target: SuiteTarget;
+}
+export declare function resolveTarget(args: ResolveTargetArgs): Promise<ResolveTargetResult>;
+
 // ---- Artifacts + verification ----
 
 export interface RawRow {

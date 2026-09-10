@@ -126,6 +126,31 @@ test('listSuites reports the suite dir and target config triple', async () => {
   });
 });
 
+test('listSuites synthesizes a bundle field equal to the target id', async () => {
+  await withTempDir(async (repoRoot) => {
+    const manifest = validManifest();
+    manifest.targets['another-target'] = {
+      benchmark: 'configs/benchmarks/demo-suite/another.json',
+      provider: 'configs/providers/demo.json',
+      scorer: 'configs/scorers/demo.json',
+      rows: 10
+    };
+    await writeManifest(repoRoot, 'trustfoundry-demo-suite', manifest);
+    const [suite] = await listSuites({ repoRoot });
+    assert.equal(suite.targets['demo-50'].bundle, 'demo-50');
+    assert.equal(suite.targets['another-target'].bundle, 'another-target');
+  });
+});
+
+test('listSuites rejects a manifest that tries to author a bundle key', async () => {
+  await withTempDir(async (repoRoot) => {
+    const manifest = validManifest();
+    manifest.targets['demo-50'].bundle = 'demo-50';
+    await writeManifest(repoRoot, 'trustfoundry-demo-suite', manifest);
+    await assert.rejects(listSuites({ repoRoot }), /unknown key 'bundle'/);
+  });
+});
+
 test('listSuites throws a clear error for invalid JSON in suite.json', async () => {
   await withTempDir(async (repoRoot) => {
     const dir = path.join(repoRoot, 'suites', 'trustfoundry-broken-suite');
@@ -195,6 +220,7 @@ test('resolveTarget returns the config triple for a target', async () => {
     assert.equal(targetId, 'demo-50');
     assert.equal(target.benchmark, 'configs/benchmarks/demo-suite/demo-50.json');
     assert.equal(target.rows, 50);
+    assert.equal(target.bundle, 'demo-50');
   });
 });
 

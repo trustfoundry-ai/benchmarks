@@ -13,6 +13,11 @@
  * enforcement. `test/suites.test.mjs` reads the schema's `required` lists
  * back and asserts the loader agrees with them, so the two artifacts can't
  * silently drift apart.
+ *
+ * Every target returned from here carries a `bundle` field equal to its
+ * own target id — the directory leaf a published result bundle is written
+ * under. It is derived, not authored: no manifest declares it, and the
+ * schema doesn't describe it as a property a manifest may set.
  */
 import { readdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -113,6 +118,21 @@ function validateManifest(doc, source) {
 }
 
 /**
+ * Attaches the runtime-only `bundle` field to each of a suite's targets:
+ * the target id itself, which is also the directory leaf a published
+ * result bundle is written under (`results/<suite>/<date>/<target>/`) and
+ * the key a `latest.json` pointer uses. Manifests never author this field
+ * — it would let a target's declared `bundle` disagree with its own key,
+ * which is a defect with no upside — so `bundle` is derived here rather
+ * than accepted as an authored property.
+ */
+function withBundleIds(targets) {
+  return Object.fromEntries(
+    Object.entries(targets).map(([targetId, target]) => [targetId, { ...target, bundle: targetId }])
+  );
+}
+
+/**
  * Reads and validates every `suites/<id>/suite.json` manifest under
  * `repoRoot`. A suite directory with no manifest (a README-only stub for a
  * suite that isn't registered yet) is skipped rather than treated as an
@@ -142,7 +162,7 @@ export async function listSuites({ repoRoot }) {
       title: doc.title,
       status: doc.status,
       dir: relDir,
-      targets: doc.targets
+      targets: withBundleIds(doc.targets)
     });
   }
   return suites;

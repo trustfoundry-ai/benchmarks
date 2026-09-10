@@ -24,6 +24,7 @@
       "description": "Keyed by target id, e.g. suites/<id>/targets/<targetId>. A target's config triple must resolve to real files under configs/.",
       "additionalProperties": {
         "type": "object",
+        "$comment": "A resolved target also carries a `bundle` field equal to its own key — the directory leaf a published result bundle lives under. It is derived by the loader, not authored here: this schema has no `bundle` property, and `additionalProperties: false` means a manifest that tries to set one is rejected as an unknown key.",
         "required": ["benchmark", "provider", "scorer", "rows"],
         "additionalProperties": false,
         "properties": {
