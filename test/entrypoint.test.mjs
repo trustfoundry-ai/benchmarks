@@ -38,7 +38,7 @@ test('all resolves only runnable targets', async () => {
   assert.match(stdout, /trustfoundry-legal-search\/laws-5k/);
 });
 
-test('all resolves exactly the ten real targets and no vendor config', async () => {
+test('all resolves exactly the eleven real targets and no vendor config', async () => {
   const { stdout } = await runEntrypoint('all');
   // Neither of the five vendor adapter directories is a suite in the
   // registry, so none of their configs can appear no matter how the
@@ -54,7 +54,7 @@ test('all resolves exactly the ten real targets and no vendor config', async () 
   }
 
   const resolvedHeaders = stdout.match(/^=== .+ ===$/gm) ?? [];
-  assert.equal(resolvedHeaders.length, 10);
+  assert.equal(resolvedHeaders.length, 11);
 
   for (const target of [
     'trustfoundry-legal-search/case-questions-200',
@@ -66,7 +66,8 @@ test('all resolves exactly the ten real targets and no vendor config', async () 
     'trustfoundry-legal-search/regs-200',
     'trustfoundry-legal-search/regs-5k',
     'trustfoundry-case-name-lookup/public-8850',
-    'trustfoundry-case-name-lookup/negatives-50'
+    'trustfoundry-case-name-lookup/negatives-50',
+    'trustfoundry-case-name-lookup/public-1050'
   ]) {
     assert.match(stdout, new RegExp(`=== ${target.replace('/', '\\/')} ===`));
   }
@@ -81,10 +82,11 @@ test('<suite>/all resolves only that suite\'s targets', async () => {
   const { stdout } = await runEntrypoint('trustfoundry-case-name-lookup/all');
   assert.match(stdout, /trustfoundry-case-name-lookup\/public-8850/);
   assert.match(stdout, /trustfoundry-case-name-lookup\/negatives-50/);
+  assert.match(stdout, /trustfoundry-case-name-lookup\/public-1050/);
   assert.doesNotMatch(stdout, /trustfoundry-legal-search\//);
 
   const resolvedHeaders = stdout.match(/^=== .+ ===$/gm) ?? [];
-  assert.equal(resolvedHeaders.length, 2);
+  assert.equal(resolvedHeaders.length, 3);
 });
 
 test('an unknown target lists valid targets and exits non-zero', async () => {

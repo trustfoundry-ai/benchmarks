@@ -5,6 +5,7 @@
   "status": "published",
   "targets": {
     "public-8850": { "benchmark": "configs/benchmarks/trustfoundry-case-name-lookup/v2-public.json", "provider": "configs/providers/trustfoundry-case-name-lookup.json", "scorer": "configs/scorers/trustfoundry-case-name-lookup.json", "rows": 8850, "tier": "full", "headline": true },
-    "negatives-50": { "benchmark": "configs/benchmarks/trustfoundry-case-name-lookup/v2-negatives.json", "provider": "configs/providers/trustfoundry-case-name-lookup.json", "scorer": "configs/scorers/trustfoundry-case-name-lookup.json", "rows": 50, "tier": "full" }
+    "negatives-50": { "benchmark": "configs/benchmarks/trustfoundry-case-name-lookup/v2-negatives.json", "provider": "configs/providers/trustfoundry-case-name-lookup.json", "scorer": "configs/scorers/trustfoundry-case-name-lookup.json", "rows": 50, "tier": "full" },
+    "public-1050": { "$comment": "Strided 1,050-row subset of public-8850's dataset. Smoke and cheap external verification; not a headline.", "benchmark": "configs/benchmarks/trustfoundry-case-name-lookup/v2-public-1050.json", "provider": "configs/providers/trustfoundry-case-name-lookup.json", "scorer": "configs/scorers/trustfoundry-case-name-lookup.json", "rows": 1050, "tier": "smoke" }
   }
 }

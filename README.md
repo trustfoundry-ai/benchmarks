@@ -24,7 +24,7 @@ The public benchmarks in this space measure adjacent capabilities. [LegalBench](
 <!-- BEGIN GENERATED: suite-status -->
 | Suite | Status | Targets | Published bundles |
 |---|---|---:|---|
-| [`trustfoundry-case-name-lookup`](suites/trustfoundry-case-name-lookup/README.md) | published | 2 | 2 bundles under [`results/trustfoundry-case-name-lookup/2026-09-09/`](results/trustfoundry-case-name-lookup/2026-09-09/) |
+| [`trustfoundry-case-name-lookup`](suites/trustfoundry-case-name-lookup/README.md) | published | 3 | 2 bundles under [`results/trustfoundry-case-name-lookup/2026-09-09/`](results/trustfoundry-case-name-lookup/2026-09-09/) |
 | [`trustfoundry-legal-search`](suites/trustfoundry-legal-search/README.md) | published | 8 | 8 bundles under [`results/trustfoundry-legal-search/2026-07-05/`](results/trustfoundry-legal-search/2026-07-05/) |
 <!-- END GENERATED: suite-status -->
 

@@ -1,0 +1,16 @@
+{
+  "_comment": [
+    "THE SMOKE TIER. 15 categories x 35 pairs x 2 arms = 1,050 rows, drawn from the same dataset as v2-public by walking each category's 295 pairs with a stride of 8 from offset 0 and keeping the first 35 so selected.",
+    "",
+    "Strided rather than contiguous: both are unbiased in expectation, but across all 8 phases a contiguous block of 35 has sd 0.0160 against the full-set pooled rate while a strided sample has sd 0.0095. Stride and offset are stated explicitly rather than derived, so the selection is readable from this file alone.",
+    "",
+    "Read the pooled headline off this tier, never a per-category number: at 35 pairs per category the intervals are +/-8-15pp and six of fifteen categories saturate at 1.0000."
+  ],
+  "benchmarkId": "trustfoundry-case-name-lookup",
+  "datasetPath": "data/trustfoundry-case-name-lookup/v2-public.jsonl",
+  "datasetLabel": "trustfoundry-case-name-lookup-v2-public-1050",
+  "scorer": "trustfoundry-case-name-lookup",
+  "pairsPerCategory": 35,
+  "stride": 8,
+  "offset": 0
+}

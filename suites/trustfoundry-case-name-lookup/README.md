@@ -155,6 +155,28 @@ fifty independent probes — see "What this benchmark cannot claim."
 This tier reports a **false-positive rate and never a hit rate**, and it is excluded
 from the headline by construction.
 
+### The 1,050-row smoke tier
+
+`public-1050` runs 15 categories × 35 pairs × 2 arms from the same dataset as
+`public-8850`, selected by walking each category's 295 pairs with a stride of 8.
+It takes about 105 seconds at `--parallel 4`; with the 50-row negatives arm, a
+complete smoke is under two minutes.
+
+Both numbers are published with their intervals, so you can run the cheap tier,
+confirm it, and reason about the full set — or run the full set.
+
+Three limits are load-bearing:
+
+1. At 35 pairs per category the per-category intervals are ±8–15pp and six of
+   fifteen categories saturate at exactly 1.0000. **Per-category numbers must
+   not be quoted off this tier.** It is keyed on the pooled headline.
+2. Confirming this tier verifies the pipeline and a published 12% sample. It is
+   not an audit: the subset is deterministic and public, therefore knowable in
+   advance. `public-8850` remains the number of record.
+3. Precision scales as 1/√n — ±2.15pp costs 1,050 rows, ±1.04pp costs 4,500, and
+   the full ±0.74pp costs 8,850. No cheap tier is quotable as a headline
+   estimate, which is why this one is not presented as one.
+
 ## Published numbers
 
 The `trustfoundry-legal-search` provider (`model_type: case_name`) results below are
