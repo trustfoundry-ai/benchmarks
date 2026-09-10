@@ -212,6 +212,14 @@ Current adapters:
 pnpm benchmark adapters
 ```
 
+### Adding a suite
+
+A suite is a benchmark, a scorer, one or more datasets, and a manifest
+naming the targets they combine into. See
+[`docs/adding-a-suite.md`](docs/adding-a-suite.md) for the full walkthrough —
+naming, writing the adapters, declaring targets in `suites/<suite>/suite.json`,
+and publishing a bundle.
+
 ### Coding-agent skill
 
 If you're using a coding agent to add a new provider adapter, this repository ships a skill that walks a fresh session through the whole checklist — adapter module, provider + benchmark configs, tests, docs, and a one-row smoke against the vendor API — modeled on the five shipped `-legal-search` adapters. The same skill is checked in twice, once per agent convention:

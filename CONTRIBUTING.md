@@ -14,6 +14,9 @@ pnpm verify:results
 
 Use focused changes. Benchmark harness changes should include tests, and published result bundles should include `manifest.json`, `checksums.txt`, `result.json`, and raw row evidence.
 
+Adding a new suite (a benchmark, scorer, dataset, and manifest) is its own
+walkthrough — see [`docs/adding-a-suite.md`](docs/adding-a-suite.md).
+
 ## Result Bundles
 
 Use the benchmark CLI to publish and verify result bundles:
