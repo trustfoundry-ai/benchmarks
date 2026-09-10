@@ -9,7 +9,7 @@ import {
   DEFAULT_PROVIDER_CONFIG,
   DEFAULT_SCORER_CONFIG,
   resolveRunConfig
-} from '../src/cli.mjs';
+} from '../src/cli-run-config.mjs';
 
 const execFileAsync = promisify(execFile);
 
@@ -186,4 +186,15 @@ test('a flag present as a valueless boolean does not count as an explicit overri
   // silently win over --target instead of erroring or falling through.
   const result = resolveRunConfig({ 'benchmark-config': true }, fakeResolved);
   assert.equal(result.benchmarkConfigPath, fakeResolved.benchmarkConfig);
+});
+
+test('a valueless --out does not count as an explicit override either', () => {
+  // Same trap as above, for outDir specifically: a bare `--out` with
+  // nothing after it must fall through to the --target-derived path (or
+  // the default, with no target), not set outDir to the boolean true.
+  const withTarget = resolveRunConfig({ out: true }, fakeResolved);
+  assert.equal(withTarget.outDir, `runs/${fakeResolved.bundle}`);
+
+  const withoutTarget = resolveRunConfig({ out: true }, null);
+  assert.equal(withoutTarget.outDir, DEFAULT_OUT_DIR);
 });

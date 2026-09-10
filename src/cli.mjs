@@ -11,17 +11,13 @@ import {
 } from './core/runner.mjs';
 import { defaultRegistry } from './core/registry.mjs';
 import { listSuites, parseTargetRef, resolveTarget } from './core/suites.mjs';
-
-// Operational defaults for the shipped CLI. The framework core has no
-// hardcoded default adapter; this CLI is the layer that names the
-// shipped `trustfoundry-legal-search` suite as its out-of-the-box
-// convenience. Consumers who wire their own adapter register it and
-// pass explicit --benchmark-config / --provider-config / --scorer-config
-// paths.
-export const DEFAULT_BENCHMARK_CONFIG = 'configs/benchmarks/trustfoundry-legal-search/case-questions-200.json';
-export const DEFAULT_PROVIDER_CONFIG = 'configs/providers/trustfoundry-legal-search.json';
-export const DEFAULT_SCORER_CONFIG = 'configs/scorers/trustfoundry-legal-search.json';
-export const DEFAULT_OUT_DIR = 'runs/trustfoundry-legal-search-case-questions-200';
+import {
+  DEFAULT_BENCHMARK_CONFIG,
+  DEFAULT_OUT_DIR,
+  DEFAULT_PROVIDER_CONFIG,
+  DEFAULT_SCORER_CONFIG,
+  resolveRunConfig
+} from './cli-run-config.mjs';
 
 function printHelp() {
   console.log(`TrustFoundry benchmarks
@@ -159,27 +155,6 @@ async function targetsCommand() {
       console.log(`  ${suite.id}/${targetId}  ${target.rows} rows${tags ? `  [${tags}]` : ''}`);
     }
   }
-}
-
-// Pure precedence resolution for `run`'s config triple and out dir, split
-// out from runCommand so it can be unit-tested without executeRun (no
-// network, no benchmark execution): given the raw CLI `options` and the
-// already-resolved `--target` (or `null` when none was given), it decides
-// what wins. `stringOption(...)` is what tells "flag given" apart from
-// "flag absent" — an explicit flag is always a non-empty string, so it
-// always outranks a value the registry resolved from `--target`, which in
-// turn outranks the operational default. Passing no target and no flags
-// reproduces today's DEFAULT_* / DEFAULT_OUT_DIR behavior unchanged.
-export function resolveRunConfig(options, resolved) {
-  return {
-    outDir: options.out ?? (resolved ? `runs/${resolved.bundle}` : DEFAULT_OUT_DIR),
-    benchmarkConfigPath:
-      stringOption(options['benchmark-config']) ?? resolved?.benchmarkConfig ?? DEFAULT_BENCHMARK_CONFIG,
-    providerConfigPath:
-      stringOption(options['provider-config']) ?? resolved?.providerConfig ?? DEFAULT_PROVIDER_CONFIG,
-    scorerConfigPath:
-      stringOption(options['scorer-config']) ?? resolved?.scorerConfig ?? DEFAULT_SCORER_CONFIG
-  };
 }
 
 async function runCommand(options) {
