@@ -19,6 +19,7 @@ import * as publicApi from '../src/index.mjs';
 const EXPECTED_PUBLIC_EXPORTS = [
   'FileBackedRateLimiter',
   'STRIP_SYNTHETIC_INSTRUCTION_PREFIXES',
+  'Z95',
   'acceptedCitationSet',
   'adapterInventory',
   'applyQueryTransform',
@@ -92,6 +93,7 @@ const EXPECTED_PUBLIC_EXPORTS = [
   'validateApiRequestLimitAgainstCutoffs',
   'validateScorerCutoffsMatchImplementation',
   'verifyResultBundle',
+  'wilsonInterval',
   'writeCaseCheckpoint',
   'writeCaseProgressCheckpoint',
   'writeJson',

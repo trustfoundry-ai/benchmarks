@@ -600,3 +600,13 @@ export declare function mapWithConcurrency<T, R>(
   concurrency: number,
   fn: (item: T) => Promise<R>
 ): Promise<R[]>;
+
+// ---- Statistics ----
+
+export declare const Z95: number;
+
+export declare function wilsonInterval(
+  successes: number,
+  n: number,
+  z?: number
+): [number, number];

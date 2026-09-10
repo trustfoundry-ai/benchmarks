@@ -153,3 +153,6 @@ export {
   mapWithConcurrency,
   normalizeScheduler
 } from './core/scheduler.mjs';
+
+// ---- Statistics ----
+export { Z95, wilsonInterval } from './core/stats.mjs';
