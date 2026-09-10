@@ -37,14 +37,14 @@ The `trustfoundry-legal-search` provider results below are the current canonical
 
 | Date | Target | Bundle | 200-row companion |
 |---|---|---|---|
-| 2026-07-05 | case-questions | [`5k`](../../results/trustfoundry-legal-search/2026-07-05/case-questions/5k/) | [`200`](../../results/trustfoundry-legal-search/2026-07-05/case-questions/200/) |
-| 2026-07-05 | key-facts | [`5k`](../../results/trustfoundry-legal-search/2026-07-05/key-facts/5k/) | [`200`](../../results/trustfoundry-legal-search/2026-07-05/key-facts/200/) |
-| 2026-07-05 | laws | [`5k`](../../results/trustfoundry-legal-search/2026-07-05/laws/5k/) | [`200`](../../results/trustfoundry-legal-search/2026-07-05/laws/200/) |
-| 2026-07-05 | regs | [`5k`](../../results/trustfoundry-legal-search/2026-07-05/regs/5k/) | [`200`](../../results/trustfoundry-legal-search/2026-07-05/regs/200/) |
+| 2026-07-05 | case-questions | [`5k`](../../results/trustfoundry-legal-search/2026-07-05/case-questions-5k/) | [`200`](../../results/trustfoundry-legal-search/2026-07-05/case-questions-200/) |
+| 2026-07-05 | key-facts | [`5k`](../../results/trustfoundry-legal-search/2026-07-05/key-facts-5k/) | [`200`](../../results/trustfoundry-legal-search/2026-07-05/key-facts-200/) |
+| 2026-07-05 | laws | [`5k`](../../results/trustfoundry-legal-search/2026-07-05/laws-5k/) | [`200`](../../results/trustfoundry-legal-search/2026-07-05/laws-200/) |
+| 2026-07-05 | regs | [`5k`](../../results/trustfoundry-legal-search/2026-07-05/regs-5k/) | [`200`](../../results/trustfoundry-legal-search/2026-07-05/regs-200/) |
 
-**Latest pointer.** [`results/trustfoundry-legal-search/latest.json`](../../results/trustfoundry-legal-search/latest.json) maps each `(target, size)` to its currently-canonical dated bundle — a stable URL for external consumers who don't want to guess the date. `pnpm verify:results` verifies the pointer and every bundle it references.
+**Latest pointer.** [`results/trustfoundry-legal-search/latest.json`](../../results/trustfoundry-legal-search/latest.json) maps each target id to its currently-canonical dated bundle — a stable URL for external consumers who don't want to guess the date. `pnpm verify:results` verifies the pointer and every bundle it references.
 
-For a concrete example of what a bundle's scored summary looks like, see [`results/trustfoundry-legal-search/2026-07-05/case-questions/5k/result.json`](../../results/trustfoundry-legal-search/2026-07-05/case-questions/5k/result.json). The full checked-in bundle also carries the raw row-level evidence, manifest, and checksums.
+For a concrete example of what a bundle's scored summary looks like, see [`results/trustfoundry-legal-search/2026-07-05/case-questions-5k/result.json`](../../results/trustfoundry-legal-search/2026-07-05/case-questions-5k/result.json). The full checked-in bundle also carries the raw row-level evidence, manifest, and checksums.
 
 ## Test data schema
 

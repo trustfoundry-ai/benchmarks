@@ -50,7 +50,7 @@ These are the latest canonical benchmark runs in this repository. Dataset labels
   <tbody>
     <tr>
       <td>2026-07-05</td>
-      <td><a href="results/trustfoundry-legal-search/2026-07-05/case-questions/5k/">5000 case questions</a></td>
+      <td><a href="results/trustfoundry-legal-search/2026-07-05/case-questions-5k/">5000 case questions</a></td>
       <td>0.3868</td>
       <td>0.7114</td>
       <td>0.4723</td>
@@ -59,7 +59,7 @@ These are the latest canonical benchmark runs in this repository. Dataset labels
     </tr>
     <tr>
       <td>2026-07-05</td>
-      <td><a href="results/trustfoundry-legal-search/2026-07-05/key-facts/5k/">5000 key facts</a></td>
+      <td><a href="results/trustfoundry-legal-search/2026-07-05/key-facts-5k/">5000 key facts</a></td>
       <td>0.8734</td>
       <td>0.9766</td>
       <td>0.9128</td>
@@ -68,7 +68,7 @@ These are the latest canonical benchmark runs in this repository. Dataset labels
     </tr>
     <tr>
       <td>2026-07-05</td>
-      <td><a href="results/trustfoundry-legal-search/2026-07-05/laws/5k/">5000 law questions</a></td>
+      <td><a href="results/trustfoundry-legal-search/2026-07-05/laws-5k/">5000 law questions</a></td>
       <td>0.6688</td>
       <td>0.9176</td>
       <td>0.7579</td>
@@ -77,7 +77,7 @@ These are the latest canonical benchmark runs in this repository. Dataset labels
     </tr>
     <tr>
       <td>2026-07-05</td>
-      <td><a href="results/trustfoundry-legal-search/2026-07-05/regs/5k/">5000 regulation questions</a></td>
+      <td><a href="results/trustfoundry-legal-search/2026-07-05/regs-5k/">5000 regulation questions</a></td>
       <td>0.5820</td>
       <td>0.9012</td>
       <td>0.6961</td>
@@ -92,10 +92,10 @@ These are the latest canonical benchmark runs in this repository. Dataset labels
 
 Latest full 5k runs (2026-07-05; provider failures 0 for every row):
 
-- Case questions: Recall@1 0.3868; Recall@10 0.639; Recall@25 0.7114; MRR 0.4723; latency p50 857 ms, p95 1248 ms. [5k results](results/trustfoundry-legal-search/2026-07-05/case-questions/5k/); [200-row companion](results/trustfoundry-legal-search/2026-07-05/case-questions/200/).
-- Key facts: Recall@1 0.8734; Recall@10 0.9688; Recall@25 0.9766; MRR 0.9128; latency p50 1051 ms, p95 1798 ms. [5k results](results/trustfoundry-legal-search/2026-07-05/key-facts/5k/); [200-row companion](results/trustfoundry-legal-search/2026-07-05/key-facts/200/).
-- Law questions: Recall@1 0.6688; Recall@10 0.8988; Recall@25 0.9176; MRR 0.7579; latency p50 729 ms, p95 1156 ms. [5k results](results/trustfoundry-legal-search/2026-07-05/laws/5k/); [200-row companion](results/trustfoundry-legal-search/2026-07-05/laws/200/).
-- Regulation questions: Recall@1 0.5820; Recall@10 0.883; Recall@25 0.9012; MRR 0.6961; latency p50 788 ms, p95 1148 ms. [5k results](results/trustfoundry-legal-search/2026-07-05/regs/5k/); [200-row companion](results/trustfoundry-legal-search/2026-07-05/regs/200/).
+- Case questions: Recall@1 0.3868; Recall@10 0.639; Recall@25 0.7114; MRR 0.4723; latency p50 857 ms, p95 1248 ms. [5k results](results/trustfoundry-legal-search/2026-07-05/case-questions-5k/); [200-row companion](results/trustfoundry-legal-search/2026-07-05/case-questions-200/).
+- Key facts: Recall@1 0.8734; Recall@10 0.9688; Recall@25 0.9766; MRR 0.9128; latency p50 1051 ms, p95 1798 ms. [5k results](results/trustfoundry-legal-search/2026-07-05/key-facts-5k/); [200-row companion](results/trustfoundry-legal-search/2026-07-05/key-facts-200/).
+- Law questions: Recall@1 0.6688; Recall@10 0.8988; Recall@25 0.9176; MRR 0.7579; latency p50 729 ms, p95 1156 ms. [5k results](results/trustfoundry-legal-search/2026-07-05/laws-5k/); [200-row companion](results/trustfoundry-legal-search/2026-07-05/laws-200/).
+- Regulation questions: Recall@1 0.5820; Recall@10 0.883; Recall@25 0.9012; MRR 0.6961; latency p50 788 ms, p95 1148 ms. [5k results](results/trustfoundry-legal-search/2026-07-05/regs-5k/); [200-row companion](results/trustfoundry-legal-search/2026-07-05/regs-200/).
 
 </details>
 
@@ -117,7 +117,7 @@ Latest full 5k runs (2026-07-05; provider failures 0 for every row):
   <tbody>
     <tr>
       <td>2026-09-09</td>
-      <td><a href="results/trustfoundry-case-name-lookup/2026-09-09/public/8850/">8850 case-name queries</a></td>
+      <td><a href="results/trustfoundry-case-name-lookup/2026-09-09/public-8850/">8850 case-name queries</a></td>
       <td>0.9331</td>
       <td>0.9584</td>
       <td>0.9437</td>
@@ -132,8 +132,8 @@ Latest full 5k runs (2026-07-05; provider failures 0 for every row):
 
 Latest full run (2026-09-09; provider failures 0 for every row; latency measured at 4 concurrent requests):
 
-- Public set: hit@1 0.9331 (macro-averaged across 15 categories, 295 pairs each); hit@3 0.9544; hit@5 0.9584; hit@10 0.9584; MRR 0.9437; wrong-name rate 0.0943; latency p50 406 ms, p95 511 ms. [Results](results/trustfoundry-case-name-lookup/2026-09-09/public/8850/).
-- Negatives set: 50 fabricated case names, false-positive rate 0.84. [Results](results/trustfoundry-case-name-lookup/2026-09-09/negatives/50/).
+- Public set: hit@1 0.9331 (macro-averaged across 15 categories, 295 pairs each); hit@3 0.9544; hit@5 0.9584; hit@10 0.9584; MRR 0.9437; wrong-name rate 0.0943; latency p50 406 ms, p95 511 ms. [Results](results/trustfoundry-case-name-lookup/2026-09-09/public-8850/).
+- Negatives set: 50 fabricated case names, false-positive rate 0.84. [Results](results/trustfoundry-case-name-lookup/2026-09-09/negatives-50/).
 
 See the suite's [Published numbers](suites/trustfoundry-case-name-lookup/README.md#published-numbers) section for the per-category breakdown and the paired perturbed/control comparison.
 

@@ -1,17 +1,18 @@
 # Results
 
-Generated result bundles use this folder convention:
+## Path convention
 
-```text
-results/<benchmark>/<yyyy-mm-dd>/<type>/<size>/
+```
+results/<suite>/<yyyy-mm-dd>/<target>/
 ```
 
-Segments (all lowercase kebab-case):
+`<suite>` and `<target>` are the ids declared in `suites/<suite>/suite.json` — the
+same pair the CLI takes as `--target <suite>/<target>` and the container takes as
+`BENCHMARK_CONFIG`. One identifier names the config, the run, the bundle
+directory, and the `latest.json` key.
 
-- `<benchmark>` — the suite family (e.g. `trustfoundry-legal-search`).
-- `<yyyy-mm-dd>` — the date the run was executed against the live provider. All 200/5k × type combinations from one run day cluster under this dir.
-- `<type>` — the benchmark target within the suite (e.g. `case-questions`, `key-facts`, `laws`, `regs`).
-- `<size>` — the row count of the config that produced the bundle (`200` or `5k`).
+`latest.json` maps each target id to its currently-canonical dated bundle.
+`pnpm verify:results` verifies the pointer and every bundle it references.
 
 The provider that produced the bundle is recorded inside the bundle's `manifest.json` (`manifest.provider.id`); it doesn't live in the path.
 
@@ -22,7 +23,7 @@ Example:
 ```bash
 pnpm benchmark publish-result \
   --run runs/trustfoundry-legal-search-case-questions-200 \
-  --out results/trustfoundry-legal-search/2026-07-05/case-questions/200
+  --out results/trustfoundry-legal-search/2026-07-05/case-questions-200
 ```
 
 Published bundles are permanent. New runs land next to older ones; do not delete or overwrite a bundle.

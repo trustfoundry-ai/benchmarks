@@ -268,12 +268,12 @@ concurrent requests, 50 requests.
 
 | Date | Target | Bundle |
 |---|---|---|
-| 2026-09-09 | public | [`8850`](../../results/trustfoundry-case-name-lookup/2026-09-09/public/8850/) |
-| 2026-09-09 | negatives | [`50`](../../results/trustfoundry-case-name-lookup/2026-09-09/negatives/50/) |
+| 2026-09-09 | public | [`8850`](../../results/trustfoundry-case-name-lookup/2026-09-09/public-8850/) |
+| 2026-09-09 | negatives | [`50`](../../results/trustfoundry-case-name-lookup/2026-09-09/negatives-50/) |
 
-**Latest pointer.** [`results/trustfoundry-case-name-lookup/latest.json`](../../results/trustfoundry-case-name-lookup/latest.json) maps each `(type, size)` to its currently-canonical dated bundle. `pnpm verify:results` verifies the pointer and every bundle it references.
+**Latest pointer.** [`results/trustfoundry-case-name-lookup/latest.json`](../../results/trustfoundry-case-name-lookup/latest.json) maps each target id to its currently-canonical dated bundle. `pnpm verify:results` verifies the pointer and every bundle it references.
 
-For a concrete example of what a bundle's scored summary looks like, see [`results/trustfoundry-case-name-lookup/2026-09-09/public/8850/result.json`](../../results/trustfoundry-case-name-lookup/2026-09-09/public/8850/result.json). The full checked-in bundle also carries the raw row-level evidence, manifest, and checksums.
+For a concrete example of what a bundle's scored summary looks like, see [`results/trustfoundry-case-name-lookup/2026-09-09/public-8850/result.json`](../../results/trustfoundry-case-name-lookup/2026-09-09/public-8850/result.json). The full checked-in bundle also carries the raw row-level evidence, manifest, and checksums.
 
 ## Test data schema
 
