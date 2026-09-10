@@ -5,13 +5,48 @@
  * that a force-push has rewritten, fails here.
  */
 import { execFile } from 'node:child_process';
-import { readdir, readFile, stat } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { promisify } from 'node:util';
 
-import { exists } from '../src/core/fs.mjs';
+import { exists, findLeafDirs } from '../src/core/fs.mjs';
 
 const execFileAsync = promisify(execFile);
+
+// Resolves `ref` to a commit sha in `repoRoot`, once, up front. Throws a
+// configuration error distinguishable from a per-bundle violation: an
+// unresolvable base ref (a typo, or a shallow clone that never fetched it)
+// means the gate itself cannot run, not that every bundle is in violation.
+async function resolveBaseRef(repoRoot, ref) {
+  try {
+    const { stdout } = await execFileAsync('git', [
+      '-C',
+      repoRoot,
+      'rev-parse',
+      '--verify',
+      `${ref}^{commit}`
+    ]);
+    return stdout.trim();
+  } catch (error) {
+    throw new Error(
+      `bundle provenance: base ref "${ref}" does not resolve to a commit in ${repoRoot} ` +
+        `(fetch it first — a shallow CI checkout needs an explicit fetch of the base branch): ${error.message}`
+    );
+  }
+}
+
+// True when `commit` exists in this clone's object store at all, regardless
+// of ancestry. A shallow clone or unfetched history reports the commit as
+// unknown here, which is a different situation for a reader than a commit
+// this clone has but that base does not contain.
+async function commitExists(repoRoot, commit) {
+  try {
+    await execFileAsync('git', ['-C', repoRoot, 'cat-file', '-e', `${commit}^{commit}`]);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 async function isAncestor(repoRoot, commit, baseRef) {
   try {
@@ -23,23 +58,11 @@ async function isAncestor(repoRoot, commit, baseRef) {
 }
 
 export async function findBundles(resultsRoot) {
-  if (!(await exists(resultsRoot))) return [];
-  const bundles = [];
-  async function walk(dir) {
-    if (await exists(path.join(dir, 'result.json'))) {
-      bundles.push(dir);
-      return;
-    }
-    for (const entry of await readdir(dir)) {
-      const full = path.join(dir, entry);
-      if ((await stat(full)).isDirectory()) await walk(full);
-    }
-  }
-  await walk(resultsRoot);
-  return bundles;
+  return findLeafDirs(resultsRoot, (dir) => exists(path.join(dir, 'result.json')));
 }
 
 export async function checkBundleProvenance({ repoRoot, baseRef, bundles }) {
+  const resolvedBaseRef = await resolveBaseRef(repoRoot, baseRef);
   const violations = [];
   for (const bundle of bundles) {
     const rel = path.relative(repoRoot, bundle);
@@ -58,10 +81,16 @@ export async function checkBundleProvenance({ repoRoot, baseRef, bundles }) {
     if (harness.dirty === true) {
       violations.push({ bundle: rel, reason: 'produced from a dirty working tree', commit });
     }
-    if (!(await isAncestor(repoRoot, commit, baseRef))) {
+    if (!(await commitExists(repoRoot, commit))) {
       violations.push({
         bundle: rel,
-        reason: `harness commit is not an ancestor of ${baseRef} (unknown commit or not yet merged)`,
+        reason: `harness commit is unknown to this clone (shallow clone or unfetched history)`,
+        commit
+      });
+    } else if (!(await isAncestor(repoRoot, commit, resolvedBaseRef))) {
+      violations.push({
+        bundle: rel,
+        reason: `harness commit is not an ancestor of ${baseRef} (not yet merged)`,
         commit
       });
     }
@@ -75,15 +104,20 @@ if (isMain) {
   const baseRef = baseIndex === -1 ? 'origin/main' : process.argv[baseIndex + 1];
   const repoRoot = process.cwd();
   const bundles = await findBundles(path.join(repoRoot, 'results'));
-  const { ok, violations } = await checkBundleProvenance({ repoRoot, baseRef, bundles });
-  if (!ok) {
-    console.error(`bundle provenance: ${violations.length} violation(s) against ${baseRef}\n`);
-    for (const v of violations) console.error(`  ${v.bundle}\n    ${v.reason}${v.commit ? `\n    commit ${v.commit}` : ''}`);
-    console.error(
-      '\nPublish numbers in a PR separate from the harness change that produced them:\n' +
-        '  1. merge the harness change\n  2. check out a clean main\n  3. run\n  4. publish in a follow-up PR'
-    );
+  try {
+    const { ok, violations } = await checkBundleProvenance({ repoRoot, baseRef, bundles });
+    if (!ok) {
+      console.error(`bundle provenance: ${violations.length} violation(s) against ${baseRef}\n`);
+      for (const v of violations) console.error(`  ${v.bundle}\n    ${v.reason}${v.commit ? `\n    commit ${v.commit}` : ''}`);
+      console.error(
+        '\nPublish numbers in a PR separate from the harness change that produced them:\n' +
+          '  1. merge the harness change\n  2. check out a clean main\n  3. run\n  4. publish in a follow-up PR'
+      );
+      process.exit(1);
+    }
+    console.log(`bundle provenance OK — ${bundles.length} bundle(s) against ${baseRef}`);
+  } catch (error) {
+    console.error(error.message);
     process.exit(1);
   }
-  console.log(`bundle provenance OK — ${bundles.length} bundle(s) against ${baseRef}`);
 }
