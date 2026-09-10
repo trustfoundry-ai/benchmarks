@@ -70,5 +70,10 @@ distributions and intervals, not bytes.
 
 ## A smaller clone
 
-The repository carries historical result bundles. `git clone --depth 1` gets you
-a working tree without them.
+The repository's history carries every published result bundle, so cloning it
+in full downloads far more than the harness source. `git clone
+--filter=blob:none <url>` fetches the complete commit history but defers file
+contents, pulling each blob only when something actually asks for it. Because
+the history is complete, `git checkout` on the commit an older bundle names
+still works — it just fetches the blobs that commit needs the first time you
+touch them.
