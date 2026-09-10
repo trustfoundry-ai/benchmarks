@@ -12,9 +12,7 @@ async function findBundles(root) {
   return findLeafDirs(root, async (dir) => {
     const manifest = path.join(dir, 'manifest.json');
     const result = path.join(dir, 'result.json');
-    const hasRaw = (await exists(path.join(dir, 'raw.jsonl'))) ||
-      (await exists(path.join(dir, 'raw.jsonl.gz')));
-    return (await exists(manifest)) && hasRaw && (await exists(result));
+    return (await exists(manifest)) && (await exists(result));
   });
 }
 

@@ -505,6 +505,7 @@ export interface PublishResultBundleArgs {
   runDir: string;
   outDir: string;
   force?: boolean;
+  rawHref?: string | null;
 }
 export interface PublishResultBundleResult {
   outDir: string;
@@ -519,6 +520,7 @@ export interface VerifyResultBundleArgs {
   repoRoot: string;
   bundleDir: string;
   verifyInputs?: boolean;
+  allowFetch?: boolean;
 }
 export interface VerifyResultBundleResult {
   ok: true;

@@ -1,6 +1,8 @@
 import path from 'node:path';
 import { createReadStream, createWriteStream } from 'node:fs';
-import { readFile, unlink } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, unlink } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { promisify } from 'node:util';
 import { createGunzip, createGzip, gunzip } from 'node:zlib';
@@ -354,7 +356,7 @@ function resultEnvelope({ manifest, scores }) {
   };
 }
 
-export async function publishResultBundle({ repoRoot, runDir, outDir, force = false }) {
+export async function publishResultBundle({ repoRoot, runDir, outDir, force = false, rawHref = null }) {
   const resolvedRun = path.resolve(repoRoot, runDir);
   const resolvedOut = path.resolve(repoRoot, outDir);
   if ((await exists(resolvedOut)) && !force) {
@@ -434,7 +436,8 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
       raw: {
         path: rawArtifactPath,
         sha256: await sha256File(rawPath),
-        rows: rowCount
+        rows: rowCount,
+        ...(rawHref ? { href: rawHref } : {})
       },
       result: {
         path: 'result.json',
@@ -481,68 +484,113 @@ async function verifyInputDigest(repoRoot, item, label) {
   assertEqual(await sha256File(file), item.sha256, `${label} digest mismatch`);
 }
 
-export async function verifyResultBundle({ repoRoot, bundleDir, verifyInputs = true }) {
-  const resolvedBundle = path.resolve(repoRoot, bundleDir);
-  const manifest = await readJson(path.join(resolvedBundle, 'manifest.json'));
-  const rawPath = path.join(resolvedBundle, manifest.artifacts?.raw?.path ?? 'raw.jsonl');
-  const resultPath = path.join(resolvedBundle, manifest.artifacts?.result?.path ?? 'result.json');
-  assertEqual(await sha256File(rawPath), manifest.artifacts.raw.sha256, `${manifest.artifacts.raw.path} digest mismatch`);
-  assertEqual(await sha256File(resultPath), manifest.artifacts.result.sha256, 'result.json digest mismatch');
-
-  const result = await readJson(resultPath);
-
-  // Stream raw rows through the scorer; count rows as they go so we can
-  // verify against the manifest's row count without materializing the file.
-  let rowCount = 0;
-  async function* countingRawRows() {
-    for await (const row of readRawJsonlStream(rawPath)) {
-      rowCount += 1;
-      yield row;
-    }
+// Resolves the local filesystem path to a bundle's raw evidence, without
+// ever materializing its contents in memory: a local `raw.jsonl(.gz)` copy
+// is used as-is, and a bundle that only references remote evidence via
+// `artifacts.raw.href` is streamed straight to a temp file that the caller
+// deletes when done. Callers get a path they can hand to `sha256File` and
+// `readRawJsonlStream` unchanged.
+async function resolveRawPath({ bundleDir, manifest, allowFetch }) {
+  for (const name of ['raw.jsonl.gz', 'raw.jsonl']) {
+    const local = path.join(bundleDir, name);
+    if (await exists(local)) return { rawPath: local, cleanup: async () => {} };
   }
-  // Prefer the scorer id recorded on the bundled result. Every bundle
-  // published by executeRun records `result.run.scorer.id`; a bundle
-  // missing that field cannot be verified deterministically.
-  const scorerIdForVerify =
-    result.run?.scorer?.id ?? result.summary?.execution?.scorer?.id;
-  if (typeof scorerIdForVerify !== 'string' || !scorerIdForVerify) {
+  const href = manifest?.artifacts?.raw?.href;
+  if (!href) {
     throw new Error(
-      `verifyResultBundle: bundle ${bundleDir} is missing result.run.scorer.id — ` +
-        `cannot determine which scorer to invoke for verification.`
+      `${bundleDir}: raw evidence is neither present locally nor referenced by artifacts.raw.href`
     );
   }
-  const recomputed = await scoreRawRowsStream({
-    rawRowsIterable: countingRawRows(),
-    manifest: result.run
-      ? {
-          run_id: result.run.run_id,
-          benchmark: result.run.benchmark,
-          provider: result.run.provider,
-          scheduler: result.run.scheduler,
-          scorer: result.run.scorer ?? { id: scorerIdForVerify }
-        }
-      : null,
-    scorerId: scorerIdForVerify
-  });
-  assertEqual(rowCount, manifest.artifacts.raw.rows, 'raw row count mismatch');
-  const recomputedSummary = canonicalStringify(recomputed.summary);
-  const reportedSummary = canonicalStringify(result.summary);
-  assertEqual(reportedSummary, recomputedSummary, 'result summary mismatch');
-
-  if (verifyInputs) {
-    await verifyInputDigest(repoRoot, manifest.verification_inputs?.benchmark_config, 'benchmark config');
-    await verifyInputDigest(repoRoot, manifest.verification_inputs?.provider_config, 'provider config');
-    await verifyInputDigest(repoRoot, manifest.verification_inputs?.scorer_config, 'scorer config');
-    for (const dataFile of manifest.verification_inputs?.data_files ?? []) {
-      await verifyInputDigest(repoRoot, dataFile, `data file ${dataFile.path}`);
-    }
+  if (!allowFetch) {
+    throw new Error(`${bundleDir}: raw evidence is remote and fetching is disabled`);
   }
+  const response = await fetch(href);
+  if (!response.ok) {
+    throw new Error(`${bundleDir}: fetching raw evidence failed — ${response.status} ${href}`);
+  }
+  const tmpDir = await mkdtemp(path.join(tmpdir(), 'raw-asset-'));
+  const rawName = path.basename(manifest?.artifacts?.raw?.path ?? 'raw.jsonl');
+  const tmpPath = path.join(tmpDir, rawName);
+  await pipeline(Readable.fromWeb(response.body), createWriteStream(tmpPath));
   return {
-    ok: true,
-    bundleDir: relativePath(repoRoot, resolvedBundle),
-    rows: rowCount,
-    summary: result.summary
+    rawPath: tmpPath,
+    cleanup: async () => {
+      await rm(tmpDir, { recursive: true, force: true });
+    }
   };
+}
+
+export async function verifyResultBundle({
+  repoRoot,
+  bundleDir,
+  verifyInputs = true,
+  allowFetch = true
+}) {
+  const resolvedBundle = path.resolve(repoRoot, bundleDir);
+  const manifest = await readJson(path.join(resolvedBundle, 'manifest.json'));
+  const { rawPath, cleanup } = await resolveRawPath({ bundleDir: resolvedBundle, manifest, allowFetch });
+  try {
+    const resultPath = path.join(resolvedBundle, manifest.artifacts?.result?.path ?? 'result.json');
+    assertEqual(await sha256File(rawPath), manifest.artifacts.raw.sha256, `${manifest.artifacts.raw.path} digest mismatch`);
+    assertEqual(await sha256File(resultPath), manifest.artifacts.result.sha256, 'result.json digest mismatch');
+
+    const result = await readJson(resultPath);
+
+    // Stream raw rows through the scorer; count rows as they go so we can
+    // verify against the manifest's row count without materializing the file.
+    let rowCount = 0;
+    async function* countingRawRows() {
+      for await (const row of readRawJsonlStream(rawPath)) {
+        rowCount += 1;
+        yield row;
+      }
+    }
+    // Prefer the scorer id recorded on the bundled result. Every bundle
+    // published by executeRun records `result.run.scorer.id`; a bundle
+    // missing that field cannot be verified deterministically.
+    const scorerIdForVerify =
+      result.run?.scorer?.id ?? result.summary?.execution?.scorer?.id;
+    if (typeof scorerIdForVerify !== 'string' || !scorerIdForVerify) {
+      throw new Error(
+        `verifyResultBundle: bundle ${bundleDir} is missing result.run.scorer.id — ` +
+          `cannot determine which scorer to invoke for verification.`
+      );
+    }
+    const recomputed = await scoreRawRowsStream({
+      rawRowsIterable: countingRawRows(),
+      manifest: result.run
+        ? {
+            run_id: result.run.run_id,
+            benchmark: result.run.benchmark,
+            provider: result.run.provider,
+            scheduler: result.run.scheduler,
+            scorer: result.run.scorer ?? { id: scorerIdForVerify }
+          }
+        : null,
+      scorerId: scorerIdForVerify
+    });
+    assertEqual(rowCount, manifest.artifacts.raw.rows, 'raw row count mismatch');
+    const recomputedSummary = canonicalStringify(recomputed.summary);
+    const reportedSummary = canonicalStringify(result.summary);
+    assertEqual(reportedSummary, recomputedSummary, 'result summary mismatch');
+
+    if (verifyInputs) {
+      await verifyInputDigest(repoRoot, manifest.verification_inputs?.benchmark_config, 'benchmark config');
+      await verifyInputDigest(repoRoot, manifest.verification_inputs?.provider_config, 'provider config');
+      await verifyInputDigest(repoRoot, manifest.verification_inputs?.scorer_config, 'scorer config');
+      for (const dataFile of manifest.verification_inputs?.data_files ?? []) {
+        await verifyInputDigest(repoRoot, dataFile, `data file ${dataFile.path}`);
+      }
+    }
+    return {
+      ok: true,
+      bundleDir: relativePath(repoRoot, resolvedBundle),
+      rows: rowCount,
+      summary: result.summary
+    };
+  } finally {
+    await cleanup();
+  }
 }
 
 // Kept for callers (tests + tooling) that still want to read a whole bundle

@@ -19,3 +19,8 @@ coverage/
 # are excluded.
 data/courtlistener/*.csv
 data/courtlistener/*.csv.bz2
+
+# Row-level evidence is published as a release asset and referenced by
+# manifest.artifacts.raw.href. Summaries stay in git.
+results/**/raw.jsonl
+results/**/raw.jsonl.gz
