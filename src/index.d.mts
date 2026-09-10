@@ -539,6 +539,15 @@ export declare function verifyResultBundle(
   args: VerifyResultBundleArgs
 ): Promise<VerifyResultBundleResult>;
 
+/**
+ * Validates that `summary` carries the required `overall` (`hit_at`, `mrr`,
+ * `n`) and `headline` (`metric`, `macro`, `pooled`, `per_category`, `ci95`,
+ * `n_categories`, `n_rows`) shape declared in `artifact-schemas.json`'s
+ * `result.v1.properties.summary`. Synchronous; throws on the first
+ * violation rather than returning a result.
+ */
+export declare function assertValidSummary(summary: ScorerSummary): ScorerSummary;
+
 // ---- Query transforms ----
 
 export declare const STRIP_SYNTHETIC_INSTRUCTION_PREFIXES: string;

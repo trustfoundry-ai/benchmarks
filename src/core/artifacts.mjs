@@ -527,6 +527,94 @@ export async function writeBundleChecksums({ bundleDir, rawArtifactPath }) {
   await writeText(path.join(bundleDir, 'checksums.txt'), `${checksums}\n`);
 }
 
+const HIT_AT_KEY_PATTERN = /^hit@\d+$/;
+
+function assertHitAtObject(value, label) {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`${label} must be an object`);
+  }
+  for (const [key, entry] of Object.entries(value)) {
+    if (!HIT_AT_KEY_PATTERN.test(key)) {
+      throw new Error(`${label} has key '${key}', which does not match ^hit@\\d+$`);
+    }
+    if (typeof entry !== 'number') {
+      throw new Error(`${label}['${key}'] must be a number`);
+    }
+  }
+}
+
+// Hand-written, synchronous validator for the `summary` shape both scorers
+// must produce -- there is no JSON Schema validator dependency in this
+// package (zero runtime dependencies), so this enforces by hand exactly what
+// `artifact-schemas.json`'s `result.v1.properties.summary` declares. Throws
+// on the first violation rather than collecting all of them; message style
+// matches `src/core/contracts/index.mjs`'s adapter validators.
+export function assertValidSummary(summary) {
+  if (summary === null || typeof summary !== 'object') {
+    throw new Error('summary must be an object');
+  }
+  for (const key of ['overall', 'headline']) {
+    if (summary[key] === undefined) {
+      throw new Error(`summary is missing required key '${key}'`);
+    }
+  }
+
+  const { overall, headline } = summary;
+
+  if (overall === null || typeof overall !== 'object') {
+    throw new Error('summary.overall must be an object');
+  }
+  for (const key of ['hit_at', 'mrr', 'n']) {
+    if (overall[key] === undefined) {
+      throw new Error(`summary.overall is missing required key '${key}'`);
+    }
+  }
+  assertHitAtObject(overall.hit_at, 'summary.overall.hit_at');
+  if (typeof overall.mrr !== 'number') {
+    throw new Error('summary.overall.mrr must be a number');
+  }
+  if (!Number.isInteger(overall.n)) {
+    throw new Error('summary.overall.n must be an integer');
+  }
+
+  if (headline === null || typeof headline !== 'object') {
+    throw new Error('summary.headline must be an object');
+  }
+  for (const key of ['metric', 'macro', 'pooled', 'per_category', 'ci95', 'n_categories', 'n_rows']) {
+    if (headline[key] === undefined) {
+      throw new Error(`summary.headline is missing required key '${key}'`);
+    }
+  }
+  if (typeof headline.metric !== 'string' || !HIT_AT_KEY_PATTERN.test(headline.metric)) {
+    throw new Error(
+      `summary.headline.metric must match ^hit@\\d+$, got ${JSON.stringify(headline.metric)}`
+    );
+  }
+  if (typeof headline.macro !== 'number') {
+    throw new Error('summary.headline.macro must be a number');
+  }
+  if (typeof headline.pooled !== 'number') {
+    throw new Error('summary.headline.pooled must be a number');
+  }
+  if (headline.per_category === null || typeof headline.per_category !== 'object') {
+    throw new Error('summary.headline.per_category must be an object');
+  }
+  if (
+    !Array.isArray(headline.ci95) ||
+    headline.ci95.length !== 2 ||
+    !headline.ci95.every((bound) => typeof bound === 'number')
+  ) {
+    throw new Error('summary.headline.ci95 must be a two-element array of numbers');
+  }
+  if (!Number.isInteger(headline.n_categories)) {
+    throw new Error('summary.headline.n_categories must be an integer');
+  }
+  if (!Number.isInteger(headline.n_rows)) {
+    throw new Error('summary.headline.n_rows must be an integer');
+  }
+  return summary;
+}
+
 function assertEqual(actual, expected, message) {
   if (actual !== expected) {
     throw new Error(`${message}: expected ${expected}, got ${actual}`);
@@ -601,6 +689,10 @@ export async function verifyResultBundle({
     assertEqual(await sha256File(resultPath), manifest.artifacts.result.sha256, 'result.json digest mismatch');
 
     const result = await readJson(resultPath);
+    // Validated before the recompute below so a shape violation is reported
+    // as a specific missing/malformed field rather than as an opaque
+    // summary mismatch once it is diffed against the freshly recomputed one.
+    assertValidSummary(result.summary);
 
     // Stream raw rows through the scorer; count rows as they go so we can
     // verify against the manifest's row count without materializing the file.

@@ -175,7 +175,34 @@
         "status": { "type": "string" },
         "caseScores": { "type": "array" },
         "taskScores": { "type": "array" },
-        "summary": { "type": "object" },
+        "summary": {
+          "type": "object",
+          "required": ["overall", "headline"],
+          "properties": {
+            "overall": {
+              "type": "object",
+              "required": ["hit_at", "mrr", "n"],
+              "properties": {
+                "hit_at": { "type": "object", "propertyNames": { "pattern": "^hit@\\d+$" }, "additionalProperties": { "type": "number" } },
+                "mrr": { "type": "number" },
+                "n": { "type": "integer" }
+              }
+            },
+            "headline": {
+              "type": "object",
+              "required": ["metric", "macro", "pooled", "per_category", "ci95", "n_categories", "n_rows"],
+              "properties": {
+                "metric": { "type": "string", "pattern": "^hit@\\d+$" },
+                "macro": { "type": "number" },
+                "pooled": { "type": "number" },
+                "per_category": { "type": "object" },
+                "ci95": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+                "n_categories": { "type": "integer" },
+                "n_rows": { "type": "integer" }
+              }
+            }
+          }
+        },
         "metadata": {
           "type": "object",
           "required": ["scorer", "version"],

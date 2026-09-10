@@ -101,6 +101,7 @@ export { listSuites, parseTargetRef, resolveTarget } from './core/suites.mjs';
 
 // ---- Result artifacts + verification ----
 export {
+  assertValidSummary,
   buildRawRow,
   buildRawRows,
   publishResultBundle,

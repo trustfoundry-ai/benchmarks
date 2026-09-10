@@ -25,6 +25,7 @@ const EXPECTED_PUBLIC_EXPORTS = [
   'applyQueryTransform',
   'applyShard',
   'assertCompatibleManifest',
+  'assertValidSummary',
   'benchmarkAdapterId',
   'buildManifest',
   'buildRawRow',
