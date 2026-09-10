@@ -379,6 +379,23 @@ test('listSuites against the real repo root returns both suites with their expec
   );
 });
 
+test('resolveTarget succeeds for every real target in every real suite', async () => {
+  // listSuites does no filesystem existence check on a target's benchmark/
+  // provider/scorer paths — only resolveTarget does. The orphan-config test
+  // below happens to catch a bad `benchmark` path indirectly (it cross-checks
+  // against configs/benchmarks/ contents), but nothing plays that role for
+  // `provider` or `scorer`. Looping every real target through resolveTarget
+  // is what actually proves all thirty paths resolve, and it is derived from
+  // listSuites rather than hardcoded, so a target added later is covered
+  // automatically.
+  const suites = await listSuites({ repoRoot });
+  for (const suite of suites) {
+    for (const targetId of Object.keys(suite.targets)) {
+      await resolveTarget({ repoRoot, suiteId: suite.id, targetId });
+    }
+  }
+});
+
 test('every benchmark config is claimed by exactly one suite target', async () => {
   const { readdir } = await import('node:fs/promises');
   const path = await import('node:path');

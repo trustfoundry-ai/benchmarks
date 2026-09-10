@@ -48,7 +48,7 @@
           },
           "headline": {
             "type": "boolean",
-            "description": "Whether this target's result is the one surfaced as the suite's headline number."
+            "description": "Whether this target's result is surfaced as one of the suite's headline numbers. A suite may have several — one per independent category — as distinct from a target that runs at full tier but is reported separately from the headline."
           },
           "tier": {
             "enum": ["smoke", "full"],
