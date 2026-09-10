@@ -16,8 +16,48 @@ import {
 } from '../src/core/artifacts.mjs';
 import { exists, sha256File, writeJson, writeJsonl, readJson } from '../src/core/fs.mjs';
 import { trustfoundryLegalSearchScorerAdapter } from '../src/adapters/scorers/trustfoundry-legal-search.mjs';
+import { defaultRegistry } from '../src/core/registry.mjs';
 
 const gunzipAsync = promisify(gunzip);
+
+// A minimal scorer that deliberately omits one scored case's caseScore, to
+// exercise publishResultBundle's guard against publishing a raw row with no
+// corresponding score. Registered into the shared default registry under a
+// test-only id; harmless to leave registered for the rest of the process
+// (other tests only assert the registry is non-empty, never its exact
+// membership).
+const droppingScorerAdapter = {
+  id: 'test-drops-a-case-score',
+  version: 'test-v1',
+  async scoreStream({ pairs }) {
+    const caseScores = [];
+    for await (const pair of pairs) {
+      const benchmarkCase = pair.benchmarkCase ?? pair[0];
+      if (benchmarkCase.caseId === 'dropped-case') continue;
+      caseScores.push({ caseId: benchmarkCase.caseId, status: 'scored', hitRank: 1, reciprocalRank: 1 });
+    }
+    return {
+      scorerId: this.id,
+      status: 'completed',
+      caseScores,
+      summary: {
+        overall: { hit_at: { 'hit@1': 1 }, mrr: 1, n: caseScores.length },
+        headline: {
+          metric: 'hit@1',
+          macro: 1,
+          pooled: 1,
+          per_category: {},
+          ci95: [0.9, 1],
+          n_categories: 1,
+          n_rows: caseScores.length
+        },
+        execution: { scorer: { id: this.id, cutoffs: [1], headlineCutoff: 1 } }
+      },
+      metadata: { scorer: this.id, version: this.version, cutoffs: [1], headlineCutoff: 1 }
+    };
+  }
+};
+defaultRegistry.register('scorers', droppingScorerAdapter);
 
 async function makeRun(repoRoot, root) {
   const runDir = path.join(root, 'run');
@@ -173,6 +213,32 @@ test('publishResultBundle always writes gzipped raw evidence', async () => {
 
   assert.equal(await exists(path.join(outDir, 'raw.jsonl.gz')), true);
   assert.equal(await exists(path.join(outDir, 'raw.jsonl')), false);
+});
+
+test('publishResultBundle refuses to publish a raw row for a case the scorer returned no score for', async () => {
+  const repoRoot = process.cwd();
+  const root = await mkdtemp(path.join(os.tmpdir(), 'tf-benchmarks-artifacts-missing-score-'));
+  const runDir = path.join(root, 'run');
+  const cases = [
+    { caseId: 'case-1', prompt: 'q1', metadata: { expected: {} } },
+    { caseId: 'dropped-case', prompt: 'q2', metadata: { expected: {} } }
+  ];
+  const providerResults = [
+    { caseId: 'case-1', status: 'completed', finalOutputText: JSON.stringify({ results: [] }) },
+    { caseId: 'dropped-case', status: 'completed', finalOutputText: JSON.stringify({ results: [] }) }
+  ];
+  await writeJson(path.join(runDir, 'manifest.json'), { run_id: 'missing-score-test', scorer: { id: droppingScorerAdapter.id } });
+  await writeJsonl(path.join(runDir, 'cases.jsonl'), cases);
+  await writeJsonl(path.join(runDir, 'provider-results.jsonl'), providerResults);
+
+  const outDir = path.join(root, 'bundle');
+  await assert.rejects(
+    () => publishResultBundle({ repoRoot, runDir, outDir }),
+    /returned no score for case 'dropped-case'/
+  );
+  // The throw happens mid-write, before the bundle manifest is produced, so
+  // no bundle manifest ever names a row for the case that had no score.
+  assert.equal(await exists(path.join(outDir, 'manifest.json')), false);
 });
 
 test('raw rows preserve non-case legal search metadata for recomputation', () => {

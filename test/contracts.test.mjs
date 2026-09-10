@@ -94,6 +94,100 @@ test('a headline whose metric does not match ^hit@\\d+$ is rejected', () => {
   );
 });
 
+// Each row exercises one type-check branch inside assertValidSummary that
+// the drift test above does not cover (that test only proves presence is
+// enforced; these prove the *value* of a present key is checked). Table-
+// driven so each branch gets one focused case rather than a near-identical
+// block, and each asserts on the branch's own message so it cannot pass for
+// the wrong reason.
+const REJECTION_CASES = [
+  {
+    name: 'overall.mrr is not a number',
+    mutate: (s) => {
+      s.overall.mrr = 'not-a-number';
+    },
+    pattern: /summary\.overall\.mrr must be a number/
+  },
+  {
+    name: 'overall.n is not an integer',
+    mutate: (s) => {
+      s.overall.n = 1.5;
+    },
+    pattern: /summary\.overall\.n must be an integer/
+  },
+  {
+    name: "overall.hit_at has a key that does not match ^hit@\\d+$",
+    mutate: (s) => {
+      s.overall.hit_at = { not_a_hit_key: 0.5 };
+    },
+    pattern: /summary\.overall\.hit_at has key 'not_a_hit_key'/
+  },
+  {
+    name: 'overall.hit_at has a non-number value',
+    mutate: (s) => {
+      s.overall.hit_at = { 'hit@1': 'not-a-number' };
+    },
+    pattern: /summary\.overall\.hit_at\['hit@1'\] must be a number/
+  },
+  {
+    name: 'headline.macro is not a number',
+    mutate: (s) => {
+      s.headline.macro = 'not-a-number';
+    },
+    pattern: /summary\.headline\.macro must be a number/
+  },
+  {
+    name: 'headline.pooled is not a number',
+    mutate: (s) => {
+      s.headline.pooled = 'not-a-number';
+    },
+    pattern: /summary\.headline\.pooled must be a number/
+  },
+  {
+    name: 'headline.per_category is not an object',
+    mutate: (s) => {
+      s.headline.per_category = 'not-an-object';
+    },
+    pattern: /summary\.headline\.per_category must be an object/
+  },
+  {
+    name: 'headline.ci95 has the wrong length',
+    mutate: (s) => {
+      s.headline.ci95 = [0.9];
+    },
+    pattern: /summary\.headline\.ci95 must be a two-element array of numbers/
+  },
+  {
+    name: 'headline.ci95 has a non-number element',
+    mutate: (s) => {
+      s.headline.ci95 = [0.8, 'not-a-number'];
+    },
+    pattern: /summary\.headline\.ci95 must be a two-element array of numbers/
+  },
+  {
+    name: 'headline.n_categories is not an integer',
+    mutate: (s) => {
+      s.headline.n_categories = 1.5;
+    },
+    pattern: /summary\.headline\.n_categories must be an integer/
+  },
+  {
+    name: 'headline.n_rows is not an integer',
+    mutate: (s) => {
+      s.headline.n_rows = 1.5;
+    },
+    pattern: /summary\.headline\.n_rows must be an integer/
+  }
+];
+
+for (const { name, mutate, pattern } of REJECTION_CASES) {
+  test(`assertValidSummary rejects: ${name}`, () => {
+    const invalid = structuredClone(CANONICAL_SUMMARY);
+    mutate(invalid);
+    assert.throws(() => assertValidSummary(invalid), pattern);
+  });
+}
+
 // Binds the hand-written validator to the declarative schema block in
 // artifact-schemas.json: without this test, the two can drift the same way
 // the bare `{"type": "object"}` and two suites' summary vocabularies did.

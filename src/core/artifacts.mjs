@@ -430,11 +430,12 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
   }
 
   // Score first, over the full run, so the scorer's configured cutoffs are
-  // known: they are only reported once, on the finished summary, at
+  // known: they are reported once, on the finished summary, at
   // `summary.execution.scorer.cutoffs`. Raw rows are then built in a second
   // pass over the same (small, disk-backed) pairs, keyed against the
-  // per-case scores this pass already computed -- still only one pair
-  // materialized at a time, just read twice instead of once.
+  // per-case scores this pass already computed. Only one pair is
+  // materialized at a time; the second pass re-reads `provider-results.jsonl`
+  // from disk rather than holding every pair in memory.
   const scorer = getAdapter('scorers', resolveScorerId({ manifest }));
   const scoreResult = await scorer.scoreStream({ manifest, pairs: providerPairs() });
 
@@ -450,10 +451,16 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
     (scoreResult.caseScores ?? []).map((caseScore) => [caseScore.caseId, caseScore])
   );
   for await (const { benchmarkCase, providerResult } of providerPairs()) {
+    if (!caseScoreByCaseId.has(benchmarkCase.caseId)) {
+      throw new Error(
+        `publishResultBundle: scorer '${resolveScorerId({ manifest })}' returned no score for ` +
+          `case '${benchmarkCase.caseId}' -- refusing to publish a raw row with a guessed score.`
+      );
+    }
     const rawRow = buildRawRow({
       benchmarkCase,
       providerResult,
-      caseScore: caseScoreByCaseId.get(benchmarkCase.caseId) ?? null,
+      caseScore: caseScoreByCaseId.get(benchmarkCase.caseId),
       publishedExpectedFields,
       cutoffs
     });
