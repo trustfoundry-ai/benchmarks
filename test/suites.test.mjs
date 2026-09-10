@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -376,7 +376,7 @@ test('listSuites against the real repo root returns both suites with their expec
   );
   assert.deepEqual(
     Object.keys(byId['trustfoundry-case-name-lookup'].targets).sort(),
-    ['negatives-50', 'public-8850']
+    ['negatives-50', 'public-1050', 'public-8850']
   );
 });
 
@@ -441,55 +441,90 @@ test('every benchmark config is claimed by exactly one suite target', async () =
 });
 
 /**
+ * Scans `results/<suite>/<date>/<target>/` on disk and returns the set of
+ * target ids that have at least one dated bundle directory checked in.
+ * Reads real filesystem state, independent of anything the pointer claims.
+ */
+async function findBundledTargetIds(root, suiteId) {
+  const suiteResultsDir = path.join(root, 'results', suiteId);
+  const found = new Set();
+  if (!(await exists(suiteResultsDir))) return found;
+  for (const dateEntry of await readdir(suiteResultsDir, { withFileTypes: true })) {
+    if (!dateEntry.isDirectory()) continue;
+    const dateDir = path.join(suiteResultsDir, dateEntry.name);
+    for (const targetEntry of await readdir(dateDir, { withFileTypes: true })) {
+      if (targetEntry.isDirectory()) found.add(targetEntry.name);
+    }
+  }
+  return found;
+}
+
+/**
  * Checks one suite's `results/<suite>/latest.json` pointer against its
- * declared target ids.
+ * declared targets and the bundle directories actually checked in under
+ * `results/<suite>/`. Three independent invariants, each guarding a
+ * different failure:
  *
- * A `published` suite is committing to having a bundle for every target it
- * declares: the pointer must exist, and its key set must equal the declared
- * target ids exactly, in both directions. That is what stops a published
- * suite from claiming a target it never published, or pointing at one it
- * never declared.
- *
- * Any other status (`experimental`, `deprecated`) is a suite that is allowed
- * to land and iterate before it carries published numbers, so its pointer
- * file may be absent entirely — that is not a failure. If the file is
- * present, though, its keys must still be a subset of the declared target
- * ids: a partially-published experimental suite is fine, but a pointer
- * naming an undeclared target is still the orphan case and still an error
- * regardless of status.
+ * 1. No orphan pointer entries. Every key the pointer names must be a
+ *    target id the suite manifest actually declares, and its value must
+ *    resolve to a path ending in that same target id. Applies to every
+ *    suite regardless of status — a pointer naming a target the manifest
+ *    doesn't know about is a stale or mistyped entry no matter how far
+ *    along the suite is.
+ * 2. No orphan bundles. Every target that has a dated bundle directory on
+ *    disk must have a pointer entry naming it. Applies to every suite
+ *    regardless of status. This is what catches a pointer entry lost to a
+ *    bad merge or a hand edit while the bundle it pointed at is still
+ *    sitting there on disk, unreachable through `latest.json`.
+ * 3. Full-tier coverage. A `published` suite's `tier: full` targets carry
+ *    its load-bearing claims, so each one must be backed by a real,
+ *    pointed-to bundle — not merely declared in the manifest. A `tier:
+ *    smoke` target makes no such claim and may be declared with nothing
+ *    published for it yet, so it is exempt from this rule alone (rules 1
+ *    and 2 still apply to it once it has either a pointer entry or a
+ *    bundle on disk).
  */
 async function checkPointerConsistency({ repoRoot: root, suite }) {
   const pointerPath = path.join(root, 'results', suite.id, 'latest.json');
   const targetIds = Object.keys(suite.targets).sort();
   const pointerIsPresent = await exists(pointerPath);
+  const pointer = pointerIsPresent ? JSON.parse(await readFile(pointerPath, 'utf8')) : {};
+  const pointerBundles = pointer.bundles ?? {};
 
-  if (suite.status !== 'published') {
-    if (!pointerIsPresent) return;
-    const pointer = JSON.parse(await readFile(pointerPath, 'utf8'));
-    for (const key of Object.keys(pointer.bundles ?? {})) {
-      assert.ok(
-        targetIds.includes(key),
-        `${suite.id}/latest.json '${key}' is not a target declared in suites/${suite.id}/suite.json`
-      );
-    }
-    return;
-  }
-
-  assert.ok(
-    pointerIsPresent,
-    `${suite.id} is published but has no results/${suite.id}/latest.json`
-  );
-  const pointer = JSON.parse(await readFile(pointerPath, 'utf8'));
-  const pointerKeys = Object.keys(pointer.bundles ?? {}).sort();
-  assert.deepEqual(
-    pointerKeys,
-    targetIds,
-    `${suite.id}/latest.json keys ${JSON.stringify(pointerKeys)} must exactly match declared targets ${JSON.stringify(targetIds)}`
-  );
-  for (const [key, rel] of Object.entries(pointer.bundles)) {
+  // Rule 1: no orphan pointer entries.
+  for (const [key, rel] of Object.entries(pointerBundles)) {
+    assert.ok(
+      targetIds.includes(key),
+      `${suite.id}/latest.json '${key}' is not a target declared in suites/${suite.id}/suite.json`
+    );
     assert.ok(
       rel.endsWith(`/${key}`),
       `${suite.id}/latest.json '${key}' -> '${rel}' must end with the target id`
+    );
+  }
+
+  // Rule 2: no orphan bundles -- a bundle directory on disk with no pointer
+  // entry naming it.
+  const bundledTargetIds = await findBundledTargetIds(root, suite.id);
+  for (const targetId of bundledTargetIds) {
+    if (!targetIds.includes(targetId)) continue; // not this rule's job -- see rule 1 / orphan-config
+    assert.ok(
+      targetId in pointerBundles,
+      `results/${suite.id}/ has a bundle directory for '${targetId}' but ` +
+        `results/${suite.id}/latest.json has no pointer entry for it`
+    );
+  }
+
+  if (suite.status !== 'published') return;
+
+  // Rule 3: a published suite's full-tier targets must be backed by a real,
+  // pointed-to bundle.
+  for (const [targetId, target] of Object.entries(suite.targets)) {
+    if (target.tier === 'smoke') continue;
+    assert.ok(
+      targetId in pointerBundles,
+      `${suite.id} is published and '${targetId}' is tier:full, but ` +
+        `results/${suite.id}/latest.json has no bundle for it`
     );
   }
 }
@@ -521,6 +556,68 @@ test('an experimental suite whose pointer names an undeclared target fails point
       'utf8'
     );
     const [suite] = await listSuites({ repoRoot: root });
-    await assert.rejects(() => checkPointerConsistency({ repoRoot: root, suite }));
+    await assert.rejects(
+      () => checkPointerConsistency({ repoRoot: root, suite }),
+      /'not-a-declared-target' is not a target declared/
+    );
+  });
+});
+
+test('a target with a bundle directory on disk but no pointer entry fails pointer consistency (rule 2)', async () => {
+  await withTempDir(async (root) => {
+    const manifest = validManifest({ status: 'experimental' });
+    await writeManifest(root, manifest.id, manifest);
+    // The bundle exists on disk for 'demo-50' ...
+    const bundleDir = path.join(root, 'results', manifest.id, '2026-01-01', 'demo-50');
+    await mkdir(bundleDir, { recursive: true });
+    await writeFile(path.join(bundleDir, 'result.json'), '{}\n', 'utf8');
+    // ... but latest.json has no entry for it -- not even an empty pointer file.
+    const [suite] = await listSuites({ repoRoot: root });
+    await assert.rejects(
+      () => checkPointerConsistency({ repoRoot: root, suite }),
+      /has a bundle directory for 'demo-50' but .*latest\.json has no pointer entry for it/
+    );
+  });
+});
+
+test('a bundled, pointed-to target with a bundle directory on disk passes rule 2', async () => {
+  await withTempDir(async (root) => {
+    const manifest = validManifest({ status: 'experimental' });
+    await writeManifest(root, manifest.id, manifest);
+    const resultsDir = path.join(root, 'results', manifest.id);
+    const bundleDir = path.join(resultsDir, '2026-01-01', 'demo-50');
+    await mkdir(bundleDir, { recursive: true });
+    await writeFile(path.join(bundleDir, 'result.json'), '{}\n', 'utf8');
+    await writeFile(
+      path.join(resultsDir, 'latest.json'),
+      JSON.stringify({ bundles: { 'demo-50': '2026-01-01/demo-50' } }),
+      'utf8'
+    );
+    const [suite] = await listSuites({ repoRoot: root });
+    await checkPointerConsistency({ repoRoot: root, suite });
+  });
+});
+
+test('a published suite with a tier:full target that has no bundle fails pointer consistency (rule 3)', async () => {
+  await withTempDir(async (root) => {
+    const manifest = validManifest({ status: 'published' });
+    manifest.targets['demo-50'].tier = 'full';
+    await writeManifest(root, manifest.id, manifest);
+    // No results/ directory at all for this suite -- nothing published yet.
+    const [suite] = await listSuites({ repoRoot: root });
+    await assert.rejects(
+      () => checkPointerConsistency({ repoRoot: root, suite }),
+      /is published and 'demo-50' is tier:full, but .*latest\.json has no bundle for it/
+    );
+  });
+});
+
+test('a published suite with only a tier:smoke target passes rule 3 with no bundle at all', async () => {
+  await withTempDir(async (root) => {
+    const manifest = validManifest({ status: 'published' });
+    manifest.targets['demo-50'].tier = 'smoke';
+    await writeManifest(root, manifest.id, manifest);
+    const [suite] = await listSuites({ repoRoot: root });
+    await checkPointerConsistency({ repoRoot: root, suite });
   });
 });
