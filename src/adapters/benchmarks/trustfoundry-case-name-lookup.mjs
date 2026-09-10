@@ -170,17 +170,16 @@ async function resolveDatasetPath(config, repoRoot) {
  */
 function selectPairsPerCategory(allCases, { pairsPerCategory, stride, offset }) {
   const pairOrder = new Map();
-  const byPair = new Map();
+  const seenPairs = new Set();
   for (const item of allCases) {
     const expected = item.metadata?.expected ?? {};
     const category = expected.name_transform ?? 'uncategorized';
     const pairId = expected.pair_id ?? item.caseId;
-    if (!byPair.has(pairId)) {
-      byPair.set(pairId, []);
+    if (!seenPairs.has(pairId)) {
+      seenPairs.add(pairId);
       if (!pairOrder.has(category)) pairOrder.set(category, []);
       pairOrder.get(category).push(pairId);
     }
-    byPair.get(pairId).push(item);
   }
 
   const selected = new Set();
