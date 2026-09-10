@@ -536,12 +536,24 @@ export async function writeBundleChecksums({ bundleDir, rawArtifactPath }) {
 
 const HIT_AT_KEY_PATTERN = /^hit@\d+$/;
 
+/**
+ * True when `value` is a metric name in the one vocabulary this harness
+ * assigns meaning to: a bare `hit@<cutoff>` cutoff name. `assertValidSummary`
+ * below and anything outside this module that needs to know whether a
+ * `summary.headline.metric` (or a `summary.overall.hit_at` key) is nameable
+ * import this rather than keeping a second copy of the pattern, so the
+ * schema and any consumer agree by construction on what counts.
+ */
+export function isHitAtMetric(value) {
+  return typeof value === 'string' && HIT_AT_KEY_PATTERN.test(value);
+}
+
 function assertHitAtObject(value, label) {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {
     throw new Error(`${label} must be an object`);
   }
   for (const [key, entry] of Object.entries(value)) {
-    if (!HIT_AT_KEY_PATTERN.test(key)) {
+    if (!isHitAtMetric(key)) {
       throw new Error(`${label} has key '${key}', which does not match ^hit@\\d+$`);
     }
     if (typeof entry !== 'number') {
@@ -592,7 +604,7 @@ export function assertValidSummary(summary) {
       throw new Error(`summary.headline is missing required key '${key}'`);
     }
   }
-  if (typeof headline.metric !== 'string' || !HIT_AT_KEY_PATTERN.test(headline.metric)) {
+  if (!isHitAtMetric(headline.metric)) {
     throw new Error(
       `summary.headline.metric must match ^hit@\\d+$, got ${JSON.stringify(headline.metric)}`
     );

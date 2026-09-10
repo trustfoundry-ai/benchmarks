@@ -37,9 +37,9 @@ These are the latest canonical benchmark runs in this repository, one table per 
 <!-- BEGIN GENERATED: latest-benchmarks -->
 #### TrustFoundry Case-Name Lookup
 
-| Target | Rows | hit@1 | hit@3 | hit@5 | hit@10 | hit@1 95% CI | MRR | wrong-name rate | provider failures | p50 | p95 |
+| Target | Rows | hit@1 | hit@3 | hit@5 | hit@10 | 95% CI | MRR | wrong-name rate | provider failures | p50 | p95 |
 | --- | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: |
-| [`public-8850`](results/trustfoundry-case-name-lookup/2026-09-09/public-8850/) | 8850 | 0.9331 | 0.9544 | 0.9584 | 0.9584 | [0.9254, 0.9401] | 0.9437 | 0.0943 | 0/8850 | 406 ms | 511 ms |
+| [`public-8850`](results/trustfoundry-case-name-lookup/2026-09-09/public-8850/) | 8850 | 0.9331 | 0.9544 | 0.9584 | 0.9584 | — | 0.9437 | 0.0943 | 0/8850 | 406 ms | 511 ms |
 
 Latency measured at `--parallel 4`.
 
@@ -49,7 +49,7 @@ See [`suites/trustfoundry-case-name-lookup/README.md`](suites/trustfoundry-case-
 
 #### TrustFoundry Legal Search
 
-| Target | Rows | hit@1 | hit@5 | hit@10 | hit@25 | hit@1 95% CI | MRR | wrong-name rate | provider failures | p50 | p95 |
+| Target | Rows | hit@1 | hit@5 | hit@10 | hit@25 | 95% CI | MRR | wrong-name rate | provider failures | p50 | p95 |
 | --- | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: |
 | [`case-questions-5k`](results/trustfoundry-legal-search/2026-07-05/case-questions-5k/) | 5000 | 0.3868 | 0.5758 | 0.6390 | 0.7114 | — | 0.4723 | — | 0/5000 | 857 ms | 1248 ms |
 | [`key-facts-5k`](results/trustfoundry-legal-search/2026-07-05/key-facts-5k/) | 5000 | 0.8734 | 0.9610 | 0.9688 | 0.9766 | — | 0.9128 | — | 0/5000 | 1051 ms | 1798 ms |

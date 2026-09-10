@@ -37,6 +37,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { isHitAtMetric } from '../src/core/artifacts.mjs';
 import { exists, readJson } from '../src/core/fs.mjs';
 import { listSuites } from '../src/core/suites.mjs';
 
@@ -194,11 +195,29 @@ async function renderHeadlineTable({ suite, repoRoot, pointer }) {
     entries.every(({ parallel }) => typeof parallel === 'number') &&
     new Set(entries.map(({ parallel }) => parallel)).size === 1;
 
+  // A "95% CI" column only means something if the reader knows which metric
+  // the interval brackets — legal-search's headline cutoff isn't
+  // case-name-lookup's, a bundle may carry no headline block at all, and one
+  // that does may hold a `metric` string outside the harness's own
+  // vocabulary. `isHitAtMetric`
+  // (imported from `../src/core/artifacts.mjs`, the same predicate
+  // `assertValidSummary` enforces publication against) is what "nameable"
+  // means here, so the header can never assert a name the harness itself
+  // would reject. When every headline row's metric is nameable and they all
+  // agree, name it once in the column header (mirroring `isUniformParallel`
+  // above). Otherwise the header stays generic and, for rows whose own
+  // metric is nameable, the cell names it instead — so the printed label can
+  // never claim a metric a row didn't report, or one that isn't valid.
+  const isUniformHeadlineMetric =
+    entries.every(({ summary }) => isHitAtMetric(summary.headline?.metric)) &&
+    new Set(entries.map(({ summary }) => summary.headline.metric)).size === 1;
+  const ciHeader = isUniformHeadlineMetric ? `${entries[0].summary.headline.metric} 95% CI` : '95% CI';
+
   const header = mdRow([
     'Target',
     'Rows',
     ...cutoffs,
-    'hit@1 95% CI',
+    ciHeader,
     'MRR',
     'wrong-name rate',
     'provider failures',
@@ -221,8 +240,15 @@ async function renderHeadlineTable({ suite, repoRoot, pointer }) {
 
   const rows = entries.map(({ targetId, target, rel, summary, parallel }) => {
     const hitAt = summary.overall?.hit_at ?? {};
-    const ci = summary.headline?.ci95;
-    const ciText = Array.isArray(ci) ? `[${formatScore(ci[0])}, ${formatScore(ci[1])}]` : '—';
+    // A CI interval is only worth printing alongside a name for what it
+    // brackets; a row whose metric isn't nameable (missing, or outside the
+    // harness's own `hit@<n>` vocabulary) renders the same honest em dash as
+    // a row with no headline block at all, rather than a number with no
+    // trustworthy label.
+    const metric = isHitAtMetric(summary.headline?.metric) ? summary.headline.metric : null;
+    const ci = metric === null ? undefined : summary.headline?.ci95;
+    const bracket = Array.isArray(ci) ? `[${formatScore(ci[0])}, ${formatScore(ci[1])}]` : null;
+    const ciText = bracket === null ? '—' : isUniformHeadlineMetric ? bracket : `${metric} ${bracket}`;
     return mdRow([
       `[\`${targetId}\`](results/${suite.id}/${rel}/)`,
       String(target.rows),

@@ -221,6 +221,104 @@ test('renderResultsTables treats a missing run.scheduler.parallel as non-uniform
   assert.match(output, /\[`target-1`\].*\| — \| 101 ms \| 201 ms \|/);
 });
 
+/**
+ * Builds a suite fixture with one headline row per entry of `headlines`,
+ * each entry either a `{ metric, ci95 }` pair (becomes that row's
+ * `summary.headline`) or `null` (the bundle carries no `headline` block at
+ * all). Used below to exercise the CI column header's three paths: a
+ * shared metric named once, disagreeing metrics forcing a generic header
+ * with per-row disclosure, and a missing block folded into the same
+ * non-uniform path rather than treated as an agreeing metric.
+ */
+async function renderHeadlineMetricFixture(headlines) {
+  const dir = await mkdtemp(path.join(tmpdir(), 'headline-metric-test-'));
+  try {
+    const suite = {
+      id: 'trustfoundry-headline-metric',
+      title: 'Headline Metric Suite',
+      status: 'published',
+      dir: 'suites/trustfoundry-headline-metric',
+      targets: Object.fromEntries(
+        headlines.map((_, i) => [`target-${i}`, { rows: 10, tier: 'full', headline: true }])
+      )
+    };
+
+    const resultsDir = path.join(dir, 'results', suite.id);
+    await mkdir(resultsDir, { recursive: true });
+    await writeFile(
+      path.join(resultsDir, 'latest.json'),
+      JSON.stringify({
+        bundles: Object.fromEntries(headlines.map((_, i) => [`target-${i}`, `2026-01-01/target-${i}`]))
+      }),
+      'utf8'
+    );
+
+    for (const [i, headline] of headlines.entries()) {
+      const bundleDir = path.join(resultsDir, '2026-01-01', `target-${i}`);
+      await mkdir(bundleDir, { recursive: true });
+      const summary = {
+        overall: { hit_at: { 'hit@1': 0.5 }, mrr: 0.5 },
+        providerFailures: 0,
+        total: 10,
+        latency_ms: { p50: 100, p95: 200 }
+      };
+      if (headline) summary.headline = headline;
+      await writeFile(
+        path.join(bundleDir, 'result.json'),
+        JSON.stringify({ run: { scheduler: { parallel: 4 } }, summary }),
+        'utf8'
+      );
+    }
+
+    return await renderResultsTables({ suites: [suite], repoRoot: dir });
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+}
+
+test('renderResultsTables names the actual headline metric in the CI column header when every row agrees', async () => {
+  const output = await renderHeadlineMetricFixture([
+    { metric: 'hit@25', ci95: [0.7, 0.74] },
+    { metric: 'hit@25', ci95: [0.6, 0.66] }
+  ]);
+  assert.match(output, /\| hit@25 95% CI \|/, 'the header names the metric the rows actually report');
+  assert.doesNotMatch(output, /hit@1 95% CI/, 'the header must not assert a metric no row reports');
+  assert.match(output, /\[`target-0`\].*\| \[0\.7000, 0\.7400\] \|/, 'a uniform metric keeps the cell bare');
+});
+
+test('renderResultsTables falls back to a generic CI header and names each row\'s metric inline when rows disagree', async () => {
+  const output = await renderHeadlineMetricFixture([
+    { metric: 'hit@1', ci95: [0.3, 0.4] },
+    { metric: 'hit@25', ci95: [0.7, 0.74] }
+  ]);
+  assert.match(output, /\| 95% CI \|/, 'the header does not pick one row\'s metric for the whole column');
+  assert.doesNotMatch(output, /\| hit@1 95% CI \|/);
+  assert.doesNotMatch(output, /\| hit@25 95% CI \|/);
+  assert.match(output, /\[`target-0`\].*\| hit@1 \[0\.3000, 0\.4000\] \|/, 'target-0 names its own metric');
+  assert.match(output, /\[`target-1`\].*\| hit@25 \[0\.7000, 0\.7400\] \|/, 'target-1 names its own metric');
+});
+
+test('renderResultsTables treats a bundle with no headline block as disagreeing, not as an agreeing metric', async () => {
+  const output = await renderHeadlineMetricFixture([{ metric: 'hit@25', ci95: [0.7, 0.74] }, null]);
+  assert.match(output, /\| 95% CI \|/, 'one row missing a metric must not still produce a named header');
+  assert.match(output, /\[`target-0`\].*\| hit@25 \[0\.7000, 0\.7400\] \|/);
+  assert.match(output, /\[`target-1`\].*\| — \|/, 'the missing block still renders as an honest em dash');
+});
+
+test('renderResultsTables never names a headline.metric outside hit@<n>, in the header or the cell', async () => {
+  // A bundle from before the metric field settled on `hit@<n>` names can
+  // carry any string there. Whatever it says, it is not a name this harness
+  // assigns meaning to, so it must not surface anywhere in the table.
+  const output = await renderHeadlineMetricFixture([{ metric: 'macro_hit_at_1', ci95: [0.9254, 0.9401] }]);
+  assert.doesNotMatch(output, /macro_hit_at_1/, 'the invalid metric string must not reach the README at all');
+  assert.match(output, /\| 95% CI \|/, 'an unnameable metric gets the same generic header as a missing one');
+  assert.match(
+    output,
+    /\[`target-0`\].*\| 0\.5000 \| — \| 0\.5000 \|/,
+    'the CI cell degrades to an em dash rather than printing a number with no trustworthy label'
+  );
+});
+
 async function withTempReadme(body, run) {
   const dir = await mkdtemp(path.join(tmpdir(), 'readme-tables-test-'));
   try {
