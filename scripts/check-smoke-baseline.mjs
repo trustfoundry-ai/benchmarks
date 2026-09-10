@@ -19,6 +19,34 @@ import { readJson, writeJson } from '../src/core/fs.mjs';
 
 const USAGE = 'usage: check-smoke-baseline.mjs --run <dir> [--allow N] [--write]';
 
+// The summary line counts unchanged rows from the baseline side only:
+// `total` is the number of baseline rows, so subtracting the full `changed`
+// count from it would fold in `unexpected` rows (rows the run has that the
+// baseline never did) and understate how many baseline rows actually held.
+// `unexpected` rows get their own figure instead of being mixed into that
+// subtraction.
+export function formatSummaryLine({ total, changed, allowedChanges }) {
+  const baselineChanged = changed.filter((row) => row.kind !== 'unexpected').length;
+  const unexpected = changed.filter((row) => row.kind === 'unexpected').length;
+  const baselineUnchanged = total - baselineChanged;
+  return (
+    `smoke baseline: ${baselineUnchanged}/${total} baseline rows unchanged, ` +
+    `${baselineChanged} changed, ${unexpected} unexpected (allowance ${allowedChanges})`
+  );
+}
+
+// Drives the per-row display off `kind` rather than inferring it from
+// `was`/`now`, which for `missing`/`unexpected` rows hold display prose, not
+// a comparable pair. Only a `flipped` row can carry a rank change, and a rank
+// move with the hit verdict unchanged (e.g. `true -> true`) is otherwise
+// indistinguishable at a glance from no change at all -- the rank detail is
+// appended whenever the ranks differ, regardless of whether the hit did too.
+export function formatChangedRow(row) {
+  const verdict = `${row.caseId}  ${row.category}/${row.arm}  ${row.was} -> ${row.now}`;
+  if (row.kind !== 'flipped' || row.wasRank === row.nowRank) return `  ${verdict}`;
+  return `  ${verdict}  (rank ${row.wasRank} -> ${row.nowRank})`;
+}
+
 function rowFrom(row) {
   return {
     hit: Boolean(row.hitAt1),
@@ -74,6 +102,12 @@ export function compareToBaseline({ baseline, scores, allowedChanges = 5 }) {
     }
   }
 
+  // allowedChanges is compared against changed.length as a whole -- flipped,
+  // missing, and unexpected rows all count against it. An unexpected row
+  // means the run and the baseline disagree about which rows exist at all,
+  // which is exactly the kind of drift this gate exists to catch, so it is
+  // not exempted from the allowance just because it has no baseline verdict
+  // to compare against.
   return { ok: changed.length <= allowedChanges, changed, total: Object.keys(baseline.rows).length };
 }
 
@@ -164,11 +198,9 @@ if (isMain) {
 
   const baseline = await readJson(baselinePath);
   const { ok, changed, total } = compareToBaseline({ baseline, scores, allowedChanges });
-  console.log(
-    `smoke baseline: ${total - changed.length}/${total} rows unchanged, ${changed.length} changed (allowance ${allowedChanges})`
-  );
+  console.log(formatSummaryLine({ total, changed, allowedChanges }));
   for (const row of changed) {
-    console.log(`  ${row.caseId}  ${row.category}/${row.arm}  ${row.was} -> ${row.now}`);
+    console.log(formatChangedRow(row));
   }
   if (!ok) {
     console.error(

@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { baselineFrom, compareToBaseline, parseArgs } from '../scripts/check-smoke-baseline.mjs';
+import {
+  baselineFrom,
+  compareToBaseline,
+  formatChangedRow,
+  formatSummaryLine,
+  parseArgs
+} from '../scripts/check-smoke-baseline.mjs';
 
 const baseline = {
   target: 'trustfoundry-case-name-lookup/public-1050',
@@ -106,6 +112,71 @@ test('the default allowance is 5: five changed rows out of many still pass, a si
   const six = compareToBaseline({ baseline: bigBaseline, scores: { caseScores: flip(6) } });
   assert.equal(six.ok, false);
   assert.equal(six.changed.length, 6);
+});
+
+test('formatSummaryLine counts unchanged from the baseline side only, reporting an unexpected row separately rather than folding it into the subtraction', () => {
+  const res = compareToBaseline({
+    baseline,
+    scores: {
+      caseScores: [
+        { caseId: 'c1', hitAt1: true, hitRank: 1, nameTransform: 'party_misspell', arm: 'perturbed' },
+        { caseId: 'c4', hitAt1: true, hitRank: 1, nameTransform: 'given_name', arm: 'natural' }
+      ]
+    }
+  });
+  // c1 (the only baseline row) is unchanged; c4 is unexpected. A line that
+  // subtracted changed.length (1, for c4) from total (1, for c1) would
+  // wrongly report "0/1 baseline rows unchanged", asserting a baseline flip
+  // that never happened.
+  assert.equal(
+    formatSummaryLine({ total: res.total, changed: res.changed, allowedChanges: 5 }),
+    'smoke baseline: 1/1 baseline rows unchanged, 0 changed, 1 unexpected (allowance 5)'
+  );
+});
+
+test('formatChangedRow prints the rank detail for a rank-only change, distinguishing it from a verdict flip', () => {
+  const res = compareToBaseline({
+    baseline,
+    scores: { caseScores: [{ caseId: 'c1', hitAt1: true, hitRank: 3, nameTransform: 'party_misspell', arm: 'perturbed' }] },
+    allowedChanges: 0
+  });
+  assert.equal(res.changed[0].kind, 'flipped');
+  assert.equal(res.changed[0].was, res.changed[0].now); // hit did not change
+  assert.equal(
+    formatChangedRow(res.changed[0]),
+    '  c1  party_misspell/perturbed  true -> true  (rank 1 -> 3)'
+  );
+});
+
+test('formatChangedRow omits the rank suffix when a flipped row has no rank change', () => {
+  const res = compareToBaseline({
+    baseline,
+    scores: { caseScores: [{ caseId: 'c1', hitAt1: false, hitRank: 1, nameTransform: 'party_misspell', arm: 'perturbed' }] },
+    allowedChanges: 0
+  });
+  assert.equal(res.changed[0].kind, 'flipped');
+  assert.equal(
+    formatChangedRow(res.changed[0]),
+    '  c1  party_misspell/perturbed  true -> false'
+  );
+});
+
+test('formatChangedRow renders missing and unexpected rows without a rank suffix', () => {
+  const missing = compareToBaseline({ baseline, scores: { caseScores: [] }, allowedChanges: 0 });
+  assert.equal(formatChangedRow(missing.changed[0]), '  c1  party_misspell/perturbed  true -> missing from run');
+
+  const unexpected = compareToBaseline({
+    baseline,
+    scores: {
+      caseScores: [
+        { caseId: 'c1', hitAt1: true, hitRank: 1, nameTransform: 'party_misspell', arm: 'perturbed' },
+        { caseId: 'c4', hitAt1: true, hitRank: 1, nameTransform: 'given_name', arm: 'natural' }
+      ]
+    },
+    allowedChanges: 0
+  });
+  const c4 = unexpected.changed.find((row) => row.caseId === 'c4');
+  assert.equal(formatChangedRow(c4), '  c4  given_name/natural  absent from baseline -> true');
 });
 
 test('baselineFrom keys rows by caseId and carries hit, rank, category, and arm', () => {
