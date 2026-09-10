@@ -26,23 +26,11 @@ import {
   sha256File,
   sha256Text
 } from './fs.mjs';
+import { gitDirty, gitRevision } from './git.mjs';
 
 const HARNESS_NAME = '@trustfoundry-ai/benchmarks-harness';
 const HARNESS_ORIGIN_URL = 'https://github.com/trustfoundry-ai/benchmarks.git';
 const SCHEMA_VERSION = 'trustfoundry.benchmarks.run.v1';
-
-async function gitCommit(repoRoot) {
-  const { execFile } = await import('node:child_process');
-  const { promisify } = await import('node:util');
-  try {
-    const { stdout } = await promisify(execFile)('git', ['rev-parse', 'HEAD'], {
-      cwd: repoRoot
-    });
-    return stdout.trim() || null;
-  } catch {
-    return null;
-  }
-}
 
 async function readHarnessVersion(repoRoot) {
   try {
@@ -147,9 +135,10 @@ export async function buildManifest({
       sha256: await sha256File(file)
     }))
   );
-  const [harnessCommit, harnessVersion] = await Promise.all([
-    gitCommit(repoRoot),
-    readHarnessVersion(repoRoot)
+  const [harnessCommit, harnessVersion, harnessDirty] = await Promise.all([
+    gitRevision(repoRoot),
+    readHarnessVersion(repoRoot),
+    gitDirty(repoRoot)
   ]);
   const [benchmarkConfigSha256, providerConfigSha256, scorerConfigSha256] =
     await Promise.all([
@@ -182,6 +171,7 @@ export async function buildManifest({
       originUrl: HARNESS_ORIGIN_URL,
       commit: process.env.GITHUB_SHA ?? process.env.EVAL_HARNESS_SHA ?? harnessCommit,
       version: process.env.EVAL_HARNESS_VERSION ?? harnessVersion,
+      dirty: harnessDirty,
       ...(includeHostname ? { hostname: hostname() } : {})
     },
     productBuildSha: process.env.PRODUCT_BUILD_SHA ?? null,

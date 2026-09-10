@@ -3,6 +3,7 @@ import { test } from 'node:test';
 
 import {
   assertCompatibleManifest,
+  buildManifest,
   computeFingerprints
 } from '../src/core/manifest.mjs';
 
@@ -50,4 +51,22 @@ test('assertCompatibleManifest computes fingerprints on the fly for legacy manif
   const legacy = baseManifest(); // no fingerprints block
   const current = { fingerprints: computeFingerprints(baseManifest()) };
   assert.doesNotThrow(() => assertCompatibleManifest(legacy, current));
+});
+
+test('buildManifest records harness.dirty', async () => {
+  const manifest = await buildManifest({
+    repoRoot: process.cwd(),
+    runId: 'test-run',
+    benchmark: { id: 'b1', version: 'v1' },
+    provider: { id: 'p1', version: 'v1' },
+    scorerId: 's1',
+    paths: {},
+    sourceFiles: [],
+    scheduler: { caseCount: 0, parallel: 1, retries: 0, shardCount: 1, shardIndex: 0 }
+  });
+  assert.ok('dirty' in manifest.harness, 'harness.dirty must be present');
+  assert.ok(
+    typeof manifest.harness.dirty === 'boolean' || manifest.harness.dirty === null,
+    'harness.dirty must be boolean or null'
+  );
 });

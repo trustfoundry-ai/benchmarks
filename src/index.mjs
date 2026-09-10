@@ -94,6 +94,8 @@ export {
   computeFingerprints
 } from './core/manifest.mjs';
 
+export { gitDirty, gitRevision } from './core/git.mjs';
+
 // ---- Result artifacts + verification ----
 export {
   buildRawRow,

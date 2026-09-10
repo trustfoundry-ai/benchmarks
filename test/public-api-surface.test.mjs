@@ -45,6 +45,8 @@ const EXPECTED_PUBLIC_EXPORTS = [
   'getBenchmarkAdapter',
   'getProviderAdapter',
   'getScorerAdapter',
+  'gitDirty',
+  'gitRevision',
   'hashFile',
   'hashObject',
   'isMissScore',
