@@ -69,7 +69,7 @@ pnpm benchmark publish-result \
 pnpm benchmark verify-result results/trustfoundry-legal-search/<date>/case-questions-200
 ```
 
-The published bundle contains `manifest.json` (pins harness commit, config hashes, dataset provenance), `checksums.txt`, `raw.jsonl` (row-level evidence), and `result.json` (aggregate scores). External readers can `pnpm benchmark verify-result <bundle>` to confirm the bundle is intact.
+The published bundle contains `manifest.json` (pins harness commit, config hashes, dataset provenance, and the row-level evidence path and checksum), `checksums.txt`, row-level evidence, and `result.json` (aggregate scores). External readers can `pnpm benchmark verify-result <bundle>` to confirm the bundle is intact.
 
 ## Trustfoundry-case-name-lookup lane (`model_type: case_name`)
 

@@ -16,7 +16,7 @@ directory, and the `latest.json` key.
 
 The provider that produced the bundle is recorded inside the bundle's `manifest.json` (`manifest.provider.id`); it doesn't live in the path.
 
-Each bundle contains raw rows, `result.json`, `manifest.json`, and `checksums.txt`. Large raw-row artifacts may be stored as `raw.jsonl.gz`; the bundle manifest records the exact raw path.
+Each bundle contains raw rows, `result.json`, `manifest.json`, and `checksums.txt`. Raw rows are published gzipped as `raw.jsonl.gz`; the bundle manifest records the exact raw path and checksum.
 
 Example:
 

@@ -282,7 +282,7 @@ Each line of a dataset JSONL is one JSON object.
 | Field | Description |
 |---|---|
 | `query_text` | The case-name query sent to the search API, verbatim. For a `perturbed` row this is the mangled caption; for a `control` row it is `expected.case_name` sent unchanged. |
-| `caseId` | Stable row identifier. Also the join key into a bundle's `raw.jsonl`. |
+| `caseId` | Stable row identifier. Also the join key into a bundle's raw rows. |
 | `expected.case_name` | The caption as the corpus stores it. This is the gold value hit@K matches against for every category except `single_party_search`, which matches the query text itself (see "Matching rule" above). Identical for a perturbed row and its paired control. |
 | `expected.arm` | `perturbed` or `control`. See "The paired design." |
 | `expected.pair_id` | Joins a perturbed row to its control row — both carry the same value. |

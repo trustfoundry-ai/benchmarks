@@ -26,7 +26,7 @@ pnpm benchmark publish-result --run runs/<run-id> --out results/<bundle-id>
 pnpm benchmark verify-result results/<bundle-id>
 ```
 
-Large raw artifacts may be stored as `raw.jsonl.gz`; the manifest records the artifact path and checksum.
+Raw artifacts are stored as `raw.jsonl.gz`; the manifest records the artifact path and checksum.
 
 ## Publishing numbers
 

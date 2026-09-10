@@ -63,7 +63,7 @@ Latency measured at `--parallel 4`.
 See [`suites/trustfoundry-legal-search/README.md`](suites/trustfoundry-legal-search/README.md) for the per-category and per-axis breakdown.
 <!-- END GENERATED: latest-benchmarks -->
 
-For full runs with large raw artifacts, raw rows may be stored as `raw.jsonl.gz`; `pnpm benchmark verify-result <bundle>` reads the manifest path directly.
+Raw rows are published gzipped as `raw.jsonl.gz`; the manifest records the path and checksum, and `pnpm benchmark verify-result <bundle>` reads the manifest path directly.
 
 ## Suites
 
