@@ -7,9 +7,11 @@ import { promisify } from 'node:util';
 import { gunzip } from 'node:zlib';
 
 import {
+  buildRawRow,
   buildRawRows,
   publishResultBundle,
   reconstructFromRawRows,
+  reconstructPairFromRawRow,
   verifyResultBundle
 } from '../src/core/artifacts.mjs';
 import { exists, sha256File, writeJson, writeJsonl, readJson } from '../src/core/fs.mjs';
@@ -233,7 +235,7 @@ test('raw rows preserve non-case legal search metadata for recomputation', () =>
       reciprocalRank: 1
     }
   ];
-  const rawRows = buildRawRows({ cases, providerResults, caseScores });
+  const rawRows = buildRawRows({ cases, providerResults, caseScores, cutoffs: [1, 5, 10, 25] });
   assert.equal(rawRows[0].benchmark_id, 'trustfoundry-legal-search');
   assert.equal(rawRows[0].timing.server_response_duration_ms, 8);
   assert.deepEqual(rawRows[0].token_usage, {
@@ -315,7 +317,7 @@ test('raw row round-trip preserves cl_cluster_id when present on the case', () =
       reciprocalRank: 1
     }
   ];
-  const rawRows = buildRawRows({ cases, providerResults, caseScores });
+  const rawRows = buildRawRows({ cases, providerResults, caseScores, cutoffs: [1, 5, 10, 25] });
   assert.equal(rawRows[0].expected.cl_cluster_id, '6751062');
   const reconstructed = reconstructFromRawRows(rawRows);
   assert.equal(reconstructed.cases[0].metadata.expected.cl_cluster_id, '6751062');
@@ -369,7 +371,8 @@ test('raw row round-trip carries adapter-declared expected fields', () => {
     cases: [benchmarkCase],
     providerResults: [{ caseId: 'c-1', status: 'completed' }],
     caseScores: [{ caseId: 'c-1', status: 'scored' }],
-    publishedExpectedFields: ['gold_citations', 'case_name', 'name_transform', 'tier']
+    publishedExpectedFields: ['gold_citations', 'case_name', 'name_transform', 'tier'],
+    cutoffs: [1, 5, 10, 25]
   });
 
   assert.deepEqual(row.expected.gold_citations, benchmarkCase.metadata.expected.gold_citations);
@@ -394,7 +397,81 @@ test('raw row round-trip: no declaration publishes no extra fields (regression)'
   const [row] = buildRawRows({
     cases: [{ caseId: 'c-2', prompt: 'q', metadata: { expected: { kind: 'positive', gold_citations: [] } } }],
     providerResults: [{ caseId: 'c-2', status: 'completed' }],
-    caseScores: [{ caseId: 'c-2', status: 'scored' }]
+    caseScores: [{ caseId: 'c-2', status: 'scored' }],
+    cutoffs: [1, 5, 10, 25]
   });
   assert.equal(row.expected.gold_citations, undefined);
+});
+
+test('a published raw row carries the scorer configured cutoffs', () => {
+  const row = buildRawRow({
+    benchmarkCase: { caseId: 'c1', benchmarkId: 'b', metadata: { expected: {} } },
+    providerResult: { timing: {} },
+    caseScore: { status: 'scored', hitRank: 2, reciprocalRank: 0.5 },
+    cutoffs: [1, 3, 5, 10]
+  });
+  assert.deepEqual(Object.keys(row.score.hit_at).sort(), ['hit@1', 'hit@10', 'hit@3', 'hit@5']);
+  assert.equal(row.score.hit_at['hit@1'], false);
+  assert.equal(row.score.hit_at['hit@3'], true);
+  assert.equal(row.score.hit_at_25, undefined);
+});
+
+test('buildRawRow throws rather than defaulting when cutoffs is not provided', () => {
+  assert.throws(
+    () =>
+      buildRawRow({
+        benchmarkCase: { caseId: 'c1', metadata: { expected: {} } },
+        providerResult: { timing: {} },
+        caseScore: { status: 'scored', hitRank: 1, reciprocalRank: 1 }
+      }),
+    /cutoffs/
+  );
+});
+
+test('reconstructPairFromRawRow accepts both raw-row score shapes without throwing', () => {
+  // A row published before per-scorer cutoffs carries flat `hit_at_1` /
+  // `hit_at_5` / `hit_at_10` / `hit_at_25` booleans; a current row carries
+  // `hit_at` as an object keyed `hit@K`. Re-scoring recomputes the score from
+  // `results` and `expected` rather than trusting either shape, so both must
+  // pass through this function untouched.
+  const shared = {
+    case_id: 'reconstruct-either-shape',
+    prompt: 'q',
+    metadata: {},
+    expected: {},
+    response: { provider_status: 'completed', result_count: 1, results: [{ rank: 1 }] },
+    timing: {}
+  };
+  const oldShapeRow = {
+    ...shared,
+    schema_version: 'trustfoundry.benchmarks.raw-row.v1',
+    score: {
+      status: 'scored',
+      hit_rank: 1,
+      hit_at_1: true,
+      hit_at_5: true,
+      hit_at_10: true,
+      hit_at_25: true,
+      reciprocal_rank: 1
+    }
+  };
+  const newShapeRow = {
+    ...shared,
+    schema_version: 'trustfoundry.benchmarks.raw-row.v2',
+    score: {
+      status: 'scored',
+      hit_rank: 1,
+      hit_at: { 'hit@1': true, 'hit@3': true, 'hit@5': true, 'hit@10': true },
+      reciprocal_rank: 1
+    }
+  };
+
+  const oldPair = reconstructPairFromRawRow(oldShapeRow);
+  const newPair = reconstructPairFromRawRow(newShapeRow);
+
+  assert.equal(oldPair.benchmarkCase.caseId, 'reconstruct-either-shape');
+  assert.equal(newPair.benchmarkCase.caseId, 'reconstruct-either-shape');
+  assert.equal(oldPair.providerResult.status, 'completed');
+  assert.equal(newPair.providerResult.status, 'completed');
+  assert.deepEqual(oldPair.providerResult, newPair.providerResult);
 });

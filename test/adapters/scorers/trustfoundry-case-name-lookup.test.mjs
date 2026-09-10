@@ -568,7 +568,8 @@ test('published rows carry no citation gold', () => {
     }],
     providerResults: [{ caseId: 'c', status: 'completed' }],
     caseScores: [{ caseId: 'c', status: 'scored' }],
-    publishedExpectedFields: caseNameLookupBenchmarkAdapter.publishedExpectedFields
+    publishedExpectedFields: caseNameLookupBenchmarkAdapter.publishedExpectedFields,
+    cutoffs: [1, 3, 5, 10]
   });
   assert.equal(row.expected.gold_citations, undefined);
   assert.equal(row.expected.avoid_citations, undefined);

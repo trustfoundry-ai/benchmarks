@@ -25,7 +25,7 @@ Every run emits four versioned JSON artifacts. Their JSON Schemas live at
 [`artifact-schemas.json`](./artifact-schemas.json):
 
 - `trustfoundry.benchmarks.run.v1` — the run manifest (`manifest.json`)
-- `trustfoundry.benchmarks.raw-row.v1` — one row per case (`raw.jsonl`)
+- `trustfoundry.benchmarks.raw-row.v2` — one row per case; the bundle manifest records the path
 - `trustfoundry.benchmarks.result.v1` — scored result (`result.json`)
 - `trustfoundry.benchmarks.result-manifest.v1` — publish bundle manifest
 

@@ -473,6 +473,12 @@ export declare function buildRawRow(args: {
    * Declared by the benchmark adapter as `publishedExpectedFields`.
    */
   publishedExpectedFields?: string[];
+  /**
+   * The scorer's configured cutoffs (e.g. `summary.execution.scorer.cutoffs`).
+   * Required: `score.hit_at` is keyed `hit@K` for exactly these values, with
+   * no default -- a scorer's cutoffs are not something this function can guess.
+   */
+  cutoffs: number[];
 }): RawRow;
 
 export declare function buildRawRows(args: {
@@ -480,6 +486,7 @@ export declare function buildRawRows(args: {
   providerResults: CaseResult[];
   caseScores: CaseScore[];
   publishedExpectedFields?: string[];
+  cutoffs: number[];
 }): RawRow[];
 
 export declare function reconstructPairFromRawRow(row: RawRow): {

@@ -109,19 +109,35 @@ function normalizedResults(providerResult) {
 
 // Builds a single raw-row record from one case + its provider result + its
 // score. Pure; safe to call in a streaming pipeline. The field set is the
-// raw-row.v1 schema — keep it in sync with reconstructPairFromRawRow.
+// raw-row.v2 schema — keep it in sync with reconstructPairFromRawRow.
 //
 // Additive fields (missing on older bundles → null on reconstruction) support
 // benchmark-specific stratifications without a schema version bump:
 // `metadata.document_type`, `metadata.difficulty`, `metadata.kind`,
 // `metadata.negative_category`, `metadata.geo_level_2`, and
 // `expected.kind` / `expected.negative_category` for citation-lookup.
+//
+// `cutoffs` is required: it is the scorer's own configured cutoff list (read
+// from `summary.execution.scorer.cutoffs`, the one path both scorers report
+// it at), and `score.hit_at` is keyed by exactly those values. There is no
+// default -- a scorer's cutoffs are not something this function can guess,
+// and guessing here is how a published row silently drops or fabricates a
+// hit@K metric.
 export function buildRawRow({
   benchmarkCase,
   providerResult,
   caseScore,
-  publishedExpectedFields = []
+  publishedExpectedFields = [],
+  cutoffs
 }) {
+  if (!Array.isArray(cutoffs) || cutoffs.length === 0) {
+    throw new Error(
+      "buildRawRow: 'cutoffs' is required (the scorer's configured cutoffs, e.g. from " +
+        'summary.execution.scorer.cutoffs) and must be a non-empty array; received ' +
+        `${JSON.stringify(cutoffs)}`
+    );
+  }
+
   const expectedSource = benchmarkCase.metadata?.expected ?? {};
   const publishedExpected = {};
   for (const field of publishedExpectedFields) {
@@ -130,7 +146,7 @@ export function buildRawRow({
 
   const parsed = safeParseJson(providerResult?.finalOutputText) ?? {};
   return {
-    schema_version: 'trustfoundry.benchmarks.raw-row.v1',
+    schema_version: 'trustfoundry.benchmarks.raw-row.v2',
     case_id: benchmarkCase.caseId,
     benchmark_id: benchmarkCase.benchmarkId ?? null,
     row_index: benchmarkCase.metadata?.datasetIndex ?? null,
@@ -192,10 +208,12 @@ export function buildRawRow({
     score: {
       status: caseScore?.status ?? null,
       hit_rank: caseScore?.hitRank ?? null,
-      hit_at_1: caseScore?.hitAt1 ?? false,
-      hit_at_5: caseScore?.hitAt5 ?? false,
-      hit_at_10: caseScore?.hitAt10 ?? false,
-      hit_at_25: caseScore?.hitAt25 ?? false,
+      hit_at: Object.fromEntries(
+        cutoffs.map((k) => [
+          `hit@${k}`,
+          Number.isFinite(caseScore?.hitRank) && caseScore.hitRank <= k
+        ])
+      ),
       reciprocal_rank: caseScore?.reciprocalRank ?? 0
     }
   };
@@ -207,7 +225,8 @@ export function buildRawRows({
   cases,
   providerResults,
   caseScores,
-  publishedExpectedFields = []
+  publishedExpectedFields = [],
+  cutoffs
 }) {
   const providerByCase = new Map(providerResults.map((row) => [row.caseId, row]));
   const scoreByCase = new Map(caseScores.map((score) => [score.caseId, score]));
@@ -216,7 +235,8 @@ export function buildRawRows({
       benchmarkCase,
       providerResult: providerByCase.get(benchmarkCase.caseId) ?? null,
       caseScore: scoreByCase.get(benchmarkCase.caseId) ?? null,
-      publishedExpectedFields
+      publishedExpectedFields,
+      cutoffs
     })
   );
 }
@@ -229,6 +249,13 @@ export function buildRawRows({
 // kind, negative_category, geo_level_2) when the raw row has them; older
 // bundles missing those fields get null defaults so scorers that ignore
 // them can continue to work unchanged.
+//
+// Deliberately does not read `row.score` at all: a row's score, in either
+// shape (`score.hit_at_1`/`hit_at_5`/`hit_at_10`/`hit_at_25` on an older row,
+// `score.hit_at['hit@K']` on a current one), is a scorer's prior output, not
+// an input. Re-scoring a bundle recomputes it fresh from `results` and
+// `expected` below; trusting a stored score here would make verification
+// circular. Both row shapes pass through unaffected as a result.
 export function reconstructPairFromRawRow(row) {
   const expectedKind = row.expected?.kind ?? 'exact';
   const benchmarkCase = {
@@ -371,8 +398,10 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
   const cases = await readJsonl(casesPath);
   const casesById = new Map(cases.map((benchmarkCase) => [benchmarkCase.caseId, benchmarkCase]));
 
-  // Stream provider-results through the scorer; build + write each raw row as
-  // its case score is produced. Only one pair lives in memory at a time.
+  // Stream provider-results into (benchmarkCase, providerResult) pairs.
+  // `providerPairs` is a generator function, not a generator object -- each
+  // call opens a fresh read of provider-results.jsonl, so it can be iterated
+  // more than once without materializing the file.
   let rawArtifactPath = 'raw.jsonl';
   let rawPath = path.join(resolvedOut, rawArtifactPath);
   const rawWriter = await createJsonlWriter(rawPath);
@@ -400,21 +429,37 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
     publishedExpectedFields = [];
   }
 
+  // Score first, over the full run, so the scorer's configured cutoffs are
+  // known: they are only reported once, on the finished summary, at
+  // `summary.execution.scorer.cutoffs`. Raw rows are then built in a second
+  // pass over the same (small, disk-backed) pairs, keyed against the
+  // per-case scores this pass already computed -- still only one pair
+  // materialized at a time, just read twice instead of once.
   const scorer = getAdapter('scorers', resolveScorerId({ manifest }));
-  const scoreResult = await scorer.scoreStream({
-    manifest,
-    pairs: providerPairs(),
-    onCaseScored: async ({ benchmarkCase, providerResult, caseScore }) => {
-      const rawRow = buildRawRow({
-        benchmarkCase,
-        providerResult,
-        caseScore,
-        publishedExpectedFields
-      });
-      await rawWriter.write(rawRow);
-      rowCount += 1;
-    }
-  });
+  const scoreResult = await scorer.scoreStream({ manifest, pairs: providerPairs() });
+
+  const cutoffs = scoreResult.summary?.execution?.scorer?.cutoffs;
+  if (!Array.isArray(cutoffs) || cutoffs.length === 0) {
+    throw new Error(
+      `publishResultBundle: scorer '${resolveScorerId({ manifest })}' did not report ` +
+        'summary.execution.scorer.cutoffs -- cannot project score.hit_at into raw rows.'
+    );
+  }
+
+  const caseScoreByCaseId = new Map(
+    (scoreResult.caseScores ?? []).map((caseScore) => [caseScore.caseId, caseScore])
+  );
+  for await (const { benchmarkCase, providerResult } of providerPairs()) {
+    const rawRow = buildRawRow({
+      benchmarkCase,
+      providerResult,
+      caseScore: caseScoreByCaseId.get(benchmarkCase.caseId) ?? null,
+      publishedExpectedFields,
+      cutoffs
+    });
+    await rawWriter.write(rawRow);
+    rowCount += 1;
+  }
   await rawWriter.close();
 
   const gzPath = path.join(resolvedOut, 'raw.jsonl.gz');

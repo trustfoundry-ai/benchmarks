@@ -256,7 +256,7 @@ Written at run start and updated at run end. Records:
     checkpointed run to resume in a fresh directory.
   - `manifest` — digest of the full manifest for change detection.
 
-### `trustfoundry.benchmarks.raw-row.v1` — `provider-results.jsonl`
+### `trustfoundry.benchmarks.raw-row.v2` — one row per case
 
 One row per case. Concatenation of `benchmarkCase` fields plus the
 `CaseResult` fields returned by the provider. Row order matches
