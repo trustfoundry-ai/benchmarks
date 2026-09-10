@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 
 import { listSuites, parseTargetRef, resolveTarget } from '../src/core/suites.mjs';
+import { exists } from '../src/core/fs.mjs';
 
 // These tests build their own fixture manifests under a temp directory
 // rather than asserting against `suites/` in this repo: suite manifests
@@ -439,22 +440,87 @@ test('every benchmark config is claimed by exactly one suite target', async () =
   }
 });
 
-test("every latest.json key set exactly matches its suite's declared target ids", async () => {
-  for (const suite of await listSuites({ repoRoot })) {
-    const pointerPath = path.join(repoRoot, 'results', suite.id, 'latest.json');
+/**
+ * Checks one suite's `results/<suite>/latest.json` pointer against its
+ * declared target ids.
+ *
+ * A `published` suite is committing to having a bundle for every target it
+ * declares: the pointer must exist, and its key set must equal the declared
+ * target ids exactly, in both directions. That is what stops a published
+ * suite from claiming a target it never published, or pointing at one it
+ * never declared.
+ *
+ * Any other status (`experimental`, `deprecated`) is a suite that is allowed
+ * to land and iterate before it carries published numbers, so its pointer
+ * file may be absent entirely — that is not a failure. If the file is
+ * present, though, its keys must still be a subset of the declared target
+ * ids: a partially-published experimental suite is fine, but a pointer
+ * naming an undeclared target is still the orphan case and still an error
+ * regardless of status.
+ */
+async function checkPointerConsistency({ repoRoot: root, suite }) {
+  const pointerPath = path.join(root, 'results', suite.id, 'latest.json');
+  const targetIds = Object.keys(suite.targets).sort();
+  const pointerIsPresent = await exists(pointerPath);
+
+  if (suite.status !== 'published') {
+    if (!pointerIsPresent) return;
     const pointer = JSON.parse(await readFile(pointerPath, 'utf8'));
-    const pointerKeys = Object.keys(pointer.bundles).sort();
-    const targetIds = Object.keys(suite.targets).sort();
-    assert.deepEqual(
-      pointerKeys,
-      targetIds,
-      `${suite.id}/latest.json keys ${JSON.stringify(pointerKeys)} must exactly match declared targets ${JSON.stringify(targetIds)}`
-    );
-    for (const [key, rel] of Object.entries(pointer.bundles)) {
+    for (const key of Object.keys(pointer.bundles ?? {})) {
       assert.ok(
-        rel.endsWith(`/${key}`),
-        `${suite.id}/latest.json '${key}' -> '${rel}' must end with the target id`
+        targetIds.includes(key),
+        `${suite.id}/latest.json '${key}' is not a target declared in suites/${suite.id}/suite.json`
       );
     }
+    return;
   }
+
+  assert.ok(
+    pointerIsPresent,
+    `${suite.id} is published but has no results/${suite.id}/latest.json`
+  );
+  const pointer = JSON.parse(await readFile(pointerPath, 'utf8'));
+  const pointerKeys = Object.keys(pointer.bundles ?? {}).sort();
+  assert.deepEqual(
+    pointerKeys,
+    targetIds,
+    `${suite.id}/latest.json keys ${JSON.stringify(pointerKeys)} must exactly match declared targets ${JSON.stringify(targetIds)}`
+  );
+  for (const [key, rel] of Object.entries(pointer.bundles)) {
+    assert.ok(
+      rel.endsWith(`/${key}`),
+      `${suite.id}/latest.json '${key}' -> '${rel}' must end with the target id`
+    );
+  }
+}
+
+test("published suites' latest.json matches declared target ids exactly; other statuses may omit or partially populate the pointer", async () => {
+  for (const suite of await listSuites({ repoRoot })) {
+    await checkPointerConsistency({ repoRoot, suite });
+  }
+});
+
+test('an experimental suite with no pointer file at all passes pointer consistency', async () => {
+  await withTempDir(async (root) => {
+    const manifest = validManifest();
+    await writeManifest(root, manifest.id, manifest);
+    const [suite] = await listSuites({ repoRoot: root });
+    await checkPointerConsistency({ repoRoot: root, suite });
+  });
+});
+
+test('an experimental suite whose pointer names an undeclared target fails pointer consistency', async () => {
+  await withTempDir(async (root) => {
+    const manifest = validManifest();
+    await writeManifest(root, manifest.id, manifest);
+    const resultsDir = path.join(root, 'results', manifest.id);
+    await mkdir(resultsDir, { recursive: true });
+    await writeFile(
+      path.join(resultsDir, 'latest.json'),
+      JSON.stringify({ bundles: { 'not-a-declared-target': '2026-01-01/not-a-declared-target' } }),
+      'utf8'
+    );
+    const [suite] = await listSuites({ repoRoot: root });
+    await assert.rejects(() => checkPointerConsistency({ repoRoot: root, suite }));
+  });
 });
