@@ -509,15 +509,25 @@ async function resolveRawPath({ bundleDir, manifest, allowFetch }) {
     throw new Error(`${bundleDir}: fetching raw evidence failed — ${response.status} ${href}`);
   }
   const tmpDir = await mkdtemp(path.join(tmpdir(), 'raw-asset-'));
-  const rawName = path.basename(manifest?.artifacts?.raw?.path ?? 'raw.jsonl');
-  const tmpPath = path.join(tmpDir, rawName);
-  await pipeline(Readable.fromWeb(response.body), createWriteStream(tmpPath));
-  return {
-    rawPath: tmpPath,
-    cleanup: async () => {
-      await rm(tmpDir, { recursive: true, force: true });
-    }
-  };
+  try {
+    const rawName = path.basename(manifest?.artifacts?.raw?.path ?? 'raw.jsonl');
+    const tmpPath = path.join(tmpDir, rawName);
+    await pipeline(Readable.fromWeb(response.body), createWriteStream(tmpPath));
+    return {
+      rawPath: tmpPath,
+      cleanup: async () => {
+        await rm(tmpDir, { recursive: true, force: true });
+      }
+    };
+  } catch (error) {
+    // The pipeline can fail partway through the download (dropped
+    // connection, truncated body) after the directory already exists but
+    // before a `cleanup` is ever handed back to a caller. This function
+    // created the directory, so it is responsible for removing it on any
+    // path that does not return one.
+    await rm(tmpDir, { recursive: true, force: true });
+    throw error;
+  }
 }
 
 export async function verifyResultBundle({
