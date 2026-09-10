@@ -250,6 +250,8 @@ matching `compatibility` fingerprints can be merged and compared;
 matching `resume` fingerprints share the same shard slice; the
 `manifest` fingerprint is unique per run.
 
+See [Reproducing a published number](docs/reproducing.md) for the step-by-step recipe.
+
 ### Verifying releases
 
 Each tagged release ships with a signed [SLSA build provenance
