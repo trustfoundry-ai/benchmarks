@@ -96,6 +96,9 @@ export {
 
 export { gitDirty, gitRevision } from './core/git.mjs';
 
+// ---- Suite registry ----
+export { listSuites, parseTargetRef, resolveTarget } from './core/suites.mjs';
+
 // ---- Result artifacts + verification ----
 export {
   buildRawRow,

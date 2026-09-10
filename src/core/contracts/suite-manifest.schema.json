@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "trustfoundry.benchmarks.suite-manifest.v1",
+  "title": "TrustFoundry Benchmarks — suite manifest",
+  "description": "Declares a suite at suites/<id>/suite.json: its identity, publication status, and the targets it can run. This document describes the shape; nothing in the package loads it to validate against — the enforcement lives in src/core/suites.mjs, and test/suites.test.mjs asserts the two stay in agreement. See ../../../docs/adapter-contracts.md.",
+  "type": "object",
+  "required": ["id", "title", "status", "targets"],
+  "additionalProperties": false,
+  "properties": {
+    "$comment": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^trustfoundry-[a-z0-9-]+$",
+      "description": "Must match the manifest's own directory name, suites/<id>/."
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "status": {
+      "enum": ["experimental", "published", "deprecated"],
+      "description": "published suites appear in the generated README tables; experimental and deprecated do not."
+    },
+    "targets": {
+      "type": "object",
+      "minProperties": 1,
+      "description": "Keyed by target id, e.g. suites/<id>/targets/<targetId>. A target's config triple must resolve to real files under configs/.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["benchmark", "provider", "scorer", "rows"],
+        "additionalProperties": false,
+        "properties": {
+          "$comment": { "type": "string" },
+          "benchmark": {
+            "type": "string",
+            "description": "Repo-relative path to the benchmark config, e.g. configs/benchmarks/<suite>/<name>.json."
+          },
+          "provider": {
+            "type": "string",
+            "description": "Repo-relative path to the provider config, e.g. configs/providers/<name>.json."
+          },
+          "scorer": {
+            "type": "string",
+            "description": "Repo-relative path to the scorer config, e.g. configs/scorers/<name>.json."
+          },
+          "rows": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Row count the target's benchmark config is expected to produce — a sanity bound, not the source of truth for row count."
+          },
+          "headline": {
+            "type": "boolean",
+            "description": "Whether this target's result is the one surfaced as the suite's headline number."
+          },
+          "tier": {
+            "enum": ["smoke", "full"],
+            "description": "smoke targets are cheap sanity runs; full targets are the publication-grade run."
+          }
+        }
+      }
+    }
+  }
+}
