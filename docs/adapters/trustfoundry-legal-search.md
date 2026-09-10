@@ -63,13 +63,13 @@ Turn a run into a checksummed, shareable bundle:
 ```bash
 pnpm benchmark publish-result \
   --run runs/trustfoundry-legal-search-case-questions-200 \
-  --out results/trustfoundry-legal-search/<date>/case-questions/200 \
+  --out results/trustfoundry-legal-search/<date>/case-questions-200 \
   --force
 
-pnpm benchmark verify-result results/trustfoundry-legal-search/<date>/case-questions/200
+pnpm benchmark verify-result results/trustfoundry-legal-search/<date>/case-questions-200
 ```
 
-The published bundle contains `manifest.json` (pins harness commit, config hashes, dataset provenance), `checksums.txt`, `raw.jsonl` (row-level evidence), and `result.json` (aggregate scores). External readers can `pnpm benchmark verify-result <bundle>` to confirm the bundle is intact.
+The published bundle contains `manifest.json` (pins harness commit, config hashes, dataset provenance, and the row-level evidence path and checksum), `checksums.txt`, row-level evidence, and `result.json` (aggregate scores). External readers can `pnpm benchmark verify-result <bundle>` to confirm the bundle is intact.
 
 ## Trustfoundry-case-name-lookup lane (`model_type: case_name`)
 
@@ -108,11 +108,11 @@ Use `--limit N --offset K` for a smaller smoke; this suite has no separate 200-r
 ### Publishing a result bundle
 
 ```bash
-pnpm benchmark publish-result --run runs/v2-public --out results/trustfoundry-case-name-lookup/<date>/public/8850 --force
-pnpm benchmark publish-result --run runs/v2-negatives --out results/trustfoundry-case-name-lookup/<date>/negatives/50 --force
+pnpm benchmark publish-result --run runs/v2-public --out results/trustfoundry-case-name-lookup/<date>/public-8850 --force
+pnpm benchmark publish-result --run runs/v2-negatives --out results/trustfoundry-case-name-lookup/<date>/negatives-50 --force
 
-pnpm benchmark verify-result results/trustfoundry-case-name-lookup/<date>/public/8850
-pnpm benchmark verify-result results/trustfoundry-case-name-lookup/<date>/negatives/50
+pnpm benchmark verify-result results/trustfoundry-case-name-lookup/<date>/public-8850
+pnpm benchmark verify-result results/trustfoundry-case-name-lookup/<date>/negatives-50
 ```
 
 Case-name gold does not fit the raw-row schema's default `expected` shape, which is built for single-citation gold. The `trustfoundry-case-name-lookup` benchmark adapter declares `publishedExpectedFields` so its caption-based gold survives publishing and re-scoring — see [`results/README.md`](../../results/README.md#suites-whose-gold-does-not-fit-the-default-raw-row-shape).

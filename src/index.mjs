@@ -94,8 +94,14 @@ export {
   computeFingerprints
 } from './core/manifest.mjs';
 
+export { gitDirty, gitRevision } from './core/git.mjs';
+
+// ---- Suite registry ----
+export { listSuites, parseTargetRef, resolveTarget } from './core/suites.mjs';
+
 // ---- Result artifacts + verification ----
 export {
+  assertValidSummary,
   buildRawRow,
   buildRawRows,
   publishResultBundle,
@@ -148,3 +154,6 @@ export {
   mapWithConcurrency,
   normalizeScheduler
 } from './core/scheduler.mjs';
+
+// ---- Statistics ----
+export { Z95, wilsonInterval } from './core/stats.mjs';

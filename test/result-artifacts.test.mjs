@@ -4,18 +4,60 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { promisify } from 'node:util';
-import { gzip } from 'node:zlib';
+import { gunzip } from 'node:zlib';
 
 import {
+  buildRawRow,
   buildRawRows,
   publishResultBundle,
   reconstructFromRawRows,
+  reconstructPairFromRawRow,
   verifyResultBundle
 } from '../src/core/artifacts.mjs';
-import { sha256File, writeJson, writeJsonl, readJson } from '../src/core/fs.mjs';
+import { exists, sha256File, writeJson, writeJsonl, readJson } from '../src/core/fs.mjs';
 import { trustfoundryLegalSearchScorerAdapter } from '../src/adapters/scorers/trustfoundry-legal-search.mjs';
+import { defaultRegistry } from '../src/core/registry.mjs';
 
-const gzipAsync = promisify(gzip);
+const gunzipAsync = promisify(gunzip);
+
+// A minimal scorer that deliberately omits one scored case's caseScore, to
+// exercise publishResultBundle's guard against publishing a raw row with no
+// corresponding score. Registered into the shared default registry under a
+// test-only id; harmless to leave registered for the rest of the process
+// (other tests only assert the registry is non-empty, never its exact
+// membership).
+const droppingScorerAdapter = {
+  id: 'test-drops-a-case-score',
+  version: 'test-v1',
+  async scoreStream({ pairs }) {
+    const caseScores = [];
+    for await (const pair of pairs) {
+      const benchmarkCase = pair.benchmarkCase ?? pair[0];
+      if (benchmarkCase.caseId === 'dropped-case') continue;
+      caseScores.push({ caseId: benchmarkCase.caseId, status: 'scored', hitRank: 1, reciprocalRank: 1 });
+    }
+    return {
+      scorerId: this.id,
+      status: 'completed',
+      caseScores,
+      summary: {
+        overall: { hit_at: { 'hit@1': 1 }, mrr: 1, n: caseScores.length },
+        headline: {
+          metric: 'hit@1',
+          macro: 1,
+          pooled: 1,
+          per_category: {},
+          ci95: [0.9, 1],
+          n_categories: 1,
+          n_rows: caseScores.length
+        },
+        execution: { scorer: { id: this.id, cutoffs: [1], headlineCutoff: 1 } }
+      },
+      metadata: { scorer: this.id, version: this.version, cutoffs: [1], headlineCutoff: 1 }
+    };
+  }
+};
+defaultRegistry.register('scorers', droppingScorerAdapter);
 
 async function makeRun(repoRoot, root) {
   const runDir = path.join(root, 'run');
@@ -103,7 +145,7 @@ test('publishes and verifies result bundles, then detects edited summaries', asy
   const resultPath = path.join(outDir, 'result.json');
   const manifestPath = path.join(outDir, 'manifest.json');
   const result = await readJson(resultPath);
-  result.summary.hitAt1 = 0;
+  result.summary.overall.hit_at['hit@1'] = 0;
   await writeJson(resultPath, result);
   const manifest = await readJson(manifestPath);
   manifest.artifacts.result.sha256 = await sha256File(resultPath);
@@ -139,27 +181,64 @@ test('aggregate result verification can ignore current input digests', async () 
   assert.equal(verification.rows, 1);
 });
 
-test('verifies result bundles with gzip-compressed raw rows', async () => {
+test('verifies result bundles from a plain (non-gzip) raw.jsonl copy', async () => {
   const repoRoot = process.cwd();
-  const root = await mkdtemp(path.join(os.tmpdir(), 'tf-benchmarks-artifacts-gz-'));
+  const root = await mkdtemp(path.join(os.tmpdir(), 'tf-benchmarks-artifacts-plain-'));
   const runDir = await makeRun(repoRoot, root);
   const outDir = path.join(root, 'bundle');
   await publishResultBundle({ repoRoot, runDir, outDir });
 
-  const rawPath = path.join(outDir, 'raw.jsonl');
   const gzPath = path.join(outDir, 'raw.jsonl.gz');
-  await writeFile(gzPath, await gzipAsync(await readFile(rawPath)));
-  await unlink(rawPath);
+  const rawPath = path.join(outDir, 'raw.jsonl');
+  await writeFile(rawPath, await gunzipAsync(await readFile(gzPath)));
+  await unlink(gzPath);
 
   const manifestPath = path.join(outDir, 'manifest.json');
   const manifest = await readJson(manifestPath);
-  manifest.artifacts.raw.path = 'raw.jsonl.gz';
-  manifest.artifacts.raw.sha256 = await sha256File(gzPath);
+  manifest.artifacts.raw.path = 'raw.jsonl';
+  manifest.artifacts.raw.sha256 = await sha256File(rawPath);
   await writeJson(manifestPath, manifest);
 
   const verification = await verifyResultBundle({ repoRoot, bundleDir: outDir });
   assert.equal(verification.ok, true);
   assert.equal(verification.rows, 1);
+});
+
+test('publishResultBundle always writes gzipped raw evidence', async () => {
+  const repoRoot = process.cwd();
+  const root = await mkdtemp(path.join(os.tmpdir(), 'tf-benchmarks-artifacts-gzip-always-'));
+  const runDir = await makeRun(repoRoot, root);
+  const outDir = path.join(root, 'bundle');
+  await publishResultBundle({ repoRoot, runDir, outDir });
+
+  assert.equal(await exists(path.join(outDir, 'raw.jsonl.gz')), true);
+  assert.equal(await exists(path.join(outDir, 'raw.jsonl')), false);
+});
+
+test('publishResultBundle refuses to publish a raw row for a case the scorer returned no score for', async () => {
+  const repoRoot = process.cwd();
+  const root = await mkdtemp(path.join(os.tmpdir(), 'tf-benchmarks-artifacts-missing-score-'));
+  const runDir = path.join(root, 'run');
+  const cases = [
+    { caseId: 'case-1', prompt: 'q1', metadata: { expected: {} } },
+    { caseId: 'dropped-case', prompt: 'q2', metadata: { expected: {} } }
+  ];
+  const providerResults = [
+    { caseId: 'case-1', status: 'completed', finalOutputText: JSON.stringify({ results: [] }) },
+    { caseId: 'dropped-case', status: 'completed', finalOutputText: JSON.stringify({ results: [] }) }
+  ];
+  await writeJson(path.join(runDir, 'manifest.json'), { run_id: 'missing-score-test', scorer: { id: droppingScorerAdapter.id } });
+  await writeJsonl(path.join(runDir, 'cases.jsonl'), cases);
+  await writeJsonl(path.join(runDir, 'provider-results.jsonl'), providerResults);
+
+  const outDir = path.join(root, 'bundle');
+  await assert.rejects(
+    () => publishResultBundle({ repoRoot, runDir, outDir }),
+    /returned no score for case 'dropped-case'/
+  );
+  // The throw happens mid-write, before the bundle manifest is produced, so
+  // no bundle manifest ever names a row for the case that had no score.
+  assert.equal(await exists(path.join(outDir, 'manifest.json')), false);
 });
 
 test('raw rows preserve non-case legal search metadata for recomputation', () => {
@@ -222,7 +301,7 @@ test('raw rows preserve non-case legal search metadata for recomputation', () =>
       reciprocalRank: 1
     }
   ];
-  const rawRows = buildRawRows({ cases, providerResults, caseScores });
+  const rawRows = buildRawRows({ cases, providerResults, caseScores, cutoffs: [1, 5, 10, 25] });
   assert.equal(rawRows[0].benchmark_id, 'trustfoundry-legal-search');
   assert.equal(rawRows[0].timing.server_response_duration_ms, 8);
   assert.deepEqual(rawRows[0].token_usage, {
@@ -304,7 +383,7 @@ test('raw row round-trip preserves cl_cluster_id when present on the case', () =
       reciprocalRank: 1
     }
   ];
-  const rawRows = buildRawRows({ cases, providerResults, caseScores });
+  const rawRows = buildRawRows({ cases, providerResults, caseScores, cutoffs: [1, 5, 10, 25] });
   assert.equal(rawRows[0].expected.cl_cluster_id, '6751062');
   const reconstructed = reconstructFromRawRows(rawRows);
   assert.equal(reconstructed.cases[0].metadata.expected.cl_cluster_id, '6751062');
@@ -358,7 +437,8 @@ test('raw row round-trip carries adapter-declared expected fields', () => {
     cases: [benchmarkCase],
     providerResults: [{ caseId: 'c-1', status: 'completed' }],
     caseScores: [{ caseId: 'c-1', status: 'scored' }],
-    publishedExpectedFields: ['gold_citations', 'case_name', 'name_transform', 'tier']
+    publishedExpectedFields: ['gold_citations', 'case_name', 'name_transform', 'tier'],
+    cutoffs: [1, 5, 10, 25]
   });
 
   assert.deepEqual(row.expected.gold_citations, benchmarkCase.metadata.expected.gold_citations);
@@ -383,7 +463,81 @@ test('raw row round-trip: no declaration publishes no extra fields (regression)'
   const [row] = buildRawRows({
     cases: [{ caseId: 'c-2', prompt: 'q', metadata: { expected: { kind: 'positive', gold_citations: [] } } }],
     providerResults: [{ caseId: 'c-2', status: 'completed' }],
-    caseScores: [{ caseId: 'c-2', status: 'scored' }]
+    caseScores: [{ caseId: 'c-2', status: 'scored' }],
+    cutoffs: [1, 5, 10, 25]
   });
   assert.equal(row.expected.gold_citations, undefined);
+});
+
+test('a published raw row carries the scorer configured cutoffs', () => {
+  const row = buildRawRow({
+    benchmarkCase: { caseId: 'c1', benchmarkId: 'b', metadata: { expected: {} } },
+    providerResult: { timing: {} },
+    caseScore: { status: 'scored', hitRank: 2, reciprocalRank: 0.5 },
+    cutoffs: [1, 3, 5, 10]
+  });
+  assert.deepEqual(Object.keys(row.score.hit_at).sort(), ['hit@1', 'hit@10', 'hit@3', 'hit@5']);
+  assert.equal(row.score.hit_at['hit@1'], false);
+  assert.equal(row.score.hit_at['hit@3'], true);
+  assert.equal(row.score.hit_at_25, undefined);
+});
+
+test('buildRawRow throws rather than defaulting when cutoffs is not provided', () => {
+  assert.throws(
+    () =>
+      buildRawRow({
+        benchmarkCase: { caseId: 'c1', metadata: { expected: {} } },
+        providerResult: { timing: {} },
+        caseScore: { status: 'scored', hitRank: 1, reciprocalRank: 1 }
+      }),
+    /cutoffs/
+  );
+});
+
+test('reconstructPairFromRawRow accepts both raw-row score shapes without throwing', () => {
+  // A row published before per-scorer cutoffs carries flat `hit_at_1` /
+  // `hit_at_5` / `hit_at_10` / `hit_at_25` booleans; a current row carries
+  // `hit_at` as an object keyed `hit@K`. Re-scoring recomputes the score from
+  // `results` and `expected` rather than trusting either shape, so both must
+  // pass through this function untouched.
+  const shared = {
+    case_id: 'reconstruct-either-shape',
+    prompt: 'q',
+    metadata: {},
+    expected: {},
+    response: { provider_status: 'completed', result_count: 1, results: [{ rank: 1 }] },
+    timing: {}
+  };
+  const oldShapeRow = {
+    ...shared,
+    schema_version: 'trustfoundry.benchmarks.raw-row.v1',
+    score: {
+      status: 'scored',
+      hit_rank: 1,
+      hit_at_1: true,
+      hit_at_5: true,
+      hit_at_10: true,
+      hit_at_25: true,
+      reciprocal_rank: 1
+    }
+  };
+  const newShapeRow = {
+    ...shared,
+    schema_version: 'trustfoundry.benchmarks.raw-row.v2',
+    score: {
+      status: 'scored',
+      hit_rank: 1,
+      hit_at: { 'hit@1': true, 'hit@3': true, 'hit@5': true, 'hit@10': true },
+      reciprocal_rank: 1
+    }
+  };
+
+  const oldPair = reconstructPairFromRawRow(oldShapeRow);
+  const newPair = reconstructPairFromRawRow(newShapeRow);
+
+  assert.equal(oldPair.benchmarkCase.caseId, 'reconstruct-either-shape');
+  assert.equal(newPair.benchmarkCase.caseId, 'reconstruct-either-shape');
+  assert.equal(oldPair.providerResult.status, 'completed');
+  assert.equal(newPair.providerResult.status, 'completed');
+  assert.deepEqual(oldPair.providerResult, newPair.providerResult);
 });

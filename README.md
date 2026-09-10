@@ -21,125 +21,49 @@ The public benchmarks in this space measure adjacent capabilities. [LegalBench](
 
 ## Suite status
 
-| Suite | Status | Published numbers |
-|---|---|---|
-| `trustfoundry-legal-search` | Numbers published | 8 bundles under [`results/trustfoundry-legal-search/2026-07-05/`](results/trustfoundry-legal-search/2026-07-05/) (200-row and 5k-row × case-questions / key-facts / laws / regs) |
-| `trustfoundry-case-name-lookup` | Numbers published | 2 bundles under [`results/trustfoundry-case-name-lookup/2026-09-09/`](results/trustfoundry-case-name-lookup/2026-09-09/) (8,850-row public set, 50-row negatives set) |
+<!-- BEGIN GENERATED: suite-status -->
+| Suite | Status | Targets | Published bundles |
+|---|---|---:|---|
+| [`trustfoundry-case-name-lookup`](suites/trustfoundry-case-name-lookup/README.md) | published | 3 | 2 bundles under [`results/trustfoundry-case-name-lookup/2026-09-09/`](results/trustfoundry-case-name-lookup/2026-09-09/) |
+| [`trustfoundry-legal-search`](suites/trustfoundry-legal-search/README.md) | published | 8 | 8 bundles under [`results/trustfoundry-legal-search/2026-07-05/`](results/trustfoundry-legal-search/2026-07-05/) |
+<!-- END GENERATED: suite-status -->
 
-"Numbers published" means a scored result bundle exists under [`results/`](results/) with checksummed row-level evidence and passes `pnpm verify:results`.
+Only suites with `status: published` in their manifest (`suites/<id>/suite.json`) are listed above; `experimental` and `deprecated` suites are left out until they're ready. "Targets" is the number of benchmark × provider × scorer combinations the suite declares; "Published bundles" is how many of them currently have a checked-in, checksummed result bundle under [`results/`](results/) that passes `pnpm verify:results`.
 
 ## Latest Benchmarks
 
-These are the latest canonical benchmark runs in this repository. Dataset labels link to the raw and scored result bundles each row's score is computed from; each checked-in bundle includes `manifest.json`, `checksums.txt`, scored results, and row-level raw evidence. Every dated run lives alongside the others under the same suite directory — browse `results/trustfoundry-legal-search/` or `results/trustfoundry-case-name-lookup/` and their date subdirectories for the full set.
+These are the latest canonical benchmark runs in this repository, one table per published suite, one row per headline target. Target labels link to the raw and scored result bundle each row's score is computed from; each checked-in bundle includes `manifest.json`, `checksums.txt`, scored results, and row-level raw evidence. A suite may report more than one headline number — legal-search reports one per document family — so a suite's table may carry several rows. Hit-rate columns are whichever cutoffs the suite's own scorer reports (`summary.overall.hit_at`); `provider failures` is failures out of total rows attempted, so a reader can tell a run was complete rather than missing rows. Non-headline targets — invariant/negative populations (reported as a false-positive rate, not a hit rate, since there's no gold document for a fabricated query to hit) and smoke-tier companions (a cheap subset of the same target) — are listed under each suite's table rather than given a row in it; browse `results/trustfoundry-legal-search/` or `results/trustfoundry-case-name-lookup/` and their date subdirectories for the full set either way.
 
-<table>
-  <thead>
-    <tr>
-      <th colspan="7" align="left">TrustFoundry Legal Search</th>
-    </tr>
-    <tr>
-      <th>Date</th>
-      <th>Dataset</th>
-      <th>Recall@1</th>
-      <th>Recall@25</th>
-      <th>MRR</th>
-      <th>Latency (p50)</th>
-      <th>Latency (p95)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>2026-07-05</td>
-      <td><a href="results/trustfoundry-legal-search/2026-07-05/case-questions/5k/">5000 case questions</a></td>
-      <td>0.3868</td>
-      <td>0.7114</td>
-      <td>0.4723</td>
-      <td>857 ms</td>
-      <td>1248 ms</td>
-    </tr>
-    <tr>
-      <td>2026-07-05</td>
-      <td><a href="results/trustfoundry-legal-search/2026-07-05/key-facts/5k/">5000 key facts</a></td>
-      <td>0.8734</td>
-      <td>0.9766</td>
-      <td>0.9128</td>
-      <td>1051 ms</td>
-      <td>1798 ms</td>
-    </tr>
-    <tr>
-      <td>2026-07-05</td>
-      <td><a href="results/trustfoundry-legal-search/2026-07-05/laws/5k/">5000 law questions</a></td>
-      <td>0.6688</td>
-      <td>0.9176</td>
-      <td>0.7579</td>
-      <td>729 ms</td>
-      <td>1156 ms</td>
-    </tr>
-    <tr>
-      <td>2026-07-05</td>
-      <td><a href="results/trustfoundry-legal-search/2026-07-05/regs/5k/">5000 regulation questions</a></td>
-      <td>0.5820</td>
-      <td>0.9012</td>
-      <td>0.6961</td>
-      <td>788 ms</td>
-      <td>1148 ms</td>
-    </tr>
-  </tbody>
-</table>
+<!-- BEGIN GENERATED: latest-benchmarks -->
+#### TrustFoundry Case-Name Lookup
 
-<details>
-<summary>TrustFoundry Legal Search details</summary>
+| Target | Rows | hit@1 | hit@3 | hit@5 | hit@10 | 95% CI | MRR | wrong-name rate | provider failures | p50 | p95 |
+| --- | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| [`public-8850`](results/trustfoundry-case-name-lookup/2026-09-09/public-8850/) | 8850 | 0.9331 | 0.9544 | 0.9584 | 0.9584 | — | 0.9437 | 0.0943 | 0/8850 | 406 ms | 511 ms |
 
-Latest full 5k runs (2026-07-05; provider failures 0 for every row):
+Latency measured at `--parallel 4`.
 
-- Case questions: Recall@1 0.3868; Recall@10 0.639; Recall@25 0.7114; MRR 0.4723; latency p50 857 ms, p95 1248 ms. [5k results](results/trustfoundry-legal-search/2026-07-05/case-questions/5k/); [200-row companion](results/trustfoundry-legal-search/2026-07-05/case-questions/200/).
-- Key facts: Recall@1 0.8734; Recall@10 0.9688; Recall@25 0.9766; MRR 0.9128; latency p50 1051 ms, p95 1798 ms. [5k results](results/trustfoundry-legal-search/2026-07-05/key-facts/5k/); [200-row companion](results/trustfoundry-legal-search/2026-07-05/key-facts/200/).
-- Law questions: Recall@1 0.6688; Recall@10 0.8988; Recall@25 0.9176; MRR 0.7579; latency p50 729 ms, p95 1156 ms. [5k results](results/trustfoundry-legal-search/2026-07-05/laws/5k/); [200-row companion](results/trustfoundry-legal-search/2026-07-05/laws/200/).
-- Regulation questions: Recall@1 0.5820; Recall@10 0.883; Recall@25 0.9012; MRR 0.6961; latency p50 788 ms, p95 1148 ms. [5k results](results/trustfoundry-legal-search/2026-07-05/regs/5k/); [200-row companion](results/trustfoundry-legal-search/2026-07-05/regs/200/).
+- **Invariant population** [`negatives-50`](results/trustfoundry-case-name-lookup/2026-09-09/negatives-50/): false-positive rate 0.8400 (lower is better) — 8/50 correctly returned no match.
 
-</details>
+See [`suites/trustfoundry-case-name-lookup/README.md`](suites/trustfoundry-case-name-lookup/README.md) for the per-category and per-axis breakdown.
 
-<table>
-  <thead>
-    <tr>
-      <th colspan="7" align="left">TrustFoundry Case-Name Lookup</th>
-    </tr>
-    <tr>
-      <th>Date</th>
-      <th>Dataset</th>
-      <th>hit@1</th>
-      <th>hit@10</th>
-      <th>MRR</th>
-      <th>Latency (p50)</th>
-      <th>Latency (p95)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>2026-09-09</td>
-      <td><a href="results/trustfoundry-case-name-lookup/2026-09-09/public/8850/">8850 case-name queries</a></td>
-      <td>0.9331</td>
-      <td>0.9584</td>
-      <td>0.9437</td>
-      <td>406 ms</td>
-      <td>511 ms</td>
-    </tr>
-  </tbody>
-</table>
+#### TrustFoundry Legal Search
 
-<details>
-<summary>TrustFoundry Case-Name Lookup details</summary>
+| Target | Rows | hit@1 | hit@5 | hit@10 | hit@25 | 95% CI | MRR | wrong-name rate | provider failures | p50 | p95 |
+| --- | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| [`case-questions-5k`](results/trustfoundry-legal-search/2026-07-05/case-questions-5k/) | 5000 | 0.3868 | 0.5758 | 0.6390 | 0.7114 | — | 0.4723 | — | 0/5000 | 857 ms | 1248 ms |
+| [`key-facts-5k`](results/trustfoundry-legal-search/2026-07-05/key-facts-5k/) | 5000 | 0.8734 | 0.9610 | 0.9688 | 0.9766 | — | 0.9128 | — | 0/5000 | 1051 ms | 1798 ms |
+| [`laws-5k`](results/trustfoundry-legal-search/2026-07-05/laws-5k/) | 5000 | 0.6688 | 0.8696 | 0.8988 | 0.9176 | — | 0.7579 | — | 0/5000 | 729 ms | 1156 ms |
+| [`regs-5k`](results/trustfoundry-legal-search/2026-07-05/regs-5k/) | 5000 | 0.5820 | 0.8488 | 0.8830 | 0.9012 | — | 0.6961 | — | 0/5000 | 788 ms | 1148 ms |
 
-Latest full run (2026-09-09; provider failures 0 for every row; latency measured at 4 concurrent requests):
+Latency measured at `--parallel 4`.
 
-- Public set: hit@1 0.9331 (macro-averaged across 15 categories, 295 pairs each); hit@3 0.9544; hit@5 0.9584; hit@10 0.9584; MRR 0.9437; wrong-name rate 0.0943; latency p50 406 ms, p95 511 ms. [Results](results/trustfoundry-case-name-lookup/2026-09-09/public/8850/).
-- Negatives set: 50 fabricated case names, false-positive rate 0.84. [Results](results/trustfoundry-case-name-lookup/2026-09-09/negatives/50/).
+- Smoke-tier companions (cheap, non-headline): [`case-questions-200`](results/trustfoundry-legal-search/2026-07-05/case-questions-200/), [`key-facts-200`](results/trustfoundry-legal-search/2026-07-05/key-facts-200/), [`laws-200`](results/trustfoundry-legal-search/2026-07-05/laws-200/), [`regs-200`](results/trustfoundry-legal-search/2026-07-05/regs-200/).
 
-See the suite's [Published numbers](suites/trustfoundry-case-name-lookup/README.md#published-numbers) section for the per-category breakdown and the paired perturbed/control comparison.
+See [`suites/trustfoundry-legal-search/README.md`](suites/trustfoundry-legal-search/README.md) for the per-category and per-axis breakdown.
+<!-- END GENERATED: latest-benchmarks -->
 
-</details>
-
-For full runs with large raw artifacts, raw rows may be stored as `raw.jsonl.gz`; `pnpm benchmark verify-result <bundle>` reads the manifest path directly.
+Raw rows are published gzipped as `raw.jsonl.gz`; the manifest records the path and checksum, and `pnpm benchmark verify-result <bundle>` reads the manifest path directly.
 
 ## Suites
 
@@ -182,13 +106,13 @@ docker run --rm \
   ttf-benchmarks
 ```
 
-Run all four model types at full 5k and upload each verified bundle (cloud-agnostic destination — dispatched by URI scheme):
+Run every target in a suite at once and upload each verified bundle (cloud-agnostic destination — dispatched by URI scheme):
 
 ```bash
 # Google Cloud Storage
 docker run --rm \
   -e TF_API_KEY=$TF_API_KEY \
-  -e BENCHMARK_CONFIG=all-5k \
+  -e BENCHMARK_CONFIG=trustfoundry-legal-search/all \
   -e OUTPUT_BUNDLE_URI=gs://your-bucket/your-prefix \
   -v $HOME/.config/gcloud:/root/.config/gcloud \
   ttf-benchmarks
@@ -203,11 +127,17 @@ docker run --rm \
 ```
 
 The entrypoint reads:
-- `BENCHMARK_CONFIG` — a config path under `configs/benchmarks/` without the `.json` extension (e.g. `trustfoundry-legal-search/key-facts-5k`), or one of the convenience aliases `all-200` / `all-5k` which expand to every matching config in sequence. Default: `trustfoundry-legal-search/case-questions-5k`.
+- `BENCHMARK_CONFIG` — a target reference `<suite>/<target>`, or `all` to run every
+  target in sequence, or `<suite>/all` for one suite's targets. Run
+  `pnpm benchmark targets` for the full list. Default:
+  `trustfoundry-legal-search/case-questions-5k`.
 - `RUN_LABEL` — short tag baked into the run ID. Default `manual`.
 - `OUTPUT_BUNDLE_URI` — if unset, bundles stay on the container filesystem only. Supported schemes: `gs://` (via the bundled `gcloud` SDK), `file://` or an absolute path (local `cp`). To add another cloud, extend the `upload_bundle` dispatch in `entrypoint.sh`.
+- `DRY_RUN` — resolve and print every target that would run, then exit without running anything.
 
-The image stamps the source commit it was built from into `$HARNESS_COMMIT_SHA`, and uploaded paths take the shape `${OUTPUT_BUNDLE_URI}/<benchmark-family>/<sha7>/<run-leaf>/`.
+Every target's benchmark, provider, and scorer config paths are resolved through the suite registry (`suites/<suite>/suite.json`), so adding a suite or a target needs no change to the entrypoint itself.
+
+The image stamps the source commit it was built from into `$HARNESS_COMMIT_SHA`, and uploaded paths take the shape `${OUTPUT_BUNDLE_URI}/<suite>/<sha7>/<date>-<run-label>-<target>/`.
 
 ## Repository Layout
 
@@ -250,6 +180,8 @@ matching `compatibility` fingerprints can be merged and compared;
 matching `resume` fingerprints share the same shard slice; the
 `manifest` fingerprint is unique per run.
 
+See [Reproducing a published number](docs/reproducing.md) for the step-by-step recipe.
+
 ### Verifying releases
 
 Each tagged release ships with a signed [SLSA build provenance
@@ -279,6 +211,14 @@ Current adapters:
 ```bash
 pnpm benchmark adapters
 ```
+
+### Adding a suite
+
+A suite is a benchmark, a scorer, one or more datasets, and a manifest
+naming the targets they combine into. See
+[`docs/adding-a-suite.md`](docs/adding-a-suite.md) for the full walkthrough —
+naming, writing the adapters, declaring targets in `suites/<suite>/suite.json`,
+and publishing a bundle.
 
 ### Coding-agent skill
 

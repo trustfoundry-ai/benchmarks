@@ -79,12 +79,12 @@
         "providerFailures": { "type": ["integer", "null"] }
       }
     },
-    "raw-row.v1": {
+    "raw-row.v2": {
       "type": "object",
-      "$comment": "trustfoundry.benchmarks.raw-row.v1 — one line of raw.jsonl. Additive fields carry benchmark-specific stratifications without a schema bump.",
+      "$comment": "trustfoundry.benchmarks.raw-row.v2 — one line of raw.jsonl. Additive fields carry benchmark-specific stratifications without a schema bump.",
       "required": ["schema_version", "case_id", "prompt", "metadata", "expected", "response", "timing", "score"],
       "properties": {
-        "schema_version": { "const": "trustfoundry.benchmarks.raw-row.v1" },
+        "schema_version": { "const": "trustfoundry.benchmarks.raw-row.v2" },
         "case_id": { "type": "string" },
         "benchmark_id": { "type": ["string", "null"] },
         "row_index": { "type": ["integer", "null"] },
@@ -155,10 +155,11 @@
           "properties": {
             "status": { "type": ["string", "null"] },
             "hit_rank": { "type": ["integer", "null"] },
-            "hit_at_1": { "type": "boolean" },
-            "hit_at_5": { "type": "boolean" },
-            "hit_at_10": { "type": "boolean" },
-            "hit_at_25": { "type": "boolean" },
+            "hit_at": {
+              "type": "object",
+              "propertyNames": { "pattern": "^hit@\\d+$" },
+              "additionalProperties": { "type": "boolean" }
+            },
             "reciprocal_rank": { "type": "number" }
           }
         }
@@ -174,7 +175,34 @@
         "status": { "type": "string" },
         "caseScores": { "type": "array" },
         "taskScores": { "type": "array" },
-        "summary": { "type": "object" },
+        "summary": {
+          "type": "object",
+          "required": ["overall", "headline"],
+          "properties": {
+            "overall": {
+              "type": "object",
+              "required": ["hit_at", "mrr", "n"],
+              "properties": {
+                "hit_at": { "type": "object", "propertyNames": { "pattern": "^hit@\\d+$" }, "additionalProperties": { "type": "number" } },
+                "mrr": { "type": "number" },
+                "n": { "type": "integer" }
+              }
+            },
+            "headline": {
+              "type": "object",
+              "required": ["metric", "macro", "pooled", "per_category", "ci95", "n_categories", "n_rows"],
+              "properties": {
+                "metric": { "type": "string", "pattern": "^hit@\\d+$" },
+                "macro": { "type": "number" },
+                "pooled": { "type": "number" },
+                "per_category": { "type": "object" },
+                "ci95": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+                "n_categories": { "type": "integer" },
+                "n_rows": { "type": "integer" }
+              }
+            }
+          }
+        },
         "metadata": {
           "type": "object",
           "required": ["scorer", "version"],

@@ -155,6 +155,28 @@ fifty independent probes — see "What this benchmark cannot claim."
 This tier reports a **false-positive rate and never a hit rate**, and it is excluded
 from the headline by construction.
 
+### The 1,050-row smoke tier
+
+`public-1050` runs 15 categories × 35 pairs × 2 arms from the same dataset as
+`public-8850`, selected by walking each category's 295 pairs with a stride of 8.
+It takes about 105 seconds at `--parallel 4`; with the 50-row negatives arm, a
+complete smoke is under two minutes.
+
+Both numbers are published with their intervals, so you can run the cheap tier,
+confirm it, and reason about the full set — or run the full set.
+
+Three limits are load-bearing:
+
+1. At 35 pairs per category the per-category intervals are ±8–15pp and six of
+   fifteen categories saturate at exactly 1.0000. **Per-category numbers must
+   not be quoted off this tier.** It is keyed on the pooled headline.
+2. Confirming this tier verifies the pipeline and a published 12% sample. It is
+   not an audit: the subset is deterministic and public, therefore knowable in
+   advance. `public-8850` remains the number of record.
+3. Precision scales as 1/√n — ±2.15pp costs 1,050 rows, ±1.04pp costs 4,500, and
+   the full ±0.74pp costs 8,850. No cheap tier is quotable as a headline
+   estimate, which is why this one is not presented as one.
+
 ## Published numbers
 
 The `trustfoundry-legal-search` provider (`model_type: case_name`) results below are
@@ -268,12 +290,12 @@ concurrent requests, 50 requests.
 
 | Date | Target | Bundle |
 |---|---|---|
-| 2026-09-09 | public | [`8850`](../../results/trustfoundry-case-name-lookup/2026-09-09/public/8850/) |
-| 2026-09-09 | negatives | [`50`](../../results/trustfoundry-case-name-lookup/2026-09-09/negatives/50/) |
+| 2026-09-09 | public | [`8850`](../../results/trustfoundry-case-name-lookup/2026-09-09/public-8850/) |
+| 2026-09-09 | negatives | [`50`](../../results/trustfoundry-case-name-lookup/2026-09-09/negatives-50/) |
 
-**Latest pointer.** [`results/trustfoundry-case-name-lookup/latest.json`](../../results/trustfoundry-case-name-lookup/latest.json) maps each `(type, size)` to its currently-canonical dated bundle. `pnpm verify:results` verifies the pointer and every bundle it references.
+**Latest pointer.** [`results/trustfoundry-case-name-lookup/latest.json`](../../results/trustfoundry-case-name-lookup/latest.json) maps each target id to its currently-canonical dated bundle. `pnpm verify:results` verifies the pointer and every bundle it references.
 
-For a concrete example of what a bundle's scored summary looks like, see [`results/trustfoundry-case-name-lookup/2026-09-09/public/8850/result.json`](../../results/trustfoundry-case-name-lookup/2026-09-09/public/8850/result.json). The full checked-in bundle also carries the raw row-level evidence, manifest, and checksums.
+For a concrete example of what a bundle's scored summary looks like, see [`results/trustfoundry-case-name-lookup/2026-09-09/public-8850/result.json`](../../results/trustfoundry-case-name-lookup/2026-09-09/public-8850/result.json). The full checked-in bundle also carries the raw row-level evidence, manifest, and checksums.
 
 ## Test data schema
 
@@ -282,7 +304,7 @@ Each line of a dataset JSONL is one JSON object.
 | Field | Description |
 |---|---|
 | `query_text` | The case-name query sent to the search API, verbatim. For a `perturbed` row this is the mangled caption; for a `control` row it is `expected.case_name` sent unchanged. |
-| `caseId` | Stable row identifier. Also the join key into a bundle's `raw.jsonl`. |
+| `caseId` | Stable row identifier. Also the join key into a bundle's raw rows. |
 | `expected.case_name` | The caption as the corpus stores it. This is the gold value hit@K matches against for every category except `single_party_search`, which matches the query text itself (see "Matching rule" above). Identical for a perturbed row and its paired control. |
 | `expected.arm` | `perturbed` or `control`. See "The paired design." |
 | `expected.pair_id` | Joins a perturbed row to its control row — both carry the same value. |

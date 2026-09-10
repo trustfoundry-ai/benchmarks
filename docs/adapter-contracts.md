@@ -203,7 +203,7 @@ Both entry points return:
   `'unscorable'` and `'provider_failure'` rows so downstream analysis
   keeps row alignment.
 - `summary` — the scorer-defined summary. Common fields:
-  `overallScore`, `supportedScore`, `headline{}` (metric bundle),
+  `overall{}` (`hit_at{}` / `mrr`), `headline{}` (metric bundle),
   `latency_ms{}` (percentiles), `execution{}` (runtime counters).
 - `metadata` — scorer id/version plus scorer-specific parameters
   (`cutoffs`, `headline_cutoff`, `extractionVersion`, ...). Anything
@@ -256,7 +256,7 @@ Written at run start and updated at run end. Records:
     checkpointed run to resume in a fresh directory.
   - `manifest` — digest of the full manifest for change detection.
 
-### `trustfoundry.benchmarks.raw-row.v1` — `provider-results.jsonl`
+### `trustfoundry.benchmarks.raw-row.v2` — one row per case
 
 One row per case. Concatenation of `benchmarkCase` fields plus the
 `CaseResult` fields returned by the provider. Row order matches

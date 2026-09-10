@@ -5,13 +5,13 @@
 #
 # Run (local, no cloud upload):
 #   docker run --rm -e TF_API_KEY=$TF_API_KEY \
-#     -e BENCHMARK_CONFIG=trustfoundry-legal-search-case-questions-200 \
+#     -e BENCHMARK_CONFIG=trustfoundry-legal-search/case-questions-200 \
 #     ttf-benchmarks
 #
 # Run (with upload of each verified bundle — cloud-agnostic, dispatched by
 # URI scheme; gs:// uses the bundled gcloud SDK, file:///abs/path uses cp):
 #   docker run --rm -e TF_API_KEY=$TF_API_KEY \
-#     -e BENCHMARK_CONFIG=all-5k \
+#     -e BENCHMARK_CONFIG=trustfoundry-legal-search/all \
 #     -e OUTPUT_BUNDLE_URI=gs://your-bucket/some/prefix \
 #     -v $HOME/.config/gcloud:/root/.config/gcloud \
 #     ttf-benchmarks

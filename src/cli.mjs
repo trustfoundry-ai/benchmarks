@@ -1,6 +1,7 @@
 import path from 'node:path';
 
 import { publishResultBundle, verifyResultBundle } from './core/artifacts.mjs';
+import { compareInputs } from './core/comparable.mjs';
 import { readJson, readJsonl, writeJson, exists } from './core/fs.mjs';
 import { retryFailedRun } from './core/retry-failed.mjs';
 import {
@@ -10,24 +11,24 @@ import {
   scoreRun
 } from './core/runner.mjs';
 import { defaultRegistry } from './core/registry.mjs';
-
-// Operational defaults for the shipped CLI. The framework core has no
-// hardcoded default adapter; this CLI is the layer that names the
-// shipped `trustfoundry-legal-search` suite as its out-of-the-box
-// convenience. Consumers who wire their own adapter register it and
-// pass explicit --benchmark-config / --provider-config / --scorer-config
-// paths.
-const DEFAULT_BENCHMARK_CONFIG = 'configs/benchmarks/trustfoundry-legal-search/case-questions-200.json';
-const DEFAULT_PROVIDER_CONFIG = 'configs/providers/trustfoundry-legal-search.json';
-const DEFAULT_SCORER_CONFIG = 'configs/scorers/trustfoundry-legal-search.json';
-const DEFAULT_OUT_DIR = 'runs/trustfoundry-legal-search-case-questions-200';
+import { listSuites, parseTargetRef, resolveTarget } from './core/suites.mjs';
+import {
+  DEFAULT_BENCHMARK_CONFIG,
+  DEFAULT_OUT_DIR,
+  DEFAULT_PROVIDER_CONFIG,
+  DEFAULT_SCORER_CONFIG,
+  resolveRunConfig
+} from './cli-run-config.mjs';
 
 function printHelp() {
   console.log(`TrustFoundry benchmarks
 
 Commands:
   adapters
-  run [--benchmark ID] [--provider ID] [--scorer ID]
+  targets [--ids]
+  resolve-target <suite>/<target> [--json]
+  run [--target <suite>/<target>]
+      [--benchmark ID] [--provider ID] [--scorer ID]
       [--benchmark-config PATH] [--provider-config PATH] [--scorer-config PATH]
       [--out DIR] [--parallel N] [--limit N] [--offset N] [--run-id ID]
       [--shard-index N] [--shard-count N] [--retries N]
@@ -39,6 +40,7 @@ Commands:
   retry-failed --run DIR --out DIR [--parallel N] [--retries N] [--force]
   retry-misses --run DIR --out DIR [--parallel N] [--retries N] [--force]
   report --run DIR
+  comparable <a> <b>
 
 Defaults:
   benchmark-config ${DEFAULT_BENCHMARK_CONFIG}
@@ -100,15 +102,16 @@ function printAdapters() {
 }
 
 function runSummaryLine(summary) {
+  const hitAt = summary.overall?.hit_at ?? {};
   return {
     total: summary.total,
     scored: summary.scored,
     providerFailures: summary.providerFailures,
-    hitAt1: summary.hitAt1,
-    hitAt5: summary.hitAt5,
-    hitAt10: summary.hitAt10,
-    hitAt25: summary.hitAt25,
-    mrr: summary.mrr,
+    hit_at: hitAt,
+    mrr: summary.overall?.mrr ?? null,
+    ...(summary.headline
+      ? { headline: { macro: summary.headline.macro, pooled: summary.headline.pooled, ci95: summary.headline.ci95 } }
+      : {}),
     ...(summary.latency_ms ? { latency_ms: summary.latency_ms } : {}),
     ...(summary.server_response_duration_ms
       ? { server_response_duration_ms: summary.server_response_duration_ms }
@@ -118,20 +121,75 @@ function runSummaryLine(summary) {
   };
 }
 
+// Resolves a `<suite>/<target>` reference to the config triple a run needs.
+// Shared by `resolve-target` and by `run --target`: both want the same
+// fail-fast behavior `resolveTarget` gives (unknown ids and missing config
+// paths both throw with the valid alternatives named), as opposed to
+// `listSuites`, which tolerates a missing config path because `targets` is
+// a listing, not a precondition check.
+async function resolveTargetOption(ref) {
+  const { suiteId, targetId } = parseTargetRef(ref);
+  const { target } = await resolveTarget({ repoRoot: repoRoot(), suiteId, targetId });
+  return {
+    benchmarkConfig: target.benchmark,
+    providerConfig: target.provider,
+    scorerConfig: target.scorer,
+    rows: target.rows,
+    bundle: targetId
+  };
+}
+
+async function resolveTargetCommand(positionals, options) {
+  const ref = positionals[0];
+  if (!ref) throw new Error('resolve-target requires <suite>/<target>');
+  const resolved = await resolveTargetOption(ref);
+  if (options.json) {
+    console.log(JSON.stringify(resolved, null, 2));
+    return;
+  }
+  for (const [key, value] of Object.entries(resolved)) console.log(`${key}=${value}`);
+}
+
+// `--ids` is the machine-readable form: exactly one `<suite>/<target>`
+// reference per line, nothing else on the line and no header lines. It
+// exists so a caller that needs the list of runnable targets (the
+// container entrypoint's `all` / `<suite>/all`) can consume it without
+// depending on the human-readable listing's prose or indentation.
+async function targetsCommand(options) {
+  const suites = await listSuites({ repoRoot: repoRoot() });
+  if (options.ids) {
+    for (const suite of suites) {
+      for (const targetId of Object.keys(suite.targets)) {
+        console.log(`${suite.id}/${targetId}`);
+      }
+    }
+    return;
+  }
+  for (const suite of suites) {
+    console.log(`${suite.id}  (${suite.status})`);
+    for (const [targetId, target] of Object.entries(suite.targets)) {
+      const tags = [target.tier, target.headline ? 'headline' : null].filter(Boolean).join(', ');
+      console.log(`  ${suite.id}/${targetId}  ${target.rows} rows${tags ? `  [${tags}]` : ''}`);
+    }
+  }
+}
+
 async function runCommand(options) {
-  const out = options.out ?? DEFAULT_OUT_DIR;
+  const targetRef = stringOption(options.target);
+  const resolved = targetRef ? await resolveTargetOption(targetRef) : null;
+  const { outDir, benchmarkConfigPath, providerConfigPath, scorerConfigPath } = resolveRunConfig(
+    options,
+    resolved
+  );
   const result = await executeRun({
     repoRoot: repoRoot(),
-    outDir: out,
+    outDir,
     benchmarkId: stringOption(options.benchmark),
     providerId: stringOption(options.provider),
     scorerId: stringOption(options.scorer),
-    benchmarkConfigPath:
-      stringOption(options['benchmark-config']) ?? DEFAULT_BENCHMARK_CONFIG,
-    providerConfigPath:
-      stringOption(options['provider-config']) ?? DEFAULT_PROVIDER_CONFIG,
-    scorerConfigPath:
-      stringOption(options['scorer-config']) ?? DEFAULT_SCORER_CONFIG,
+    benchmarkConfigPath,
+    providerConfigPath,
+    scorerConfigPath,
     limit: numberOption(options.limit, null),
     offset: numberOption(options.offset, null),
     parallel: numberOption(options.parallel, 4),
@@ -279,6 +337,36 @@ async function reportCommand(options) {
   console.log(JSON.stringify(report, null, 2));
 }
 
+// Loads the `{ benchmark, scorer }` input record `compareInputs` expects
+// from either a run directory (manifest.json) or a published bundle
+// (result.json's `run`). A published bundle's own manifest.json is the
+// *bundle* manifest and has no `benchmark` key, so the fall-through to
+// result.json's `run` is what makes this work for both shapes.
+async function loadComparableInputs(dir) {
+  const manifestPath = path.join(dir, 'manifest.json');
+  if (await exists(manifestPath)) {
+    const doc = await readJson(manifestPath);
+    if (doc.benchmark) return doc;
+  }
+  return (await readJson(path.join(dir, 'result.json'))).run;
+}
+
+async function comparableCommand(positionals) {
+  const [left, right] = positionals;
+  if (!left || !right) throw new Error('comparable requires two run directories or bundles');
+  const { comparable, differences } = compareInputs(
+    await loadComparableInputs(left),
+    await loadComparableInputs(right)
+  );
+  if (comparable) {
+    console.log(`comparable: ${left} and ${right} share benchmark, dataset and scorer inputs`);
+    return;
+  }
+  console.error(`NOT comparable: ${left} and ${right} differ in ${differences.length} input(s)`);
+  for (const d of differences) console.error(`  ${d.field}\n    a: ${d.a}\n    b: ${d.b}`);
+  process.exitCode = 1;
+}
+
 export async function main(args) {
   const command = args[0] ?? 'help';
   const { options, positionals } = parseArgs(args.slice(1));
@@ -287,6 +375,8 @@ export async function main(args) {
     return;
   }
   if (command === 'adapters') return printAdapters();
+  if (command === 'targets') return targetsCommand(options);
+  if (command === 'resolve-target') return resolveTargetCommand(positionals, options);
   if (command === 'run') return runCommand(options);
   if (command === 'score') return scoreCommand(options);
   if (command === 'publish-result') return publishResultCommand(options);
@@ -295,5 +385,6 @@ export async function main(args) {
   if (command === 'retry-failed') return retryFailedCommand(options);
   if (command === 'retry-misses') return retryFailedCommand(options, { selection: 'misses' });
   if (command === 'report') return reportCommand(options);
+  if (command === 'comparable') return comparableCommand(positionals);
   throw new Error(`Unknown command: ${command}`);
 }

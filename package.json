@@ -50,7 +50,10 @@
     "test:coverage": "c8 --reporter=text --reporter=lcov --report-dir=coverage --include=src/** node --test",
     "lint": "eslint src test scripts bin",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "verify:results": "node scripts/verify-result-bundles.mjs"
+    "verify:results": "node scripts/verify-result-bundles.mjs",
+    "check:provenance": "node scripts/check-bundle-provenance.mjs",
+    "check:smoke": "node scripts/check-smoke-baseline.mjs",
+    "generate:readme": "node scripts/generate-readme-tables.mjs"
   },
   "engines": {
     "node": ">=20"

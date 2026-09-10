@@ -40,6 +40,7 @@
  * level the rate is reported.
  */
 import { validateScorerCutoffsMatchImplementation } from '@trustfoundry-ai/benchmarks-harness/core/scorer-validators';
+import { wilsonInterval } from '@trustfoundry-ai/benchmarks-harness/core/stats';
 import { defineScorerAdapter } from '@trustfoundry-ai/benchmarks-harness/contracts';
 
 const SCORER_ID = 'trustfoundry-case-name-lookup';
@@ -616,30 +617,15 @@ function scoreCase({ benchmarkCase, providerResult, cutoffs, headlineCutoff }) {
   };
 }
 
-// ---- Wilson interval + macro-averaged headline (v2) ----
+// ---- Macro-averaged headline (v2) ----
 //
-// Implements the standard Wilson score interval closed form exactly, with no
-// approximation shortcuts -- the Node test suite pins hand-computed
-// constants against it so this computation cannot silently drift.
-//
-// Wilson rather than the normal approximation because per-category rates sit
-// close to 1.0 at the row counts a category typically carries, where the
-// normal interval overshoots 1.0 and stops being reportable. n === 0 returns
-// the full unit interval: a category with no rows is a MISSING measurement
-// (which `category_coverage` reports), not a confident one.
-const Z95 = 1.96;
+// `wilsonInterval`/`Z95` live in `core/stats.mjs` -- a category with no rows
+// getting the full unit interval (see that module) is what
+// `category_coverage` below is reporting as a MISSING measurement, not a
+// confident one.
 
 // The one category scored by name rather than by citation. See scoreCase.
 const PARTY_SEARCH_AXIS = 'single_party_search';
-
-function wilsonInterval(successes, n, z = Z95) {
-  if (!(n > 0)) return [0, 1];
-  const p = successes / n;
-  const denominator = 1 + (z * z) / n;
-  const centre = (p + (z * z) / (2 * n)) / denominator;
-  const margin = (z * Math.sqrt((p * (1 - p)) / n + (z * z) / (4 * n * n))) / denominator;
-  return [Math.max(0, centre - margin), Math.min(1, centre + margin)];
-}
 
 // THE PUBLISHED NUMBER: the macro-average of hit@K across every category.
 //
@@ -668,7 +654,7 @@ function macroHeadline(byAxis, cutoff) {
   const hits = Object.values(perCategory).reduce((sum, e) => sum + e[`hit@${cutoff}`] * e.n, 0);
   const macro = rates.length ? rates.reduce((a, b) => a + b, 0) / rates.length : 0;
   return {
-    metric: `macro_hit_at_${cutoff}`,
+    metric: `hit@${cutoff}`,
     macro,
     pooled: totalN ? hits / totalN : 0,
     n_categories: rates.length,
@@ -863,7 +849,6 @@ function buildSummary(caseScores, { manifest, cutoffs, headlineCutoff }) {
     ...aggregatePositives(headlinePositives, cutoffs),
     all_axes: aggregatePositives(positives, cutoffs)
   };
-  const headlineScore = overall.hit_at[`hit@${headlineCutoff}`] ?? 0;
 
   const total = caseScores.length;
   const summary = {
@@ -880,9 +865,6 @@ function buildSummary(caseScores, { manifest, cutoffs, headlineCutoff }) {
     // between "scored" and "failed" without a call site needing to know
     // which one.
     notApplicable: total - scored.length - failed.length,
-    overallScore: headlineScore,
-    supportedScore: headlineScore,
-    mrr: overall.mrr,
     execution: {
       runId: manifest?.runId ?? manifest?.run_id ?? null,
       benchmark: manifest?.benchmark ?? null,
@@ -928,10 +910,6 @@ function buildSummary(caseScores, { manifest, cutoffs, headlineCutoff }) {
   // letting the rate silently read as computed over every row.
   summary.wrong_name = wrongNameRateFields(headlinePositives);
 
-  for (const k of cutoffs) {
-    summary[`hitAt${k}`] = overall.hit_at[`hit@${k}`];
-    summary[`dedupedHitAt${k}`] = overall.deduped_hit_at[`hit@${k}`];
-  }
   return summary;
 }
 

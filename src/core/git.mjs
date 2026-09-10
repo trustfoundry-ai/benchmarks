@@ -20,3 +20,13 @@ export async function gitRevision(cwd) {
     return null;
   }
 }
+
+export async function gitDirty(cwd) {
+  if (!cwd) return null;
+  try {
+    const { stdout } = await execFileAsync('git', ['-C', cwd, 'status', '--porcelain']);
+    return stdout.trim().length > 0;
+  } catch {
+    return null;
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$comment": "Targets for the case-name lookup suite. Target ids are the identifier used by the CLI (--target), the container (BENCHMARK_CONFIG), the published bundle directory, and the latest.json key. public-8850 is the headline target: 15 categories, 295 paired cases each, one perturbed row and one control row per case. negatives-50 is the invariant population -- fabricated case names that resolve to no document -- reported separately from the headline by construction.",
+  "id": "trustfoundry-case-name-lookup",
+  "title": "TrustFoundry Case-Name Lookup",
+  "status": "published",
+  "targets": {
+    "public-8850": { "benchmark": "configs/benchmarks/trustfoundry-case-name-lookup/v2-public.json", "provider": "configs/providers/trustfoundry-case-name-lookup.json", "scorer": "configs/scorers/trustfoundry-case-name-lookup.json", "rows": 8850, "tier": "full", "headline": true },
+    "negatives-50": { "benchmark": "configs/benchmarks/trustfoundry-case-name-lookup/v2-negatives.json", "provider": "configs/providers/trustfoundry-case-name-lookup.json", "scorer": "configs/scorers/trustfoundry-case-name-lookup.json", "rows": 50, "tier": "full" },
+    "public-1050": { "$comment": "Strided 1,050-row subset of public-8850's dataset. Smoke and cheap external verification; not a headline.", "benchmark": "configs/benchmarks/trustfoundry-case-name-lookup/v2-public-1050.json", "provider": "configs/providers/trustfoundry-case-name-lookup.json", "scorer": "configs/scorers/trustfoundry-case-name-lookup.json", "rows": 1050, "tier": "smoke" }
+  }
+}

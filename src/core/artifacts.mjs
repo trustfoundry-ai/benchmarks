@@ -1,6 +1,8 @@
 import path from 'node:path';
 import { createReadStream, createWriteStream } from 'node:fs';
-import { readFile, stat, unlink } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, unlink } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { promisify } from 'node:util';
 import { createGunzip, createGzip, gunzip } from 'node:zlib';
@@ -19,7 +21,6 @@ import {
 } from './fs.mjs';
 import { getAdapter } from './registry.mjs';
 
-const LARGE_RAW_GZIP_THRESHOLD_BYTES = 95 * 1024 * 1024;
 const gunzipAsync = promisify(gunzip);
 
 function safeParseJson(text) {
@@ -108,19 +109,35 @@ function normalizedResults(providerResult) {
 
 // Builds a single raw-row record from one case + its provider result + its
 // score. Pure; safe to call in a streaming pipeline. The field set is the
-// raw-row.v1 schema — keep it in sync with reconstructPairFromRawRow.
+// raw-row.v2 schema — keep it in sync with reconstructPairFromRawRow.
 //
 // Additive fields (missing on older bundles → null on reconstruction) support
 // benchmark-specific stratifications without a schema version bump:
 // `metadata.document_type`, `metadata.difficulty`, `metadata.kind`,
 // `metadata.negative_category`, `metadata.geo_level_2`, and
 // `expected.kind` / `expected.negative_category` for citation-lookup.
+//
+// `cutoffs` is required: it is the scorer's own configured cutoff list (read
+// from `summary.execution.scorer.cutoffs`, the one path both scorers report
+// it at), and `score.hit_at` is keyed by exactly those values. There is no
+// default -- a scorer's cutoffs are not something this function can guess,
+// and guessing here is how a published row silently drops or fabricates a
+// hit@K metric.
 export function buildRawRow({
   benchmarkCase,
   providerResult,
   caseScore,
-  publishedExpectedFields = []
+  publishedExpectedFields = [],
+  cutoffs
 }) {
+  if (!Array.isArray(cutoffs) || cutoffs.length === 0) {
+    throw new Error(
+      "buildRawRow: 'cutoffs' is required (the scorer's configured cutoffs, e.g. from " +
+        'summary.execution.scorer.cutoffs) and must be a non-empty array; received ' +
+        `${JSON.stringify(cutoffs)}`
+    );
+  }
+
   const expectedSource = benchmarkCase.metadata?.expected ?? {};
   const publishedExpected = {};
   for (const field of publishedExpectedFields) {
@@ -129,7 +146,7 @@ export function buildRawRow({
 
   const parsed = safeParseJson(providerResult?.finalOutputText) ?? {};
   return {
-    schema_version: 'trustfoundry.benchmarks.raw-row.v1',
+    schema_version: 'trustfoundry.benchmarks.raw-row.v2',
     case_id: benchmarkCase.caseId,
     benchmark_id: benchmarkCase.benchmarkId ?? null,
     row_index: benchmarkCase.metadata?.datasetIndex ?? null,
@@ -191,10 +208,12 @@ export function buildRawRow({
     score: {
       status: caseScore?.status ?? null,
       hit_rank: caseScore?.hitRank ?? null,
-      hit_at_1: caseScore?.hitAt1 ?? false,
-      hit_at_5: caseScore?.hitAt5 ?? false,
-      hit_at_10: caseScore?.hitAt10 ?? false,
-      hit_at_25: caseScore?.hitAt25 ?? false,
+      hit_at: Object.fromEntries(
+        cutoffs.map((k) => [
+          `hit@${k}`,
+          Number.isFinite(caseScore?.hitRank) && caseScore.hitRank <= k
+        ])
+      ),
       reciprocal_rank: caseScore?.reciprocalRank ?? 0
     }
   };
@@ -206,7 +225,8 @@ export function buildRawRows({
   cases,
   providerResults,
   caseScores,
-  publishedExpectedFields = []
+  publishedExpectedFields = [],
+  cutoffs
 }) {
   const providerByCase = new Map(providerResults.map((row) => [row.caseId, row]));
   const scoreByCase = new Map(caseScores.map((score) => [score.caseId, score]));
@@ -215,7 +235,8 @@ export function buildRawRows({
       benchmarkCase,
       providerResult: providerByCase.get(benchmarkCase.caseId) ?? null,
       caseScore: scoreByCase.get(benchmarkCase.caseId) ?? null,
-      publishedExpectedFields
+      publishedExpectedFields,
+      cutoffs
     })
   );
 }
@@ -228,6 +249,13 @@ export function buildRawRows({
 // kind, negative_category, geo_level_2) when the raw row has them; older
 // bundles missing those fields get null defaults so scorers that ignore
 // them can continue to work unchanged.
+//
+// Deliberately does not read `row.score` at all: a row's score, in either
+// shape (`score.hit_at_1`/`hit_at_5`/`hit_at_10`/`hit_at_25` on an older row,
+// `score.hit_at['hit@K']` on a current one), is a scorer's prior output, not
+// an input. Re-scoring a bundle recomputes it fresh from `results` and
+// `expected` below; trusting a stored score here would make verification
+// circular. Both row shapes pass through unaffected as a result.
 export function reconstructPairFromRawRow(row) {
   const expectedKind = row.expected?.kind ?? 'exact';
   const benchmarkCase = {
@@ -355,7 +383,7 @@ function resultEnvelope({ manifest, scores }) {
   };
 }
 
-export async function publishResultBundle({ repoRoot, runDir, outDir, force = false }) {
+export async function publishResultBundle({ repoRoot, runDir, outDir, force = false, rawHref = null }) {
   const resolvedRun = path.resolve(repoRoot, runDir);
   const resolvedOut = path.resolve(repoRoot, outDir);
   if ((await exists(resolvedOut)) && !force) {
@@ -370,8 +398,10 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
   const cases = await readJsonl(casesPath);
   const casesById = new Map(cases.map((benchmarkCase) => [benchmarkCase.caseId, benchmarkCase]));
 
-  // Stream provider-results through the scorer; build + write each raw row as
-  // its case score is produced. Only one pair lives in memory at a time.
+  // Stream provider-results into (benchmarkCase, providerResult) pairs.
+  // `providerPairs` is a generator function, not a generator object -- each
+  // call opens a fresh read of provider-results.jsonl, so it can be iterated
+  // more than once without materializing the file.
   let rawArtifactPath = 'raw.jsonl';
   let rawPath = path.join(resolvedOut, rawArtifactPath);
   const rawWriter = await createJsonlWriter(rawPath);
@@ -399,30 +429,51 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
     publishedExpectedFields = [];
   }
 
+  // Score first, over the full run, so the scorer's configured cutoffs are
+  // known: they are reported once, on the finished summary, at
+  // `summary.execution.scorer.cutoffs`. Raw rows are then built in a second
+  // pass over the same (small, disk-backed) pairs, keyed against the
+  // per-case scores this pass already computed. Only one pair is
+  // materialized at a time; the second pass re-reads `provider-results.jsonl`
+  // from disk rather than holding every pair in memory.
   const scorer = getAdapter('scorers', resolveScorerId({ manifest }));
-  const scoreResult = await scorer.scoreStream({
-    manifest,
-    pairs: providerPairs(),
-    onCaseScored: async ({ benchmarkCase, providerResult, caseScore }) => {
-      const rawRow = buildRawRow({
-        benchmarkCase,
-        providerResult,
-        caseScore,
-        publishedExpectedFields
-      });
-      await rawWriter.write(rawRow);
-      rowCount += 1;
+  const scoreResult = await scorer.scoreStream({ manifest, pairs: providerPairs() });
+
+  const cutoffs = scoreResult.summary?.execution?.scorer?.cutoffs;
+  if (!Array.isArray(cutoffs) || cutoffs.length === 0) {
+    throw new Error(
+      `publishResultBundle: scorer '${resolveScorerId({ manifest })}' did not report ` +
+        'summary.execution.scorer.cutoffs -- cannot project score.hit_at into raw rows.'
+    );
+  }
+
+  const caseScoreByCaseId = new Map(
+    (scoreResult.caseScores ?? []).map((caseScore) => [caseScore.caseId, caseScore])
+  );
+  for await (const { benchmarkCase, providerResult } of providerPairs()) {
+    if (!caseScoreByCaseId.has(benchmarkCase.caseId)) {
+      throw new Error(
+        `publishResultBundle: scorer '${resolveScorerId({ manifest })}' returned no score for ` +
+          `case '${benchmarkCase.caseId}' -- refusing to publish a raw row with a guessed score.`
+      );
     }
-  });
+    const rawRow = buildRawRow({
+      benchmarkCase,
+      providerResult,
+      caseScore: caseScoreByCaseId.get(benchmarkCase.caseId),
+      publishedExpectedFields,
+      cutoffs
+    });
+    await rawWriter.write(rawRow);
+    rowCount += 1;
+  }
   await rawWriter.close();
 
-  if ((await stat(rawPath)).size > LARGE_RAW_GZIP_THRESHOLD_BYTES) {
-    const gzPath = path.join(resolvedOut, 'raw.jsonl.gz');
-    await gzipFile(rawPath, gzPath);
-    await unlink(rawPath);
-    rawArtifactPath = 'raw.jsonl.gz';
-    rawPath = gzPath;
-  }
+  const gzPath = path.join(resolvedOut, 'raw.jsonl.gz');
+  await gzipFile(rawPath, gzPath);
+  await unlink(rawPath);
+  rawArtifactPath = 'raw.jsonl.gz';
+  rawPath = gzPath;
 
   const result = resultEnvelope({ manifest, scores: scoreResult });
   const resultPath = path.join(resolvedOut, 'result.json');
@@ -437,7 +488,8 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
       raw: {
         path: rawArtifactPath,
         sha256: await sha256File(rawPath),
-        rows: rowCount
+        rows: rowCount,
+        ...(rawHref ? { href: rawHref } : {})
       },
       result: {
         path: 'result.json',
@@ -462,13 +514,124 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
   };
   const manifestPath = path.join(resolvedOut, 'manifest.json');
   await writeJson(manifestPath, bundleManifest);
-  const checksums = [
-    `${bundleManifest.artifacts.raw.sha256}  ${rawArtifactPath}`,
-    `${bundleManifest.artifacts.result.sha256}  result.json`,
-    `${await sha256File(manifestPath)}  manifest.json`
-  ].join('\n');
-  await writeText(path.join(resolvedOut, 'checksums.txt'), `${checksums}\n`);
+  await writeBundleChecksums({ bundleDir: resolvedOut, rawArtifactPath });
   return { outDir: resolvedOut, manifest: bundleManifest, result };
+}
+
+// (Re)writes checksums.txt for a bundle directory from whatever currently
+// sits on disk at `raw.jsonl(.gz)`, `result.json`, and `manifest.json`. Any
+// caller that rewrites one of those files after publish -- most notably
+// adding `artifacts.raw.href` to manifest.json -- must call this afterward:
+// a checksums.txt whose manifest.json line does not match the file sitting
+// next to it fails `shasum -c` for a reader with no way to tell that from
+// real tampering.
+export async function writeBundleChecksums({ bundleDir, rawArtifactPath }) {
+  const checksums = [
+    `${await sha256File(path.join(bundleDir, rawArtifactPath))}  ${rawArtifactPath}`,
+    `${await sha256File(path.join(bundleDir, 'result.json'))}  result.json`,
+    `${await sha256File(path.join(bundleDir, 'manifest.json'))}  manifest.json`
+  ].join('\n');
+  await writeText(path.join(bundleDir, 'checksums.txt'), `${checksums}\n`);
+}
+
+const HIT_AT_KEY_PATTERN = /^hit@\d+$/;
+
+/**
+ * True when `value` is a metric name in the one vocabulary this harness
+ * assigns meaning to: a bare `hit@<cutoff>` cutoff name. `assertValidSummary`
+ * below and anything outside this module that needs to know whether a
+ * `summary.headline.metric` (or a `summary.overall.hit_at` key) is nameable
+ * import this rather than keeping a second copy of the pattern, so the
+ * schema and any consumer agree by construction on what counts.
+ */
+export function isHitAtMetric(value) {
+  return typeof value === 'string' && HIT_AT_KEY_PATTERN.test(value);
+}
+
+function assertHitAtObject(value, label) {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`${label} must be an object`);
+  }
+  for (const [key, entry] of Object.entries(value)) {
+    if (!isHitAtMetric(key)) {
+      throw new Error(`${label} has key '${key}', which does not match ^hit@\\d+$`);
+    }
+    if (typeof entry !== 'number') {
+      throw new Error(`${label}['${key}'] must be a number`);
+    }
+  }
+}
+
+// Hand-written, synchronous validator for the `summary` shape both scorers
+// must produce -- there is no JSON Schema validator dependency in this
+// package (zero runtime dependencies), so this enforces by hand exactly what
+// `artifact-schemas.json`'s `result.v1.properties.summary` declares. Throws
+// on the first violation rather than collecting all of them; message style
+// matches `src/core/contracts/index.mjs`'s adapter validators.
+export function assertValidSummary(summary) {
+  if (summary === null || typeof summary !== 'object') {
+    throw new Error('summary must be an object');
+  }
+  for (const key of ['overall', 'headline']) {
+    if (summary[key] === undefined) {
+      throw new Error(`summary is missing required key '${key}'`);
+    }
+  }
+
+  const { overall, headline } = summary;
+
+  if (overall === null || typeof overall !== 'object') {
+    throw new Error('summary.overall must be an object');
+  }
+  for (const key of ['hit_at', 'mrr', 'n']) {
+    if (overall[key] === undefined) {
+      throw new Error(`summary.overall is missing required key '${key}'`);
+    }
+  }
+  assertHitAtObject(overall.hit_at, 'summary.overall.hit_at');
+  if (typeof overall.mrr !== 'number') {
+    throw new Error('summary.overall.mrr must be a number');
+  }
+  if (!Number.isInteger(overall.n)) {
+    throw new Error('summary.overall.n must be an integer');
+  }
+
+  if (headline === null || typeof headline !== 'object') {
+    throw new Error('summary.headline must be an object');
+  }
+  for (const key of ['metric', 'macro', 'pooled', 'per_category', 'ci95', 'n_categories', 'n_rows']) {
+    if (headline[key] === undefined) {
+      throw new Error(`summary.headline is missing required key '${key}'`);
+    }
+  }
+  if (!isHitAtMetric(headline.metric)) {
+    throw new Error(
+      `summary.headline.metric must match ^hit@\\d+$, got ${JSON.stringify(headline.metric)}`
+    );
+  }
+  if (typeof headline.macro !== 'number') {
+    throw new Error('summary.headline.macro must be a number');
+  }
+  if (typeof headline.pooled !== 'number') {
+    throw new Error('summary.headline.pooled must be a number');
+  }
+  if (headline.per_category === null || typeof headline.per_category !== 'object') {
+    throw new Error('summary.headline.per_category must be an object');
+  }
+  if (
+    !Array.isArray(headline.ci95) ||
+    headline.ci95.length !== 2 ||
+    !headline.ci95.every((bound) => typeof bound === 'number')
+  ) {
+    throw new Error('summary.headline.ci95 must be a two-element array of numbers');
+  }
+  if (!Number.isInteger(headline.n_categories)) {
+    throw new Error('summary.headline.n_categories must be an integer');
+  }
+  if (!Number.isInteger(headline.n_rows)) {
+    throw new Error('summary.headline.n_rows must be an integer');
+  }
+  return summary;
 }
 
 function assertEqual(actual, expected, message) {
@@ -484,68 +647,127 @@ async function verifyInputDigest(repoRoot, item, label) {
   assertEqual(await sha256File(file), item.sha256, `${label} digest mismatch`);
 }
 
-export async function verifyResultBundle({ repoRoot, bundleDir, verifyInputs = true }) {
-  const resolvedBundle = path.resolve(repoRoot, bundleDir);
-  const manifest = await readJson(path.join(resolvedBundle, 'manifest.json'));
-  const rawPath = path.join(resolvedBundle, manifest.artifacts?.raw?.path ?? 'raw.jsonl');
-  const resultPath = path.join(resolvedBundle, manifest.artifacts?.result?.path ?? 'result.json');
-  assertEqual(await sha256File(rawPath), manifest.artifacts.raw.sha256, `${manifest.artifacts.raw.path} digest mismatch`);
-  assertEqual(await sha256File(resultPath), manifest.artifacts.result.sha256, 'result.json digest mismatch');
-
-  const result = await readJson(resultPath);
-
-  // Stream raw rows through the scorer; count rows as they go so we can
-  // verify against the manifest's row count without materializing the file.
-  let rowCount = 0;
-  async function* countingRawRows() {
-    for await (const row of readRawJsonlStream(rawPath)) {
-      rowCount += 1;
-      yield row;
-    }
+// Resolves the local filesystem path to a bundle's raw evidence, without
+// ever materializing its contents in memory: a local `raw.jsonl(.gz)` copy
+// is used as-is, and a bundle that only references remote evidence via
+// `artifacts.raw.href` is streamed straight to a temp file that the caller
+// deletes when done. Callers get a path they can hand to `sha256File` and
+// `readRawJsonlStream` unchanged.
+async function resolveRawPath({ bundleDir, manifest, allowFetch }) {
+  for (const name of ['raw.jsonl.gz', 'raw.jsonl']) {
+    const local = path.join(bundleDir, name);
+    if (await exists(local)) return { rawPath: local, cleanup: async () => {} };
   }
-  // Prefer the scorer id recorded on the bundled result. Every bundle
-  // published by executeRun records `result.run.scorer.id`; a bundle
-  // missing that field cannot be verified deterministically.
-  const scorerIdForVerify =
-    result.run?.scorer?.id ?? result.summary?.execution?.scorer?.id;
-  if (typeof scorerIdForVerify !== 'string' || !scorerIdForVerify) {
+  const href = manifest?.artifacts?.raw?.href;
+  if (!href) {
     throw new Error(
-      `verifyResultBundle: bundle ${bundleDir} is missing result.run.scorer.id — ` +
-        `cannot determine which scorer to invoke for verification.`
+      `${bundleDir}: raw evidence is neither present locally nor referenced by artifacts.raw.href`
     );
   }
-  const recomputed = await scoreRawRowsStream({
-    rawRowsIterable: countingRawRows(),
-    manifest: result.run
-      ? {
-          run_id: result.run.run_id,
-          benchmark: result.run.benchmark,
-          provider: result.run.provider,
-          scheduler: result.run.scheduler,
-          scorer: result.run.scorer ?? { id: scorerIdForVerify }
-        }
-      : null,
-    scorerId: scorerIdForVerify
-  });
-  assertEqual(rowCount, manifest.artifacts.raw.rows, 'raw row count mismatch');
-  const recomputedSummary = canonicalStringify(recomputed.summary);
-  const reportedSummary = canonicalStringify(result.summary);
-  assertEqual(reportedSummary, recomputedSummary, 'result summary mismatch');
-
-  if (verifyInputs) {
-    await verifyInputDigest(repoRoot, manifest.verification_inputs?.benchmark_config, 'benchmark config');
-    await verifyInputDigest(repoRoot, manifest.verification_inputs?.provider_config, 'provider config');
-    await verifyInputDigest(repoRoot, manifest.verification_inputs?.scorer_config, 'scorer config');
-    for (const dataFile of manifest.verification_inputs?.data_files ?? []) {
-      await verifyInputDigest(repoRoot, dataFile, `data file ${dataFile.path}`);
-    }
+  if (!allowFetch) {
+    throw new Error(`${bundleDir}: raw evidence is remote and fetching is disabled`);
   }
-  return {
-    ok: true,
-    bundleDir: relativePath(repoRoot, resolvedBundle),
-    rows: rowCount,
-    summary: result.summary
-  };
+  const response = await fetch(href);
+  if (!response.ok) {
+    throw new Error(`${bundleDir}: fetching raw evidence failed — ${response.status} ${href}`);
+  }
+  const tmpDir = await mkdtemp(path.join(tmpdir(), 'raw-asset-'));
+  try {
+    const rawName = path.basename(manifest?.artifacts?.raw?.path ?? 'raw.jsonl');
+    const tmpPath = path.join(tmpDir, rawName);
+    await pipeline(Readable.fromWeb(response.body), createWriteStream(tmpPath));
+    return {
+      rawPath: tmpPath,
+      cleanup: async () => {
+        await rm(tmpDir, { recursive: true, force: true });
+      }
+    };
+  } catch (error) {
+    // The pipeline can fail partway through the download (dropped
+    // connection, truncated body) after the directory already exists but
+    // before a `cleanup` is ever handed back to a caller. This function
+    // created the directory, so it is responsible for removing it on any
+    // path that does not return one.
+    await rm(tmpDir, { recursive: true, force: true });
+    throw error;
+  }
+}
+
+export async function verifyResultBundle({
+  repoRoot,
+  bundleDir,
+  verifyInputs = true,
+  allowFetch = true
+}) {
+  const resolvedBundle = path.resolve(repoRoot, bundleDir);
+  const manifest = await readJson(path.join(resolvedBundle, 'manifest.json'));
+  const { rawPath, cleanup } = await resolveRawPath({ bundleDir: resolvedBundle, manifest, allowFetch });
+  try {
+    const resultPath = path.join(resolvedBundle, manifest.artifacts?.result?.path ?? 'result.json');
+    assertEqual(await sha256File(rawPath), manifest.artifacts.raw.sha256, `${manifest.artifacts.raw.path} digest mismatch`);
+    assertEqual(await sha256File(resultPath), manifest.artifacts.result.sha256, 'result.json digest mismatch');
+
+    const result = await readJson(resultPath);
+    // Validated before the recompute below so a shape violation is reported
+    // as a specific missing/malformed field rather than as an opaque
+    // summary mismatch once it is diffed against the freshly recomputed one.
+    assertValidSummary(result.summary);
+
+    // Stream raw rows through the scorer; count rows as they go so we can
+    // verify against the manifest's row count without materializing the file.
+    let rowCount = 0;
+    async function* countingRawRows() {
+      for await (const row of readRawJsonlStream(rawPath)) {
+        rowCount += 1;
+        yield row;
+      }
+    }
+    // Prefer the scorer id recorded on the bundled result. Every bundle
+    // published by executeRun records `result.run.scorer.id`; a bundle
+    // missing that field cannot be verified deterministically.
+    const scorerIdForVerify =
+      result.run?.scorer?.id ?? result.summary?.execution?.scorer?.id;
+    if (typeof scorerIdForVerify !== 'string' || !scorerIdForVerify) {
+      throw new Error(
+        `verifyResultBundle: bundle ${bundleDir} is missing result.run.scorer.id — ` +
+          `cannot determine which scorer to invoke for verification.`
+      );
+    }
+    const recomputed = await scoreRawRowsStream({
+      rawRowsIterable: countingRawRows(),
+      manifest: result.run
+        ? {
+            run_id: result.run.run_id,
+            benchmark: result.run.benchmark,
+            provider: result.run.provider,
+            scheduler: result.run.scheduler,
+            scorer: result.run.scorer ?? { id: scorerIdForVerify }
+          }
+        : null,
+      scorerId: scorerIdForVerify
+    });
+    assertEqual(rowCount, manifest.artifacts.raw.rows, 'raw row count mismatch');
+    const recomputedSummary = canonicalStringify(recomputed.summary);
+    const reportedSummary = canonicalStringify(result.summary);
+    assertEqual(reportedSummary, recomputedSummary, 'result summary mismatch');
+
+    if (verifyInputs) {
+      await verifyInputDigest(repoRoot, manifest.verification_inputs?.benchmark_config, 'benchmark config');
+      await verifyInputDigest(repoRoot, manifest.verification_inputs?.provider_config, 'provider config');
+      await verifyInputDigest(repoRoot, manifest.verification_inputs?.scorer_config, 'scorer config');
+      for (const dataFile of manifest.verification_inputs?.data_files ?? []) {
+        await verifyInputDigest(repoRoot, dataFile, `data file ${dataFile.path}`);
+      }
+    }
+    return {
+      ok: true,
+      bundleDir: relativePath(repoRoot, resolvedBundle),
+      rows: rowCount,
+      summary: result.summary
+    };
+  } finally {
+    await cleanup();
+  }
 }
 
 // Kept for callers (tests + tooling) that still want to read a whole bundle

@@ -4,6 +4,7 @@ import {
   splitCitationList
 } from '../../core/citations.mjs';
 import { validateScorerCutoffsMatchImplementation } from '../../core/scorer-validators.mjs';
+import { wilsonInterval } from '../../core/stats.mjs';
 
 const VERSION = 'trustfoundry-legal-search-v1';
 const DEFAULT_CUTOFFS = [1, 5, 10, 25];
@@ -268,26 +269,6 @@ function aggregate(caseScores, cutoffs) {
   };
 }
 
-function legacyAggregate(caseScores, cutoffs, headlineCutoff) {
-  const validSuccess = caseScores.filter((item) => item.status === 'scored' && item.validGold);
-  const overall = aggregate(validSuccess, cutoffs);
-  const providerFailures = caseScores.filter((item) => item.status !== 'scored').length;
-  const summary = {
-    total: caseScores.length,
-    scored: validSuccess.length,
-    providerFailures,
-    mrr: overall.mrr,
-    meanResultCount: mean(validSuccess.map((item) => item.resultCount))
-  };
-  for (const k of cutoffs) {
-    summary[`hitAt${k}`] = overall.hit_at[`hit@${k}`];
-  }
-  const headlineScore = overall.hit_at[`hit@${headlineCutoff}`] ?? 0;
-  summary.overallScore = headlineScore;
-  summary.supportedScore = headlineScore;
-  return summary;
-}
-
 function qualityCounts(caseScores) {
   const total = caseScores.length;
   const failed = caseScores.filter((item) => item.status !== 'scored').length;
@@ -423,12 +404,54 @@ function aggregateByState(caseScores, cutoffs) {
   return out;
 }
 
-function grouped(caseScores, key, cutoffs, headlineCutoff) {
+function grouped(caseScores, key, cutoffs) {
   const out = {};
   for (const [value, bucket] of Object.entries(groupRaw(caseScores, key))) {
-    out[value] = legacyAggregate(bucket, cutoffs, headlineCutoff);
+    const validSuccess = bucket.filter((item) => item.status === 'scored' && item.validGold);
+    const providerFailures = bucket.filter((item) => item.status !== 'scored').length;
+    out[value] = {
+      total: bucket.length,
+      scored: validSuccess.length,
+      providerFailures,
+      mean_result_count: mean(validSuccess.map((item) => item.resultCount)),
+      ...aggregate(validSuccess, cutoffs)
+    };
   }
   return out;
+}
+
+// A macro-averaged headline over `datasetName` (`case-questions`, `key-facts`,
+// `laws`, `regs`), with a Wilson interval on the pooled rate -- the same
+// shape the case-name scorer's headline reports, so a reader compares the
+// two suites without learning a second convention.
+function buildHeadline(validSuccess, headlineCutoff) {
+  const metric = `hit@${headlineCutoff}`;
+  const byCategory = new Map();
+  for (const item of validSuccess) {
+    const key = item.datasetName ?? 'all';
+    if (!byCategory.has(key)) byCategory.set(key, []);
+    byCategory.get(key).push(item);
+  }
+  const per_category = {};
+  const rates = [];
+  let hits = 0;
+  for (const key of [...byCategory.keys()].sort()) {
+    const rows = byCategory.get(key);
+    const k = rows.filter((item) => Number.isFinite(item.hitRank) && item.hitRank <= headlineCutoff).length;
+    hits += k;
+    rates.push(k / rows.length);
+    per_category[key] = { n: rows.length, [metric]: k / rows.length, ci95: wilsonInterval(k, rows.length) };
+  }
+  const n = validSuccess.length;
+  return {
+    metric,
+    macro: rates.length ? rates.reduce((a, b) => a + b, 0) / rates.length : 0,
+    pooled: n ? hits / n : 0,
+    per_category,
+    ci95: wilsonInterval(hits, n),
+    n_categories: rates.length,
+    n_rows: n
+  };
 }
 
 function buildSummary(caseScores, { manifest = null, cutoffs, headlineCutoff } = {}) {
@@ -437,7 +460,11 @@ function buildSummary(caseScores, { manifest = null, cutoffs, headlineCutoff } =
   const successfulScores = caseScores.filter((item) => item.status === 'scored');
   const failedScores = caseScores.filter((item) => item.status !== 'scored');
   const summary = {
-    ...legacyAggregate(caseScores, cutoffs, headlineCutoff),
+    total: caseScores.length,
+    scored: validSuccess.length,
+    providerFailures: caseScores.filter((item) => item.status !== 'scored').length,
+    mean_result_count: mean(validSuccess.map((item) => item.resultCount)),
+    headline: buildHeadline(validSuccess, headlineCutoff),
     execution: {
       runId: manifest?.runId ?? manifest?.run_id ?? null,
       benchmark: manifest?.benchmark ?? null,
@@ -458,12 +485,12 @@ function buildSummary(caseScores, { manifest = null, cutoffs, headlineCutoff } =
     strict_overall: aggregate(strict, cutoffs),
     per_state: aggregateByState(validSuccess, cutoffs),
     strict_per_state: aggregateByState(strict, cutoffs),
-    bySplit: grouped(caseScores, 'split', cutoffs, headlineCutoff),
-    byDataset: grouped(caseScores, 'datasetName', cutoffs, headlineCutoff),
-    byDocType: grouped(caseScores, 'docType', cutoffs, headlineCutoff),
-    byField: grouped(caseScores, 'field', cutoffs, headlineCutoff),
-    byModelType: grouped(caseScores, 'modelType', cutoffs, headlineCutoff),
-    byState: grouped(caseScores, 'state', cutoffs, headlineCutoff)
+    by_split: grouped(caseScores, 'split', cutoffs),
+    by_dataset: grouped(caseScores, 'datasetName', cutoffs),
+    by_doc_type: grouped(caseScores, 'docType', cutoffs),
+    by_field: grouped(caseScores, 'field', cutoffs),
+    by_model_type: grouped(caseScores, 'modelType', cutoffs),
+    by_state: grouped(caseScores, 'state', cutoffs)
   };
   if (failedScores.some((item) => Number.isFinite(item.latencyMs))) {
     summary.provider_failure_latency_ms = latencySummary(failedScores);

@@ -95,7 +95,7 @@ test("prefer='latest' keeps completed retry when earlier chunk failed", async ()
       prefer: 'latest'
     });
     assert.equal(result.scores.summary.providerFailures, 0);
-    assert.equal(result.scores.summary.hitAt1, 1);
+    assert.equal(result.scores.summary.overall.hit_at['hit@1'], 1);
     const mergeReport = JSON.parse(
       await fs.readFile(path.join(result.outDir, 'merge-report.json'), 'utf8')
     );
@@ -128,8 +128,8 @@ test("prefer='first' keeps chunk1 result even when chunk2 has one", async () => 
       outDir: path.join(tmp, 'merged'),
       prefer: 'first'
     });
-    // Chunk 1 wins → citationHit=false → hitAt1 = 0.
-    assert.equal(result.scores.summary.hitAt1, 0);
+    // Chunk 1 wins → citationHit=false → hit@1 = 0.
+    assert.equal(result.scores.summary.overall.hit_at['hit@1'], 0);
   } finally {
     await fs.rm(tmp, { recursive: true, force: true });
   }

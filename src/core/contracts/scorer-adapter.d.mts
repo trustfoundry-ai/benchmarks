@@ -25,8 +25,7 @@ export interface CaseScore {
 }
 
 export interface ScorerSummary {
-  overallScore?: number | null;
-  supportedScore?: number | null;
+  overall?: Record<string, unknown>;
   headline?: Record<string, unknown>;
   latency_ms?: Record<string, unknown> | null;
   execution?: Record<string, unknown>;

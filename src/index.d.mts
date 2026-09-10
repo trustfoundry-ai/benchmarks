@@ -399,6 +399,50 @@ export declare function assertCompatibleManifest(
   options?: { requireResume?: boolean }
 ): void;
 
+export declare function gitRevision(cwd: string | null | undefined): Promise<string | null>;
+export declare function gitDirty(cwd: string | null | undefined): Promise<boolean | null>;
+
+// ---- Suite registry ----
+
+export interface SuiteTarget {
+  benchmark: string;
+  provider: string;
+  scorer: string;
+  rows: number;
+  /**
+   * The target id itself — the directory leaf a published result bundle
+   * lives under (`results/<suite>/<date>/<target>/`). Derived from the
+   * target's own key, not an authored manifest field.
+   */
+  bundle: string;
+  headline?: boolean;
+  tier?: 'smoke' | 'full';
+}
+
+export interface Suite {
+  id: string;
+  title: string;
+  status: 'experimental' | 'published' | 'deprecated';
+  dir: string;
+  targets: Record<string, SuiteTarget>;
+}
+
+export declare function listSuites(args: { repoRoot: string }): Promise<Suite[]>;
+
+export declare function parseTargetRef(ref: string): { suiteId: string; targetId: string };
+
+export interface ResolveTargetArgs {
+  repoRoot: string;
+  suiteId: string;
+  targetId: string;
+}
+export interface ResolveTargetResult {
+  suite: Suite;
+  targetId: string;
+  target: SuiteTarget;
+}
+export declare function resolveTarget(args: ResolveTargetArgs): Promise<ResolveTargetResult>;
+
 // ---- Artifacts + verification ----
 
 export interface RawRow {
@@ -429,6 +473,12 @@ export declare function buildRawRow(args: {
    * Declared by the benchmark adapter as `publishedExpectedFields`.
    */
   publishedExpectedFields?: string[];
+  /**
+   * The scorer's configured cutoffs (e.g. `summary.execution.scorer.cutoffs`).
+   * Required: `score.hit_at` is keyed `hit@K` for exactly these values, with
+   * no default -- a scorer's cutoffs are not something this function can guess.
+   */
+  cutoffs: number[];
 }): RawRow;
 
 export declare function buildRawRows(args: {
@@ -436,6 +486,7 @@ export declare function buildRawRows(args: {
   providerResults: CaseResult[];
   caseScores: CaseScore[];
   publishedExpectedFields?: string[];
+  cutoffs: number[];
 }): RawRow[];
 
 export declare function reconstructPairFromRawRow(row: RawRow): {
@@ -461,6 +512,7 @@ export interface PublishResultBundleArgs {
   runDir: string;
   outDir: string;
   force?: boolean;
+  rawHref?: string | null;
 }
 export interface PublishResultBundleResult {
   outDir: string;
@@ -475,6 +527,7 @@ export interface VerifyResultBundleArgs {
   repoRoot: string;
   bundleDir: string;
   verifyInputs?: boolean;
+  allowFetch?: boolean;
 }
 export interface VerifyResultBundleResult {
   ok: true;
@@ -485,6 +538,15 @@ export interface VerifyResultBundleResult {
 export declare function verifyResultBundle(
   args: VerifyResultBundleArgs
 ): Promise<VerifyResultBundleResult>;
+
+/**
+ * Validates that `summary` carries the required `overall` (`hit_at`, `mrr`,
+ * `n`) and `headline` (`metric`, `macro`, `pooled`, `per_category`, `ci95`,
+ * `n_categories`, `n_rows`) shape declared in `artifact-schemas.json`'s
+ * `result.v1.properties.summary`. Synchronous; throws on the first
+ * violation rather than returning a result.
+ */
+export declare function assertValidSummary(summary: ScorerSummary): ScorerSummary;
 
 // ---- Query transforms ----
 
@@ -554,3 +616,13 @@ export declare function mapWithConcurrency<T, R>(
   concurrency: number,
   fn: (item: T) => Promise<R>
 ): Promise<R[]>;
+
+// ---- Statistics ----
+
+export declare const Z95: number;
+
+export declare function wilsonInterval(
+  successes: number,
+  n: number,
+  z?: number
+): [number, number];

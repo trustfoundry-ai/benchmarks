@@ -21,7 +21,7 @@ a case when the user knows its name but not its citation.
   and a 50-row fabricated-name negatives set whose correct answer is an empty page.
 - **First published `trustfoundry-case-name-lookup` result bundles**, under
   [`results/trustfoundry-case-name-lookup/2026-09-09/`](results/trustfoundry-case-name-lookup/2026-09-09/)
-  (`public/8850` and `negatives/50`), plus
+  (`public-8850` and `negatives-50`), plus
   [`results/trustfoundry-case-name-lookup/latest.json`](results/trustfoundry-case-name-lookup/latest.json)
   pointing at both. See the suite README's
   [Published numbers](suites/trustfoundry-case-name-lookup/README.md#published-numbers)
@@ -46,6 +46,17 @@ a case when the user knows its name but not its citation.
 
   `buildRawRow` / `buildRawRows` take an optional `publishedExpectedFields`;
   `BenchmarkAdapter` gains an optional `publishedExpectedFields` member.
+
+- **Result bundle directories are keyed by target id.** A bundle now lives at
+  `results/<suite>/<yyyy-mm-dd>/<target>/` — one path segment per target, not two.
+  `<target>` is the same identifier the CLI takes as `--target <suite>/<target>`
+  and the container reads from `BENCHMARK_CONFIG`, and `latest.json` maps that
+  same id to its currently-canonical dated bundle. The bundle path, the pointer
+  key, the CLI value, and the container config are one identifier instead of
+  four conventions for the same thing.
+
+  Anyone holding a bookmarked bundle path built from the previous two-segment
+  layout will need to update it to the flat `<target>` leaf.
 
 ### Fixed
 

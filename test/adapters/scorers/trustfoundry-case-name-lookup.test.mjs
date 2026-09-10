@@ -252,7 +252,7 @@ test('12. headline excludes negative rows (dilution guard)', async () => {
   // `scoreCase` recognizes only `kind: 'positive'` and `kind: 'negative'`
   // (party_order_swap is scored as ordinary recall, under `kind: 'positive'`),
   // so a negative row is the only kind that could otherwise dilute the
-  // headline: it must never enter `overall`/`overallScore`.
+  // headline: it must never enter `overall` or the headline computed from it.
   const bcPositive = mkCase('c12-pos', {
     kind: 'positive',
     tier: 'qualified',
@@ -274,7 +274,7 @@ test('12. headline excludes negative rows (dilution guard)', async () => {
     config: {}
   });
 
-  assert.equal(out.summary.overallScore, 1);
+  assert.equal(out.summary.overall.hit_at['hit@1'], 1);
   assert.equal(out.summary.negatives_overall.n, 1);
 });
 
@@ -335,14 +335,26 @@ test('headline score is hit@1', () => {
     { status: 'scored', kind: 'positive', arm: 'perturbed', nameTransform: 'clean', hitRank: 3, dedupedHitRank: 3, reciprocalRank: 1 / 3 }
   ];
   const summary = _internals.buildSummary(scores, { manifest: null, cutoffs: [1, 3, 5, 10], headlineCutoff: 1 });
-  assert.equal(summary.overallScore, 0.5);
+  assert.equal(summary.overall.hit_at['hit@1'], 0.5);
   assert.equal(summary.overall.hit_at['hit@3'], 1);
 });
 
+test('the summary reports hit rates only under overall.hit_at', () => {
+  const scores = [
+    { status: 'scored', kind: 'positive', arm: 'perturbed', nameTransform: 'clean', hitRank: 1, dedupedHitRank: 1, reciprocalRank: 1 },
+    { status: 'scored', kind: 'positive', arm: 'perturbed', nameTransform: 'clean', hitRank: 3, dedupedHitRank: 3, reciprocalRank: 1 / 3 }
+  ];
+  const summary = _internals.buildSummary(scores, { manifest: null, cutoffs: [1, 3, 5, 10], headlineCutoff: 1 });
+  for (const key of ['hitAt1', 'hitAt3', 'hitAt5', 'hitAt10', 'hitAt25', 'overallScore', 'supportedScore']) {
+    assert.equal(key in summary, false, `'${key}' must not appear at the top level of the summary`);
+  }
+  assert.ok(summary.overall.hit_at['hit@1'] !== undefined);
+});
+
 // End-to-end: the same exclusion holds through the full scorer pipeline,
-// including the top-level headline (overallScore), not just the unit-level
-// aggregation helpers above.
-test('overallScore and by_tier headline exclude a synthetic row end to end; all_axes and by_axis do not', async () => {
+// including the top-level headline (`summary.overall.hit_at['hit@1']`), not
+// just the unit-level aggregation helpers above.
+test('summary.overall and by_tier headline exclude a synthetic row end to end; all_axes and by_axis do not', async () => {
   const bcClean = mkCase('syn-clean', {
     kind: 'positive',
     tier: 'qualified',
@@ -556,7 +568,8 @@ test('published rows carry no citation gold', () => {
     }],
     providerResults: [{ caseId: 'c', status: 'completed' }],
     caseScores: [{ caseId: 'c', status: 'scored' }],
-    publishedExpectedFields: caseNameLookupBenchmarkAdapter.publishedExpectedFields
+    publishedExpectedFields: caseNameLookupBenchmarkAdapter.publishedExpectedFields,
+    cutoffs: [1, 3, 5, 10]
   });
   assert.equal(row.expected.gold_citations, undefined);
   assert.equal(row.expected.avoid_citations, undefined);
@@ -1131,7 +1144,7 @@ test('the headline is the macro-average of hit@1 across categories', async () =>
     party_misspell: [true, false, false, false]
   });
   const h = out.summary.headline;
-  assert.equal(h.metric, 'macro_hit_at_1');
+  assert.equal(h.metric, 'hit@1');
   assert.equal(h.n_categories, 3);
   // (1.00 + 0.75 + 0.25) / 3
   assert.ok(Math.abs(h.macro - 2 / 3) < 1e-12);

@@ -125,6 +125,28 @@ export async function exists(file) {
   }
 }
 
+// Walks a directory tree depth-first and collects every directory for
+// which `isLeaf` resolves true, without descending into it. Callers supply
+// their own notion of what marks a directory as a leaf (a result bundle, a
+// suite folder, ...) so a single walk implementation serves every caller
+// that discovers directories by content rather than by a fixed depth.
+export async function findLeafDirs(root, isLeaf) {
+  if (!(await exists(root))) return [];
+  const leaves = [];
+  async function walk(dir) {
+    if (await isLeaf(dir)) {
+      leaves.push(dir);
+      return;
+    }
+    for (const entry of await readdir(dir)) {
+      const full = path.join(dir, entry);
+      if ((await stat(full)).isDirectory()) await walk(full);
+    }
+  }
+  await walk(root);
+  return leaves;
+}
+
 export function sortJson(value) {
   if (Array.isArray(value)) return value.map(sortJson);
   if (!value || typeof value !== 'object') return value;
