@@ -24,7 +24,7 @@ function printHelp() {
 
 Commands:
   adapters
-  targets
+  targets [--ids]
   resolve-target <suite>/<target> [--json]
   run [--target <suite>/<target>]
       [--benchmark ID] [--provider ID] [--scorer ID]
@@ -147,8 +147,22 @@ async function resolveTargetCommand(positionals, options) {
   for (const [key, value] of Object.entries(resolved)) console.log(`${key}=${value}`);
 }
 
-async function targetsCommand() {
-  for (const suite of await listSuites({ repoRoot: repoRoot() })) {
+// `--ids` is the machine-readable form: exactly one `<suite>/<target>`
+// reference per line, nothing else on the line and no header lines. It
+// exists so a caller that needs the list of runnable targets (the
+// container entrypoint's `all` / `<suite>/all`) can consume it without
+// depending on the human-readable listing's prose or indentation.
+async function targetsCommand(options) {
+  const suites = await listSuites({ repoRoot: repoRoot() });
+  if (options.ids) {
+    for (const suite of suites) {
+      for (const targetId of Object.keys(suite.targets)) {
+        console.log(`${suite.id}/${targetId}`);
+      }
+    }
+    return;
+  }
+  for (const suite of suites) {
     console.log(`${suite.id}  (${suite.status})`);
     for (const [targetId, target] of Object.entries(suite.targets)) {
       const tags = [target.tier, target.headline ? 'headline' : null].filter(Boolean).join(', ');
@@ -328,7 +342,7 @@ export async function main(args) {
     return;
   }
   if (command === 'adapters') return printAdapters();
-  if (command === 'targets') return targetsCommand();
+  if (command === 'targets') return targetsCommand(options);
   if (command === 'resolve-target') return resolveTargetCommand(positionals, options);
   if (command === 'run') return runCommand(options);
   if (command === 'score') return scoreCommand(options);

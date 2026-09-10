@@ -100,6 +100,21 @@ test('targets does not assume a single headline target per suite', async () => {
   }
 });
 
+test('targets --ids prints exactly one <suite>/<target> reference per line', async () => {
+  const { stdout } = await execFileAsync('node', ['bin/benchmarks.mjs', 'targets', '--ids']);
+  const lines = stdout.split('\n').filter((line) => line.length > 0);
+  // Nothing else on any line: no suite header, no row counts, no tags --
+  // a consumer can build an array straight from these lines with no
+  // parsing beyond splitting on newlines.
+  for (const line of lines) {
+    assert.match(line, /^[a-z0-9-]+\/[a-z0-9-]+$/);
+  }
+  assert.equal(lines.length, 10);
+  assert.ok(lines.includes('trustfoundry-legal-search/laws-5k'));
+  assert.ok(lines.includes('trustfoundry-case-name-lookup/public-8850'));
+  assert.ok(lines.includes('trustfoundry-case-name-lookup/negatives-50'));
+});
+
 // ---- Unit-level: run --target precedence ----
 //
 // resolveRunConfig is the pure precedence decision runCommand delegates

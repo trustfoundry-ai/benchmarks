@@ -106,9 +106,14 @@ test('an unknown suite in <suite>/all lists valid targets and exits non-zero', a
 test('DRY_RUN prints resolved targets without running anything', async () => {
   const { stdout } = await runEntrypoint('trustfoundry-case-name-lookup/negatives-50');
   assert.match(stdout, /benchmarks entrypoint done/);
-  // Nothing under results/ or runs/ should be freshly created by a dry run
-  // for this target — it only ever prints what it resolved.
-  assert.doesNotMatch(stdout, /uploading/);
+  // `doesNotMatch(stdout, /uploading/)` would pass here regardless of
+  // DRY_RUN, since OUTPUT_BUNDLE_URI is never set in this test file — it
+  // proves nothing about the short-circuit. `pnpm benchmark run` prints
+  // `run: <outDir>` on stdout if and only if it actually executes
+  // (src/cli.mjs's runCommand, after a real executeRun call); its absence
+  // is the signal that `run` / `publish-result` / `verify-result` never
+  // fired.
+  assert.doesNotMatch(stdout, /(^|\n)run: /);
 });
 
 test('TF_API_KEY is required', async () => {

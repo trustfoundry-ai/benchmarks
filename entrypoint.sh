@@ -45,21 +45,38 @@ PARALLEL_C=4
 SHA7=${HARNESS_COMMIT_SHA:0:7}
 DATE=$(date -u +%Y-%m-%d)
 
-# The full `targets` listing, captured once. Used both to build `all` /
-# `<suite>/all` and, on a resolution failure below, to show every valid
-# target so a typo's error message doesn't leave the reader guessing.
-targets_output=$(node bin/benchmarks.mjs targets)
-mapfile -t ALL_TARGET_IDS < <(printf '%s\n' "$targets_output" | awk '/^  /{print $1}')
+# Holds one resolve-target call's stderr so it can be inspected before
+# being echoed — see the resolve-target failure handling below.
+resolve_err_file=$(mktemp)
+trap 'rm -f "$resolve_err_file"' EXIT
 
+# The machine-readable target list, captured once: exactly one
+# <suite>/<target> per line, nothing else — used to build `all` and
+# `<suite>/all`. This is `targets --ids`, not the human `targets` listing,
+# so a future change to that listing's prose or indentation can't change
+# what a run actually resolves to.
+all_ids_output=$(node bin/benchmarks.mjs targets --ids)
+declare -a ALL_TARGET_IDS=()
+while IFS= read -r id; do
+  [ -n "$id" ] && ALL_TARGET_IDS+=("$id")
+done <<<"$all_ids_output"
+
+# The human `targets` listing, captured once. Shown on a resolution
+# failure that turns out to be an unrecognized id, so a typo's error
+# message doesn't leave the reader guessing at what else is valid.
 print_valid_targets() {
   echo "Valid targets:" >&2
-  printf '%s\n' "$targets_output" >&2
+  node bin/benchmarks.mjs targets >&2
 }
 
 declare -a TARGETS=()
 case "$BENCHMARK_CONFIG" in
   all)
     TARGETS=("${ALL_TARGET_IDS[@]}")
+    if [ "${#TARGETS[@]}" -eq 0 ]; then
+      echo "No targets found in the suite registry." >&2
+      exit 1
+    fi
     ;;
   */all)
     suite="${BENCHMARK_CONFIG%/all}"
@@ -115,11 +132,24 @@ for target in "${TARGETS[@]}"; do
   # resolve-target is the single source of truth for whether a target is
   # runnable — its config paths are checked against disk, not just the
   # manifest. On failure it prints an actionable message of its own to
-  # stderr and prints nothing to stdout; this script adds the full target
-  # listing after it rather than trying to parse or improve on its prose.
-  if ! resolved_json=$(node bin/benchmarks.mjs resolve-target "$target" --json); then
-    echo >&2
-    print_valid_targets
+  # stderr and prints nothing to stdout; this script always relays that
+  # message verbatim rather than trying to parse or improve on its prose.
+  #
+  # It appends the full target listing only when the message names an
+  # unrecognized suite or target id (resolveTarget's "Unknown suite ..." /
+  # "Unknown target ..." — the one case where "here's everything valid" is
+  # actually the missing piece). Any other resolve failure — e.g. a config
+  # path missing on disk, or a malformed suite.json — is already a
+  # complete, actionable message on its own, and dumping every suite and
+  # target on top of it would bury the real problem in noise instead of
+  # explaining it.
+  if ! resolved_json=$(node bin/benchmarks.mjs resolve-target "$target" --json 2>"$resolve_err_file"); then
+    resolve_err=$(cat "$resolve_err_file")
+    printf '%s\n' "$resolve_err" >&2
+    if [[ "$resolve_err" =~ ^Unknown\ (suite|target)\ \' ]]; then
+      echo >&2
+      print_valid_targets
+    fi
     exit 1
   fi
 
