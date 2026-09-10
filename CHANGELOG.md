@@ -47,6 +47,15 @@ a case when the user knows its name but not its citation.
   `buildRawRow` / `buildRawRows` take an optional `publishedExpectedFields`;
   `BenchmarkAdapter` gains an optional `publishedExpectedFields` member.
 
+### Fixed
+
+- **Documentation links now resolve.** `docs/adapter-contracts.md` pointed both of
+  its reference-implementation examples at adapter files that are not in the tree;
+  they point at `trustfoundry-legal-search` and `trustfoundry-case-name-lookup`
+  instead. The README's status block named a release four versions behind. A test
+  (`test/doc-links.test.mjs`) now resolves every relative link in every markdown
+  file, so a link to a path this repository does not contain fails CI.
+
 ## [0.10.0] - 2026-07-08
 
 Fifth vendor provider adapter shipped (`parallel-legal-search`), plus a
@@ -621,7 +630,7 @@ byte-for-byte.
   (`src/adapters/scorers/trustfoundry-citation-lookup.mjs`) with citation-first matching
   and a generic native-`cluster_id` fallback. Five benchmark configs plus
   a scorer config live under `configs/`. See
-  [`suites/citation-lookup/README.md`](suites/citation-lookup/README.md).
+  `suites/citation-lookup/README.md`.
 - **Dataset**: `expected.cl_cluster_id` field on every case-law row in
   `data/trustfoundry-legal-search-5k/case_questions.jsonl` and
   `case_key_facts.jsonl`. 100% coverage on both files (10,000 rows total).
