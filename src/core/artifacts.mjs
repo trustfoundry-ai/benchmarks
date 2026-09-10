@@ -462,13 +462,24 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
   };
   const manifestPath = path.join(resolvedOut, 'manifest.json');
   await writeJson(manifestPath, bundleManifest);
-  const checksums = [
-    `${bundleManifest.artifacts.raw.sha256}  ${rawArtifactPath}`,
-    `${bundleManifest.artifacts.result.sha256}  result.json`,
-    `${await sha256File(manifestPath)}  manifest.json`
-  ].join('\n');
-  await writeText(path.join(resolvedOut, 'checksums.txt'), `${checksums}\n`);
+  await writeBundleChecksums({ bundleDir: resolvedOut, rawArtifactPath });
   return { outDir: resolvedOut, manifest: bundleManifest, result };
+}
+
+// (Re)writes checksums.txt for a bundle directory from whatever currently
+// sits on disk at `raw.jsonl(.gz)`, `result.json`, and `manifest.json`. Any
+// caller that rewrites one of those files after publish -- most notably
+// adding `artifacts.raw.href` to manifest.json -- must call this afterward:
+// a checksums.txt whose manifest.json line does not match the file sitting
+// next to it fails `shasum -c` for a reader with no way to tell that from
+// real tampering.
+export async function writeBundleChecksums({ bundleDir, rawArtifactPath }) {
+  const checksums = [
+    `${await sha256File(path.join(bundleDir, rawArtifactPath))}  ${rawArtifactPath}`,
+    `${await sha256File(path.join(bundleDir, 'result.json'))}  result.json`,
+    `${await sha256File(path.join(bundleDir, 'manifest.json'))}  manifest.json`
+  ].join('\n');
+  await writeText(path.join(bundleDir, 'checksums.txt'), `${checksums}\n`);
 }
 
 function assertEqual(actual, expected, message) {
