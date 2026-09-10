@@ -1,0 +1,9 @@
+{
+  "$comment": "Stable pointer to the currently-published bundle for each (type, size). Update alongside any new dated result bundle. Verified by scripts/verify-result-bundles.mjs.",
+  "benchmark": "trustfoundry-case-name-lookup",
+  "updated": "2026-09-09",
+  "bundles": {
+    "public/8850": "2026-09-09/public/8850",
+    "negatives/50": "2026-09-09/negatives/50"
+  }
+}

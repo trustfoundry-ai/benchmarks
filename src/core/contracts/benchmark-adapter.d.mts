@@ -55,5 +55,16 @@ export interface BenchmarkAdapter {
   readonly version: string;
   readonly promptVersion?: string;
   readonly materializationVersion?: string;
+  /**
+   * Keys of `case.metadata.expected` that must survive into a published
+   * bundle's raw rows, for suites whose gold does not fit the fixed
+   * single-citation shape the raw-row schema carries by default.
+   *
+   * Omitting it publishes no extra fields, which is correct for any suite
+   * whose gold is a `document_uuid` / `canonical_citation` pair. Declaring it
+   * is an allowlist and never a wildcard: `metadata.expected` may hold internal
+   * identifiers, and a published bundle is a public artifact.
+   */
+  readonly publishedExpectedFields?: readonly string[];
   loadCases(args: BenchmarkLoadArgs): Promise<BenchmarkLoadResult>;
 }

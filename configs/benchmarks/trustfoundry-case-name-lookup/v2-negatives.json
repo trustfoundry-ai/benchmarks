@@ -1,0 +1,13 @@
+{
+  "_comment": [
+    "THE INVARIANT POPULATION -- 50 fabricated case names that resolve to no document. The correct answer for every row is an empty page.",
+    "",
+    "Every caption is invented and its parties were checked against the corpus at build time; a proposal that resolved to a real document was dropped rather than emitted.",
+    "",
+    "This tier reports a false-positive rate and never a hit rate, and it is excluded from the headline by construction. It exists so the cost of answering loosely is priced rather than assumed: a backend that suppresses uncertain answers scores well on any hit rate and is worse to use."
+  ],
+  "benchmarkId": "trustfoundry-case-name-lookup",
+  "datasetPath": "data/trustfoundry-case-name-lookup/v2-negatives.jsonl",
+  "datasetLabel": "trustfoundry-case-name-lookup-v2-negatives",
+  "scorer": "trustfoundry-case-name-lookup"
+}

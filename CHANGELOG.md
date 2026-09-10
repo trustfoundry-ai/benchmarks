@@ -4,6 +4,58 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+Ships the `trustfoundry-case-name-lookup` suite — measuring whether a search backend surfaces
+a case when the user knows its name but not its citation.
+
+### Added
+
+- **`trustfoundry-case-name-lookup` benchmark suite.** `src/adapters/benchmarks/trustfoundry-case-name-lookup.mjs`
+  loader + `src/adapters/scorers/trustfoundry-case-name-lookup.mjs`. A hit is a normalized-caption
+  match against the gold case name (whole-token containment for the one category whose
+  query is a bare party fragment), not a citation match — case names are the thing
+  users type, so gold is the caption itself. Suite docs at
+  [`suites/trustfoundry-case-name-lookup/README.md`](suites/trustfoundry-case-name-lookup/README.md).
+- **Two datasets.** An 8,850-row public set — 15 categories × 295 cases, each case
+  queried once under a perturbed caption and once under its own unperturbed control,
+  so a category's score is read against its own baseline rather than a global one —
+  and a 50-row fabricated-name negatives set whose correct answer is an empty page.
+- **First published `trustfoundry-case-name-lookup` result bundles**, under
+  [`results/trustfoundry-case-name-lookup/2026-09-09/`](results/trustfoundry-case-name-lookup/2026-09-09/)
+  (`public/8850` and `negatives/50`), plus
+  [`results/trustfoundry-case-name-lookup/latest.json`](results/trustfoundry-case-name-lookup/latest.json)
+  pointing at both. See the suite README's
+  [Published numbers](suites/trustfoundry-case-name-lookup/README.md#published-numbers)
+  section for the headline, per-category, and negatives figures.
+
+### Changed
+
+- **Published raw rows can now carry suite-declared gold.** A benchmark adapter may
+  declare `publishedExpectedFields`; those keys are copied from
+  `case.metadata.expected` into each published row and restored by
+  `reconstructPairFromRawRow`. Additive and opt-in — a suite that declares nothing
+  publishes exactly what it did before, and existing bundles are unaffected.
+
+  This is what makes a `trustfoundry-case-name-lookup` bundle verifiable. The fixed `expected`
+  block is shaped for single-citation gold; trustfoundry-case-name-lookup's gold is the caption
+  itself, plus the perturbation category, the arm, and the pair identifier its
+  paired-control comparison is built from, so without the declaration
+  `verify-result` rebuilt every row with no gold and the whole summary re-scored to
+  0. The declaration is an allowlist rather than a wildcard, because
+  `metadata.expected` can hold internal identifiers that must not reach a public
+  bundle.
+
+  `buildRawRow` / `buildRawRows` take an optional `publishedExpectedFields`;
+  `BenchmarkAdapter` gains an optional `publishedExpectedFields` member.
+
+### Fixed
+
+- **Documentation links now resolve.** `docs/adapter-contracts.md` pointed both of
+  its reference-implementation examples at adapter files that are not in the tree;
+  they point at `trustfoundry-legal-search` and `trustfoundry-case-name-lookup`
+  instead. The README's status block named a release four versions behind. A test
+  (`test/doc-links.test.mjs`) now resolves every relative link in every markdown
+  file, so a link to a path this repository does not contain fails CI.
+
 ## [0.10.0] - 2026-07-08
 
 Fifth vendor provider adapter shipped (`parallel-legal-search`), plus a
@@ -578,7 +630,7 @@ byte-for-byte.
   (`src/adapters/scorers/trustfoundry-citation-lookup.mjs`) with citation-first matching
   and a generic native-`cluster_id` fallback. Five benchmark configs plus
   a scorer config live under `configs/`. See
-  [`suites/citation-lookup/README.md`](suites/citation-lookup/README.md).
+  `suites/citation-lookup/README.md`.
 - **Dataset**: `expected.cl_cluster_id` field on every case-law row in
   `data/trustfoundry-legal-search-5k/case_questions.jsonl` and
   `case_key_facts.jsonl`. 100% coverage on both files (10,000 rows total).

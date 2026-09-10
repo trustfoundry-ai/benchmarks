@@ -1,0 +1,225 @@
+{
+  "generated_at": "2026-09-09T20:42:30.395Z",
+  "metadata": {
+    "cutoffs": [
+      1,
+      3,
+      5,
+      10
+    ],
+    "headlineCutoff": 1,
+    "mrrDecimalPlaces": 4,
+    "scorer": "trustfoundry-case-name-lookup",
+    "version": "trustfoundry-case-name-lookup-v9"
+  },
+  "run": {
+    "benchmark": {
+      "configPath": "configs/benchmarks/trustfoundry-case-name-lookup/v2-negatives.json",
+      "configSha256": "95cc1f7be79c1dcf2df7d774d9303bc5a6d8aaba12b4da3b00cf7f22c601e421",
+      "datasetNames": null,
+      "datasetSize": null,
+      "id": "trustfoundry-case-name-lookup",
+      "materializationVersion": "trustfoundry-case-name-lookup-data-v1",
+      "promptVersion": null,
+      "queryTransformId": null,
+      "sourceCommit": null,
+      "sourceFiles": [
+        {
+          "path": "data/trustfoundry-case-name-lookup/v2-negatives.jsonl",
+          "sha256": "6a1fdd2cde3766370f46ee4371227fa719abd763b151e2bc857fd2347ea23aa5"
+        }
+      ],
+      "sourceRoot": "data/trustfoundry-case-name-lookup",
+      "splits": null,
+      "version": "trustfoundry-case-name-lookup-v1"
+    },
+    "harness": {
+      "commit": "a37d336960779febe7c3949ba5270e4b6c70bc79",
+      "name": "@trustfoundry-ai/benchmarks-harness",
+      "originUrl": "https://github.com/trustfoundry-ai/benchmarks.git",
+      "version": "0.11.0"
+    },
+    "provider": {
+      "apiKeyEnv": "TF_API_KEY",
+      "configPath": "configs/providers/trustfoundry-case-name-lookup.json",
+      "configSha256": "169d7890a1921fd8baf7c3e86bd506bfa4a6aa0ff0a163302628e6e4ffed4fdc",
+      "id": "trustfoundry-legal-search",
+      "settings": {
+        "limit": 25,
+        "maxResults": null,
+        "modelType": "case_name",
+        "requestTimeoutMs": 60000,
+        "stateFilterEnabled": true
+      },
+      "subject": "case_name",
+      "target": "https://api.trustfoundry.ai/public/v1/search",
+      "version": "trustfoundry-legal-search-provider-v1"
+    },
+    "run_id": "trustfoundry-case-name-lookup-case_name-20260909T202238Z",
+    "scheduler": {
+      "caseCount": 50,
+      "parallel": 4,
+      "retries": 2,
+      "shardCount": 1,
+      "shardIndex": 0
+    },
+    "scorer": {
+      "configPath": "configs/scorers/trustfoundry-case-name-lookup.json",
+      "configSha256": "78fa715cfbb315a2cf6e87fa6ddb13f8a9a0c3c83252205df88c0be384c6252e",
+      "id": "trustfoundry-case-name-lookup",
+      "notes": "Case-name-lookup scoring. A hit is a case with this name coming back, not the exact citation string -- hitRank is the rank of the first result whose caption matches the target caption (equality for every axis except single_party_search, which matches by whole-token containment against the query fragment). party_order_swap rows also carry orderPreference, a ranking claim that never changes score or hitRank. Negative rows (kind=negative) are correct iff the provider returns zero results. A containment-based nameHitRank diagnostic (never the headline) separates \"no case with this name came back at all\" from \"the case came back under a caption only equality would reject\". summary.wrong_name reports an independent rate: the share of returned results sharing no distinctive party token with the query, over the headline population, with excluded_n counting queries whose every token is too common to discriminate. The same rate is reported again on each by_axis[axis].perturbed/.control arm, with its own applicable_n and excluded_n.",
+      "version": "trustfoundry-case-name-lookup-v9"
+    }
+  },
+  "schema_version": "trustfoundry.benchmarks.result.v1",
+  "status": "self-reported",
+  "summary": {
+    "by_axis": {},
+    "by_tier": {},
+    "dedupedHitAt1": 0,
+    "dedupedHitAt10": 0,
+    "dedupedHitAt3": 0,
+    "dedupedHitAt5": 0,
+    "execution": {
+      "benchmark": {
+        "configPath": "configs/benchmarks/trustfoundry-case-name-lookup/v2-negatives.json",
+        "configSha256": "95cc1f7be79c1dcf2df7d774d9303bc5a6d8aaba12b4da3b00cf7f22c601e421",
+        "datasetNames": null,
+        "datasetSize": null,
+        "id": "trustfoundry-case-name-lookup",
+        "materializationVersion": "trustfoundry-case-name-lookup-data-v1",
+        "promptVersion": null,
+        "queryTransformId": null,
+        "sourceCommit": null,
+        "sourceFiles": [
+          {
+            "path": "data/trustfoundry-case-name-lookup/v2-negatives.jsonl",
+            "sha256": "6a1fdd2cde3766370f46ee4371227fa719abd763b151e2bc857fd2347ea23aa5"
+          }
+        ],
+        "sourceRoot": "data/trustfoundry-case-name-lookup",
+        "splits": null,
+        "version": "trustfoundry-case-name-lookup-v1"
+      },
+      "caseCount": 50,
+      "provider": {
+        "apiKeyEnv": "TF_API_KEY",
+        "configPath": "configs/providers/trustfoundry-case-name-lookup.json",
+        "configSha256": "169d7890a1921fd8baf7c3e86bd506bfa4a6aa0ff0a163302628e6e4ffed4fdc",
+        "id": "trustfoundry-legal-search",
+        "settings": {
+          "limit": 25,
+          "maxResults": null,
+          "modelType": "case_name",
+          "requestTimeoutMs": 60000,
+          "stateFilterEnabled": true
+        },
+        "subject": "case_name",
+        "target": "https://api.trustfoundry.ai/public/v1/search",
+        "version": "trustfoundry-legal-search-provider-v1"
+      },
+      "runId": "trustfoundry-case-name-lookup-case_name-20260909T202238Z",
+      "scheduler": {
+        "caseCount": 50,
+        "parallel": 4,
+        "retries": 2,
+        "shardCount": 1,
+        "shardIndex": 0
+      },
+      "scorer": {
+        "cutoffs": [
+          1,
+          3,
+          5,
+          10
+        ],
+        "headlineCutoff": 1,
+        "id": "trustfoundry-case-name-lookup",
+        "mrrDecimalPlaces": 4,
+        "version": "trustfoundry-case-name-lookup-v9"
+      }
+    },
+    "headline": {
+      "ci95": [
+        0,
+        1
+      ],
+      "macro": 0,
+      "metric": "macro_hit_at_1",
+      "n_categories": 0,
+      "n_rows": 0,
+      "per_category": {},
+      "pooled": 0
+    },
+    "hitAt1": 0,
+    "hitAt10": 0,
+    "hitAt3": 0,
+    "hitAt5": 0,
+    "latency_ms": {
+      "max": 6102,
+      "mean": 598.28,
+      "min": 273,
+      "n": 50,
+      "p50": 321,
+      "p95": 1037.9499999999996
+    },
+    "mrr": 0,
+    "negatives": 50,
+    "negatives_overall": {
+      "by_category": {
+        "fabricated_name": {
+          "correct_empty": 8,
+          "fp_rate": 0.84,
+          "n": 50
+        }
+      },
+      "correct_empty": 8,
+      "fp_rate": 0.84,
+      "n": 50
+    },
+    "notApplicable": 0,
+    "overall": {
+      "all_axes": {
+        "deduped_hit_at": {
+          "hit@1": 0,
+          "hit@10": 0,
+          "hit@3": 0,
+          "hit@5": 0
+        },
+        "hit_at": {
+          "hit@1": 0,
+          "hit@10": 0,
+          "hit@3": 0,
+          "hit@5": 0
+        },
+        "mrr": 0,
+        "n": 0
+      },
+      "deduped_hit_at": {
+        "hit@1": 0,
+        "hit@10": 0,
+        "hit@3": 0,
+        "hit@5": 0
+      },
+      "hit_at": {
+        "hit@1": 0,
+        "hit@10": 0,
+        "hit@3": 0,
+        "hit@5": 0
+      },
+      "mrr": 0,
+      "n": 0
+    },
+    "overallScore": 0,
+    "positives": 0,
+    "providerFailures": 0,
+    "scored": 50,
+    "supportedScore": 0,
+    "total": 50,
+    "wrong_name": {
+      "applicable_n": 0,
+      "excluded_n": 0,
+      "rate": 0
+    }
+  }
+}

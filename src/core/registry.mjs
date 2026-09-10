@@ -17,6 +17,7 @@
  * (string, unique within its kind) and `version` (string). See the
  * factories in `src/core/contracts/index.mjs` for the full contract.
  */
+import { caseNameLookupBenchmarkAdapter } from '../adapters/benchmarks/trustfoundry-case-name-lookup.mjs';
 import { trustfoundryLegalSearchBenchmarkAdapter } from '../adapters/benchmarks/trustfoundry-legal-search.mjs';
 import { anthropicLegalSearchProviderAdapter } from '../adapters/providers/anthropic-legal-search.mjs';
 import { courtlistenerSearchProviderAdapter } from '../adapters/providers/courtlistener-search.mjs';
@@ -24,6 +25,7 @@ import { exaLegalSearchProviderAdapter } from '../adapters/providers/exa-legal-s
 import { openaiLegalSearchProviderAdapter } from '../adapters/providers/openai-legal-search.mjs';
 import { parallelLegalSearchProviderAdapter } from '../adapters/providers/parallel-legal-search.mjs';
 import { trustfoundryLegalSearchProviderAdapter } from '../adapters/providers/trustfoundry-legal-search.mjs';
+import { caseNameLookupScorerAdapter } from '../adapters/scorers/trustfoundry-case-name-lookup.mjs';
 import { trustfoundryLegalSearchScorerAdapter } from '../adapters/scorers/trustfoundry-legal-search.mjs';
 
 export function createRegistry() {
@@ -46,6 +48,7 @@ export function createRegistry() {
 }
 
 export const defaultRegistry = createRegistry();
+defaultRegistry.register('benchmarks', caseNameLookupBenchmarkAdapter);
 defaultRegistry.register('benchmarks', trustfoundryLegalSearchBenchmarkAdapter);
 defaultRegistry.register('providers', anthropicLegalSearchProviderAdapter);
 defaultRegistry.register('providers', courtlistenerSearchProviderAdapter);
@@ -53,6 +56,7 @@ defaultRegistry.register('providers', exaLegalSearchProviderAdapter);
 defaultRegistry.register('providers', openaiLegalSearchProviderAdapter);
 defaultRegistry.register('providers', parallelLegalSearchProviderAdapter);
 defaultRegistry.register('providers', trustfoundryLegalSearchProviderAdapter);
+defaultRegistry.register('scorers', caseNameLookupScorerAdapter);
 defaultRegistry.register('scorers', trustfoundryLegalSearchScorerAdapter);
 
 // Backwards-compat alias — existing public callers import `registry`.
