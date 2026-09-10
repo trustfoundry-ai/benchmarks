@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { createReadStream, createWriteStream } from 'node:fs';
-import { readFile, stat, unlink } from 'node:fs/promises';
+import { readFile, unlink } from 'node:fs/promises';
 import { pipeline } from 'node:stream/promises';
 import { promisify } from 'node:util';
 import { createGunzip, createGzip, gunzip } from 'node:zlib';
@@ -19,7 +19,6 @@ import {
 } from './fs.mjs';
 import { getAdapter } from './registry.mjs';
 
-const LARGE_RAW_GZIP_THRESHOLD_BYTES = 95 * 1024 * 1024;
 const gunzipAsync = promisify(gunzip);
 
 function safeParseJson(text) {
@@ -416,13 +415,11 @@ export async function publishResultBundle({ repoRoot, runDir, outDir, force = fa
   });
   await rawWriter.close();
 
-  if ((await stat(rawPath)).size > LARGE_RAW_GZIP_THRESHOLD_BYTES) {
-    const gzPath = path.join(resolvedOut, 'raw.jsonl.gz');
-    await gzipFile(rawPath, gzPath);
-    await unlink(rawPath);
-    rawArtifactPath = 'raw.jsonl.gz';
-    rawPath = gzPath;
-  }
+  const gzPath = path.join(resolvedOut, 'raw.jsonl.gz');
+  await gzipFile(rawPath, gzPath);
+  await unlink(rawPath);
+  rawArtifactPath = 'raw.jsonl.gz';
+  rawPath = gzPath;
 
   const result = resultEnvelope({ manifest, scores: scoreResult });
   const resultPath = path.join(resolvedOut, 'result.json');

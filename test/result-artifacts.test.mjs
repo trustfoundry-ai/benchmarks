@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { promisify } from 'node:util';
-import { gzip } from 'node:zlib';
+import { gunzip } from 'node:zlib';
 
 import {
   buildRawRows,
@@ -12,10 +12,10 @@ import {
   reconstructFromRawRows,
   verifyResultBundle
 } from '../src/core/artifacts.mjs';
-import { sha256File, writeJson, writeJsonl, readJson } from '../src/core/fs.mjs';
+import { exists, sha256File, writeJson, writeJsonl, readJson } from '../src/core/fs.mjs';
 import { trustfoundryLegalSearchScorerAdapter } from '../src/adapters/scorers/trustfoundry-legal-search.mjs';
 
-const gzipAsync = promisify(gzip);
+const gunzipAsync = promisify(gunzip);
 
 async function makeRun(repoRoot, root) {
   const runDir = path.join(root, 'run');
@@ -139,27 +139,38 @@ test('aggregate result verification can ignore current input digests', async () 
   assert.equal(verification.rows, 1);
 });
 
-test('verifies result bundles with gzip-compressed raw rows', async () => {
+test('verifies result bundles from a plain (non-gzip) raw.jsonl copy', async () => {
   const repoRoot = process.cwd();
-  const root = await mkdtemp(path.join(os.tmpdir(), 'tf-benchmarks-artifacts-gz-'));
+  const root = await mkdtemp(path.join(os.tmpdir(), 'tf-benchmarks-artifacts-plain-'));
   const runDir = await makeRun(repoRoot, root);
   const outDir = path.join(root, 'bundle');
   await publishResultBundle({ repoRoot, runDir, outDir });
 
-  const rawPath = path.join(outDir, 'raw.jsonl');
   const gzPath = path.join(outDir, 'raw.jsonl.gz');
-  await writeFile(gzPath, await gzipAsync(await readFile(rawPath)));
-  await unlink(rawPath);
+  const rawPath = path.join(outDir, 'raw.jsonl');
+  await writeFile(rawPath, await gunzipAsync(await readFile(gzPath)));
+  await unlink(gzPath);
 
   const manifestPath = path.join(outDir, 'manifest.json');
   const manifest = await readJson(manifestPath);
-  manifest.artifacts.raw.path = 'raw.jsonl.gz';
-  manifest.artifacts.raw.sha256 = await sha256File(gzPath);
+  manifest.artifacts.raw.path = 'raw.jsonl';
+  manifest.artifacts.raw.sha256 = await sha256File(rawPath);
   await writeJson(manifestPath, manifest);
 
   const verification = await verifyResultBundle({ repoRoot, bundleDir: outDir });
   assert.equal(verification.ok, true);
   assert.equal(verification.rows, 1);
+});
+
+test('publishResultBundle always writes gzipped raw evidence', async () => {
+  const repoRoot = process.cwd();
+  const root = await mkdtemp(path.join(os.tmpdir(), 'tf-benchmarks-artifacts-gzip-always-'));
+  const runDir = await makeRun(repoRoot, root);
+  const outDir = path.join(root, 'bundle');
+  await publishResultBundle({ repoRoot, runDir, outDir });
+
+  assert.equal(await exists(path.join(outDir, 'raw.jsonl.gz')), true);
+  assert.equal(await exists(path.join(outDir, 'raw.jsonl')), false);
 });
 
 test('raw rows preserve non-case legal search metadata for recomputation', () => {
