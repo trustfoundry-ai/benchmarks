@@ -49,6 +49,21 @@ configuration its manifest names. Re-scoring stored responses is the right tool
 for analysis; it is not how a published artifact is produced, because
 recomputed checksums attest to file integrity rather than provenance.
 
+Row-level evidence does not have to be committed. A bundle's manifest can
+record `artifacts.raw.href` instead of (or alongside) a local `raw.jsonl.gz`,
+pointing at that file uploaded as a release asset. Attach it and record the
+URL with:
+
+```bash
+node scripts/upload-raw-assets.mjs --tag <release-tag> results/<suite>/<date>/<target>
+```
+
+Pass `--dry-run` first to print the exact `gh` command and the href it would
+write without uploading or touching the manifest. `pnpm verify:results` then
+fetches and checksums the referenced asset. A bundle with neither a local raw
+file nor an `artifacts.raw.href` fails verification rather than passing
+silently.
+
 ## Pull Requests
 
 Pull requests should include:

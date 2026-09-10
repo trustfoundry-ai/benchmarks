@@ -18,6 +18,14 @@ The provider that produced the bundle is recorded inside the bundle's `manifest.
 
 Each bundle contains raw rows, `result.json`, `manifest.json`, and `checksums.txt`. Raw rows are published gzipped as `raw.jsonl.gz`; the bundle manifest records the exact raw path and checksum.
 
+Raw rows do not have to live in the bundle directory itself. The manifest can
+also record `artifacts.raw.href`, the URL of a release asset carrying the same
+`raw.jsonl.gz`. `pnpm verify:results` uses a local copy when a bundle has one
+and otherwise fetches the referenced asset and checksums it against
+`artifacts.raw.sha256` — a bundle with neither fails verification rather than
+passing silently. Whether a given bundle's raw rows are local or remote is a
+per-bundle fact recorded in that bundle's own manifest, not a repo-wide rule.
+
 Example:
 
 ```bash

@@ -15,6 +15,12 @@ Every published bundle's harness commit is checked to be an ancestor of `main`
 (`pnpm check:provenance` — see [Publishing numbers](../CONTRIBUTING.md#publishing-numbers)),
 so this checkout always resolves to a commit a plain clone can reach.
 
+Row-level evidence can live on the release rather than in the clone: the
+manifest records the raw path, its checksum, and optionally
+`artifacts.raw.href`. `verify-result` uses a local copy when the bundle has
+one and otherwise fetches and checksums the referenced asset; to fetch it
+yourself, follow `manifest.artifacts.raw.href`.
+
 ## 2. Install and configure
 
 ```bash
