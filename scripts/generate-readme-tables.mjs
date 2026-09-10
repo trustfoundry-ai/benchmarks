@@ -15,10 +15,22 @@
  * A suite's targets may include more than one `headline: true` target (one
  * per independent category), so the results table renders every headline
  * target as its own row rather than reducing a suite to a single row.
- * Several published targets carry no `summary.headline` block at all
- * (that block is scorer-specific, opt-in extra detail); a missing block
- * renders as an em dash rather than a value computed here or borrowed from
- * an unrelated field.
+ * Several published targets carry no `summary.headline` block at all (that
+ * block is scorer-specific, opt-in extra detail); a missing block renders
+ * as an em dash rather than a value computed here or borrowed from an
+ * unrelated field. `summary.overallScore` is never read — its cutoff is
+ * scorer-specific (legal-search's is hit@25, case-name-lookup's is hit@1)
+ * and putting it in one shared column would let a reader compare two
+ * different cutoffs without knowing it; every hit-rate cell below instead
+ * comes from `summary.overall.hit_at`, one column per cutoff the suite's
+ * own bundles report, named by its own key.
+ *
+ * A target with `headline: false` is not omitted — its scorer may still
+ * report something a reader needs, just not a hit rate comparable to the
+ * headline rows (an invariant population whose `summary.negatives_overall`
+ * is non-empty, e.g.), and its own README-worthy content is surfaced in a
+ * dedicated line below the headline table, keyed off the data that target's
+ * own bundle carries rather than a hardcoded target id.
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -81,32 +93,184 @@ function formatMs(value) {
   return typeof value === 'number' ? `${Math.round(value)} ms` : '—';
 }
 
-/**
- * Renders the "Suite status" table. Only `suite.id`, `suite.status`, and
- * `suite.targets` are used — no filesystem access beyond what `listSuites`
- * already did — so this stays a pure function of the registry.
- */
-export function renderSuiteStatusTable(suites) {
-  const rows = suites
-    .filter((suite) => suite.status === 'published')
-    .map((suite) => {
-      const targetCount = Object.keys(suite.targets).length;
-      return `| [\`${suite.id}\`](${suite.dir}/README.md) | ${suite.status} | ${targetCount} |`;
-    });
-  return ['| Suite | Status | Targets |', '|---|---|---:|', ...rows].join('\n');
+function mdRow(cells) {
+  return `| ${cells.join(' | ')} |`;
 }
 
 /**
- * Renders one markdown table per published suite, one row per
- * `headline: true` target, sourced from that suite's `latest.json` pointer
- * and the pointed-at `result.json`'s `summary`. A suite with several
- * headline targets (legal-search has four) gets one row per target, never
- * a single reduced row. `summary.overallScore` is never used here — its
- * cutoff is scorer-specific (legal-search reports hit@25 there, case-name
- * hit@1) and putting it in one shared column would let a reader compare
- * two different cutoffs without knowing it. The hit-rate column is always
- * `summary.overall.hit_at['hit@1']`, named explicitly in its own header.
+ * The bundle-count + dated-directory cell for one suite's row in the suite
+ * status table. Reads only that suite's `latest.json` pointer — nothing
+ * about individual targets — so a suite with no published bundle yet reads
+ * as an honest em dash rather than a broken link.
  */
+async function publishedBundlesCell({ suite, repoRoot }) {
+  const pointerPath = path.join(repoRoot, 'results', suite.id, 'latest.json');
+  if (!(await exists(pointerPath))) return '—';
+  const pointer = await readJson(pointerPath);
+  const relPaths = Object.values(pointer.bundles ?? {});
+  if (!relPaths.length) return '—';
+  const count = relPaths.length;
+  const label = `${count} bundle${count === 1 ? '' : 's'}`;
+  const dates = new Set(relPaths.map((rel) => rel.split('/')[0]));
+  const dir = dates.size === 1 ? `results/${suite.id}/${[...dates][0]}/` : `results/${suite.id}/`;
+  return `${label} under [\`${dir}\`](${dir})`;
+}
+
+/**
+ * Renders the "Suite status" table: one row per published suite, its
+ * declared target count, and how many result bundles it currently has
+ * published (with a link to the dated directory when every bundle shares
+ * one date, or the suite's whole results directory when they don't).
+ */
+export async function renderSuiteStatusTable({ suites, repoRoot }) {
+  const rows = [];
+  for (const suite of suites) {
+    if (suite.status !== 'published') continue;
+    const targetCount = Object.keys(suite.targets).length;
+    const bundlesCell = await publishedBundlesCell({ suite, repoRoot });
+    rows.push(
+      mdRow([`[\`${suite.id}\`](${suite.dir}/README.md)`, suite.status, String(targetCount), bundlesCell])
+    );
+  }
+  return [mdRow(['Suite', 'Status', 'Targets', 'Published bundles']), '|---|---|---:|---|', ...rows].join(
+    '\n'
+  );
+}
+
+/**
+ * Loads the `summary` and `run.scheduler.parallel` for one published
+ * target, or `null` if it isn't actually published yet (declared in the
+ * manifest but no bundle checked in under the path its own `latest.json`
+ * entry names).
+ */
+async function loadPublishedTarget({ repoRoot, suiteId, targetId, pointer }) {
+  const rel = pointer.bundles?.[targetId];
+  if (!rel) return null;
+  const resultPath = path.join(repoRoot, 'results', suiteId, rel, 'result.json');
+  if (!(await exists(resultPath))) return null;
+  const doc = await readJson(resultPath);
+  return { rel, summary: doc.summary ?? {}, parallel: doc.run?.scheduler?.parallel };
+}
+
+/** Ascending sort of `hit@K` keys by their numeric cutoff. */
+function sortCutoffs(keys) {
+  return [...keys].sort((a, b) => Number(a.slice('hit@'.length)) - Number(b.slice('hit@'.length)));
+}
+
+/**
+ * Renders the headline table for one suite: one row per `headline: true`
+ * target, one column per hit@K cutoff its bundles actually report (derived
+ * from the data, since legal-search and case-name-lookup use different
+ * cutoff sets), plus the fields every published bundle carries regardless
+ * of scorer — MRR, provider failures out of total rows, and latency.
+ * `wrong-name rate` only exists on the case-name-lookup scorer; it renders
+ * as an em dash for every other suite rather than being a suite-specific
+ * column that only sometimes exists.
+ */
+async function renderHeadlineTable({ suite, repoRoot, pointer }) {
+  const headlineTargets = Object.entries(suite.targets).filter(([, target]) => target.headline === true);
+
+  const entries = [];
+  for (const [targetId, target] of headlineTargets) {
+    const loaded = await loadPublishedTarget({ repoRoot, suiteId: suite.id, targetId, pointer });
+    if (!loaded) continue;
+    entries.push({ targetId, target, ...loaded });
+  }
+  if (!entries.length) return null;
+
+  const cutoffs = sortCutoffs(
+    new Set(entries.flatMap(({ summary }) => Object.keys(summary.overall?.hit_at ?? {})))
+  );
+
+  const header = mdRow([
+    'Target',
+    'Rows',
+    ...cutoffs,
+    'hit@1 95% CI',
+    'MRR',
+    'wrong-name rate',
+    'provider failures',
+    'p50',
+    'p95'
+  ]);
+  const align = mdRow([
+    '---',
+    '---:',
+    ...cutoffs.map(() => '---:'),
+    '---',
+    '---:',
+    '---:',
+    '---:',
+    '---:',
+    '---:'
+  ]);
+
+  const rows = entries.map(({ targetId, target, rel, summary }) => {
+    const hitAt = summary.overall?.hit_at ?? {};
+    const ci = summary.headline?.ci95;
+    const ciText = Array.isArray(ci) ? `[${formatScore(ci[0])}, ${formatScore(ci[1])}]` : '—';
+    return mdRow([
+      `[\`${targetId}\`](results/${suite.id}/${rel}/)`,
+      String(target.rows),
+      ...cutoffs.map((cutoff) => formatScore(hitAt[cutoff])),
+      ciText,
+      formatScore(summary.overall?.mrr),
+      formatScore(summary.wrong_name?.rate),
+      `${summary.providerFailures ?? '—'}/${summary.total ?? '—'}`,
+      formatMs(summary.latency_ms?.p50),
+      formatMs(summary.latency_ms?.p95)
+    ]);
+  });
+
+  const parallels = new Set(entries.map(({ parallel }) => parallel).filter((p) => typeof p === 'number'));
+  const concurrencyLine =
+    parallels.size === 1 ? `\n\nLatency measured at \`--parallel ${[...parallels][0]}\`.` : '';
+
+  return `${[header, align, ...rows].join('\n')}${concurrencyLine}`;
+}
+
+/**
+ * Renders one line per target whose published bundle reports a non-empty
+ * `summary.negatives_overall` (an invariant/negative population — rows with
+ * no correct answer to hit, so a hit rate would misreport it as failure).
+ * Membership is decided by that field being present with `n > 0` on the
+ * bundle itself, not by a hardcoded target id, so a second suite that ships
+ * its own negatives population is picked up the same way.
+ */
+async function renderNegativePopulations({ suite, repoRoot, pointer }) {
+  const lines = [];
+  for (const targetId of Object.keys(suite.targets)) {
+    const loaded = await loadPublishedTarget({ repoRoot, suiteId: suite.id, targetId, pointer });
+    if (!loaded) continue;
+    const negatives = loaded.summary.negatives_overall;
+    if (!negatives || !(negatives.n > 0)) continue;
+    const link = `results/${suite.id}/${loaded.rel}/`;
+    lines.push(
+      `- **Invariant population** [\`${targetId}\`](${link}): false-positive rate ` +
+        `${formatScore(negatives.fp_rate)} (lower is better) — ${negatives.correct_empty}/${negatives.n} ` +
+        'correctly returned no match.'
+    );
+  }
+  return lines;
+}
+
+/**
+ * Lists smoke-tier targets (cheap, non-headline companions to a headline
+ * run) as links, so a reader who wants the cheap version can still find it
+ * even though it isn't a row in the headline table.
+ */
+async function renderSmokeCompanions({ suite, repoRoot, pointer }) {
+  const links = [];
+  for (const [targetId, target] of Object.entries(suite.targets)) {
+    if (target.tier !== 'smoke') continue;
+    const loaded = await loadPublishedTarget({ repoRoot, suiteId: suite.id, targetId, pointer });
+    if (!loaded) continue;
+    links.push(`[\`${targetId}\`](results/${suite.id}/${loaded.rel}/)`);
+  }
+  if (!links.length) return [];
+  return [`- Smoke-tier companions (cheap, non-headline): ${links.join(', ')}.`];
+}
+
 export async function renderResultsTables({ suites, repoRoot }) {
   const sections = [];
   for (const suite of suites) {
@@ -116,38 +280,17 @@ export async function renderResultsTables({ suites, repoRoot }) {
     if (!(await exists(pointerPath))) continue;
     const pointer = await readJson(pointerPath);
 
-    const headlineTargets = Object.entries(suite.targets).filter(
-      ([, target]) => target.headline === true
-    );
+    const table = await renderHeadlineTable({ suite, repoRoot, pointer });
+    if (!table) continue;
 
-    const rows = [];
-    for (const [targetId, target] of headlineTargets) {
-      const rel = pointer.bundles?.[targetId];
-      if (!rel) continue;
-      const resultPath = path.join(repoRoot, 'results', suite.id, rel, 'result.json');
-      if (!(await exists(resultPath))) continue;
+    const noteLines = [
+      ...(await renderNegativePopulations({ suite, repoRoot, pointer })),
+      ...(await renderSmokeCompanions({ suite, repoRoot, pointer }))
+    ];
+    const notes = noteLines.length ? `\n\n${noteLines.join('\n')}` : '';
 
-      const summary = (await readJson(resultPath)).summary ?? {};
-      const hit1 = summary.overall?.hit_at?.['hit@1'];
-      const mrr = summary.overall?.mrr;
-      const ci = summary.headline?.ci95;
-      const latency = summary.latency_ms ?? {};
-
-      const ciText = Array.isArray(ci) ? `[${formatScore(ci[0])}, ${formatScore(ci[1])}]` : '—';
-      rows.push(
-        `| [\`${targetId}\`](results/${suite.id}/${rel}/) | ${target.rows} | ${formatScore(hit1)} | ` +
-          `${ciText} | ${formatScore(mrr)} | ${formatMs(latency.p50)} | ${formatMs(latency.p95)} |`
-      );
-    }
-    if (!rows.length) continue;
-
-    const table = [
-      '| Target | Rows | hit@1 | hit@1 95% CI | MRR | p50 | p95 |',
-      '|---|---:|---:|---|---:|---:|---:|',
-      ...rows
-    ].join('\n');
     sections.push(
-      `#### ${suite.title}\n\n${table}\n\n` +
+      `#### ${suite.title}\n\n${table}${notes}\n\n` +
         `See [\`${suite.dir}/README.md\`](${suite.dir}/README.md) for the per-category and per-axis breakdown.`
     );
   }
@@ -156,7 +299,7 @@ export async function renderResultsTables({ suites, repoRoot }) {
 
 export async function renderReadme({ repoRoot, readme }) {
   const suites = await listSuites({ repoRoot });
-  let out = replaceRegion(readme, 'suite-status', renderSuiteStatusTable(suites));
+  let out = replaceRegion(readme, 'suite-status', await renderSuiteStatusTable({ suites, repoRoot }));
   out = replaceRegion(out, 'latest-benchmarks', await renderResultsTables({ suites, repoRoot }));
   return out;
 }

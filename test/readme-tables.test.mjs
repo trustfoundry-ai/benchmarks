@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { renderReadme, renderSuiteStatusTable } from '../scripts/generate-readme-tables.mjs';
+import { renderReadme, renderResultsTables, renderSuiteStatusTable } from '../scripts/generate-readme-tables.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -19,14 +19,129 @@ test('the committed README matches the generator', async () => {
   );
 });
 
-test('renderSuiteStatusTable only lists published suites, one row each, with a target count', () => {
-  const table = renderSuiteStatusTable([
-    { id: 'trustfoundry-a', status: 'published', dir: 'suites/trustfoundry-a', targets: { x: {}, y: {} } },
-    { id: 'trustfoundry-b', status: 'experimental', dir: 'suites/trustfoundry-b', targets: { z: {} } }
-  ]);
-  assert.match(table, /trustfoundry-a/);
-  assert.doesNotMatch(table, /trustfoundry-b/);
-  assert.match(table, /\| \[`trustfoundry-a`\]\(suites\/trustfoundry-a\/README\.md\) \| published \| 2 \|/);
+test('renderSuiteStatusTable only lists published suites, one row each, with a target count and bundle cell', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'suite-status-test-'));
+  try {
+    const suites = [
+      { id: 'trustfoundry-a', status: 'published', dir: 'suites/trustfoundry-a', targets: { x: {}, y: {} } },
+      { id: 'trustfoundry-b', status: 'experimental', dir: 'suites/trustfoundry-b', targets: { z: {} } }
+    ];
+    // No results/ directory in this fixture repoRoot at all, so the
+    // "Published bundles" cell for trustfoundry-a must read as an honest
+    // em dash rather than throwing or fabricating a count.
+    const table = await renderSuiteStatusTable({ suites, repoRoot: dir });
+    assert.match(table, /trustfoundry-a/);
+    assert.doesNotMatch(table, /trustfoundry-b/);
+    assert.match(
+      table,
+      /\| \[`trustfoundry-a`\]\(suites\/trustfoundry-a\/README\.md\) \| published \| 2 \| — \|/
+    );
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('renderSuiteStatusTable reports a published bundle count and its dated directory', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'suite-status-test-'));
+  try {
+    await mkdir(path.join(dir, 'results', 'trustfoundry-a'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'results', 'trustfoundry-a', 'latest.json'),
+      JSON.stringify({ bundles: { x: '2026-01-01/x', y: '2026-01-01/y' } }),
+      'utf8'
+    );
+    const suites = [
+      { id: 'trustfoundry-a', status: 'published', dir: 'suites/trustfoundry-a', targets: { x: {}, y: {} } }
+    ];
+    const table = await renderSuiteStatusTable({ suites, repoRoot: dir });
+    assert.match(table, /2 bundles under \[`results\/trustfoundry-a\/2026-01-01\/`\]/);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('renderResultsTables derives cutoff columns from the data, surfaces the invariant population and smoke companions separately, and states concurrency once when uniform', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'results-tables-test-'));
+  try {
+    const suite = {
+      id: 'trustfoundry-demo',
+      title: 'Demo Suite',
+      status: 'published',
+      dir: 'suites/trustfoundry-demo',
+      targets: {
+        'full-100': { rows: 100, tier: 'full', headline: true },
+        'smoke-20': { rows: 20, tier: 'smoke' },
+        'negatives-10': { rows: 10, tier: 'full' }
+      }
+    };
+
+    const resultsDir = path.join(dir, 'results', suite.id);
+    await mkdir(resultsDir, { recursive: true });
+    await writeFile(
+      path.join(resultsDir, 'latest.json'),
+      JSON.stringify({
+        bundles: {
+          'full-100': '2026-01-01/full-100',
+          'smoke-20': '2026-01-01/smoke-20',
+          'negatives-10': '2026-01-01/negatives-10'
+        }
+      }),
+      'utf8'
+    );
+
+    async function writeBundle(targetId, result) {
+      const bundleDir = path.join(resultsDir, '2026-01-01', targetId);
+      await mkdir(bundleDir, { recursive: true });
+      await writeFile(path.join(bundleDir, 'result.json'), JSON.stringify(result), 'utf8');
+    }
+
+    await writeBundle('full-100', {
+      run: { scheduler: { parallel: 4 } },
+      summary: {
+        overall: { hit_at: { 'hit@1': 0.9, 'hit@5': 0.95 }, mrr: 0.92 },
+        providerFailures: 0,
+        total: 100,
+        latency_ms: { p50: 100, p95: 200 }
+        // No `wrong_name`, no `headline` block — this scorer never reports them.
+      }
+    });
+    await writeBundle('smoke-20', {
+      run: { scheduler: { parallel: 4 } },
+      summary: { overall: { hit_at: { 'hit@1': 0.9 }, mrr: 0.9 }, providerFailures: 0, total: 20 }
+    });
+    await writeBundle('negatives-10', {
+      run: { scheduler: { parallel: 4 } },
+      summary: {
+        overall: { hit_at: { 'hit@1': 0 }, mrr: 0 },
+        providerFailures: 0,
+        total: 10,
+        negatives_overall: { n: 10, correct_empty: 9, fp_rate: 0.1 }
+      }
+    });
+
+    const output = await renderResultsTables({ suites: [suite], repoRoot: dir });
+
+    assert.match(output, /\| Target \| Rows \| hit@1 \| hit@5 \|/, 'cutoff columns come from the data');
+    assert.match(output, /\[`full-100`\].*\| 0\.9000 \| 0\.9500 \|/, 'hit@1 and hit@5 both render for full-100');
+    assert.doesNotMatch(
+      output,
+      /\| \[`negatives-10`\]/,
+      'the invariant population is not a row in the headline table'
+    );
+    assert.match(
+      output,
+      /Invariant population.*\[`negatives-10`\].*false-positive rate 0\.1000 \(lower is better\).*9\/10/,
+      'the invariant population gets its own line with a stated direction'
+    );
+    assert.match(
+      output,
+      /Smoke-tier companions.*\[`smoke-20`\]/,
+      'the smoke-tier companion is linked even though it is not a headline row'
+    );
+    assert.match(output, /Latency measured at `--parallel 4`\./);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
 });
 
 async function withTempReadme(body, run) {
