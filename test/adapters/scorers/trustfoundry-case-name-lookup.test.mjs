@@ -339,14 +339,14 @@ test('headline score is hit@1', () => {
   assert.equal(summary.overall.hit_at['hit@3'], 1);
 });
 
-test('the summary carries no legacy top-level hit keys', () => {
+test('the summary reports hit rates only under overall.hit_at', () => {
   const scores = [
     { status: 'scored', kind: 'positive', arm: 'perturbed', nameTransform: 'clean', hitRank: 1, dedupedHitRank: 1, reciprocalRank: 1 },
     { status: 'scored', kind: 'positive', arm: 'perturbed', nameTransform: 'clean', hitRank: 3, dedupedHitRank: 3, reciprocalRank: 1 / 3 }
   ];
   const summary = _internals.buildSummary(scores, { manifest: null, cutoffs: [1, 3, 5, 10], headlineCutoff: 1 });
   for (const key of ['hitAt1', 'hitAt3', 'hitAt5', 'hitAt10', 'hitAt25', 'overallScore', 'supportedScore']) {
-    assert.equal(key in summary, false, `legacy key '${key}' is still emitted`);
+    assert.equal(key in summary, false, `'${key}' must not appear at the top level of the summary`);
   }
   assert.ok(summary.overall.hit_at['hit@1'] !== undefined);
 });

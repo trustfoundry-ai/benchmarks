@@ -18,9 +18,10 @@
  * Several published targets carry no `summary.headline` block at all (that
  * block is scorer-specific, opt-in extra detail); a missing block renders
  * as an em dash rather than a value computed here or borrowed from an
- * unrelated field. `summary.headline` is never read — its cutoff is
- * scorer-specific (legal-search's is hit@25, case-name-lookup's is hit@1)
- * and putting it in one shared column would let a reader compare two
+ * unrelated field. `summary.headline.ci95` is read directly for the
+ * interval column, but its hit rate is never read for a shared column — its
+ * cutoff is scorer-specific (legal-search's is hit@25, case-name-lookup's is
+ * hit@1) and putting it in one shared column would let a reader compare two
  * different cutoffs without knowing it; every hit-rate cell below instead
  * comes from `summary.overall.hit_at`, one column per cutoff the suite's
  * own bundles report, named by its own key.

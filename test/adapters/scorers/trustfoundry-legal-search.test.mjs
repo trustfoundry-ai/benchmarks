@@ -449,7 +449,7 @@ test('summary.headline reports macro, pooled and a Wilson interval', () => {
   assert.ok('laws' in summary.headline.per_category);
 });
 
-test('the summary carries no legacy top-level hit keys', () => {
+test('the summary reports hit rates only under overall.hit_at', () => {
   const scores = [
     {
       status: 'scored',
@@ -462,7 +462,7 @@ test('the summary carries no legacy top-level hit keys', () => {
   ];
   const summary = scorerInternals.buildSummary(scores, { cutoffs: [1, 5, 10, 25], headlineCutoff: 1 });
   for (const key of ['hitAt1', 'hitAt3', 'hitAt5', 'hitAt10', 'hitAt25', 'overallScore', 'supportedScore']) {
-    assert.equal(key in summary, false, `legacy key '${key}' is still emitted`);
+    assert.equal(key in summary, false, `'${key}' must not appear at the top level of the summary`);
   }
   assert.ok(summary.overall.hit_at['hit@1'] !== undefined);
 });
@@ -488,6 +488,6 @@ test('breakdowns use snake_case keys', () => {
     assert.ok(key in summary, `missing ${key}`);
   }
   for (const key of ['byDataset', 'byDocType', 'byField', 'byModelType', 'bySplit', 'byState']) {
-    assert.equal(key in summary, false, `camelCase ${key} still emitted`);
+    assert.equal(key in summary, false, `'${key}' must not appear in the summary`);
   }
 });
