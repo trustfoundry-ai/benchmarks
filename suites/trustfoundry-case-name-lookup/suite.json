@@ -1,5 +1,5 @@
 {
-  "$comment": "Targets for the case-name lookup suite. public-1050 is a strided subset of public-8850's dataset; see the suite README for what it may and may not be quoted for.",
+  "$comment": "Targets for the case-name lookup suite. Target ids are the identifier used by the CLI (--target), the container (BENCHMARK_CONFIG), the published bundle directory, and the latest.json key. public-8850 is the headline target: 15 categories, 295 paired cases each, one perturbed row and one control row per case. negatives-50 is the invariant population -- fabricated case names that resolve to no document -- reported separately from the headline by construction.",
   "id": "trustfoundry-case-name-lookup",
   "title": "TrustFoundry Case-Name Lookup",
   "status": "published",
