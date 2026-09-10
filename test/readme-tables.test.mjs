@@ -144,6 +144,83 @@ test('renderResultsTables derives cutoff columns from the data, surfaces the inv
   }
 });
 
+/**
+ * Builds a two-headline-target suite fixture under a fresh temp repoRoot,
+ * one bundle per given `parallel` value, and returns the rendered
+ * `renderResultsTables` output. Used by the two tests below to prove both
+ * directions of the uniform-vs-per-row concurrency branch: neither can rot
+ * without a fixture actually exercising it.
+ */
+async function renderConcurrencyFixture(parallels) {
+  const dir = await mkdtemp(path.join(tmpdir(), 'concurrency-test-'));
+  try {
+    const suite = {
+      id: 'trustfoundry-concurrency',
+      title: 'Concurrency Suite',
+      status: 'published',
+      dir: 'suites/trustfoundry-concurrency',
+      targets: Object.fromEntries(
+        parallels.map((_, i) => [`target-${i}`, { rows: 10, tier: 'full', headline: true }])
+      )
+    };
+
+    const resultsDir = path.join(dir, 'results', suite.id);
+    await mkdir(resultsDir, { recursive: true });
+    await writeFile(
+      path.join(resultsDir, 'latest.json'),
+      JSON.stringify({
+        bundles: Object.fromEntries(parallels.map((_, i) => [`target-${i}`, `2026-01-01/target-${i}`]))
+      }),
+      'utf8'
+    );
+
+    for (const [i, parallel] of parallels.entries()) {
+      const bundleDir = path.join(resultsDir, '2026-01-01', `target-${i}`);
+      await mkdir(bundleDir, { recursive: true });
+      const run = typeof parallel === 'number' ? { scheduler: { parallel } } : {};
+      await writeFile(
+        path.join(bundleDir, 'result.json'),
+        JSON.stringify({
+          run,
+          summary: {
+            overall: { hit_at: { 'hit@1': 0.5 }, mrr: 0.5 },
+            providerFailures: 0,
+            total: 10,
+            latency_ms: { p50: 100 + i, p95: 200 + i }
+          }
+        }),
+        'utf8'
+      );
+    }
+
+    return await renderResultsTables({ suites: [suite], repoRoot: dir });
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+}
+
+test('renderResultsTables states concurrency once when every headline row shares one --parallel value', async () => {
+  const output = await renderConcurrencyFixture([4, 4]);
+  assert.match(output, /Latency measured at `--parallel 4`\./);
+  assert.doesNotMatch(output, /\| parallel \|/, 'no per-row parallel column when the value is uniform');
+});
+
+test('renderResultsTables renders a per-row parallel column when concurrency differs, never dropping disclosure', async () => {
+  const output = await renderConcurrencyFixture([4, 8]);
+  assert.doesNotMatch(output, /Latency measured at/, 'no single blanket line when rows disagree');
+  assert.match(output, /\| provider failures \| parallel \| p50 \| p95 \|/, 'a parallel column is added');
+  assert.match(output, /\[`target-0`\].*\| 4 \| 100 ms \| 200 ms \|/);
+  assert.match(output, /\[`target-1`\].*\| 8 \| 101 ms \| 201 ms \|/);
+});
+
+test('renderResultsTables treats a missing run.scheduler.parallel as non-uniform and renders it as an em dash, not a dropped disclosure', async () => {
+  const output = await renderConcurrencyFixture([4, undefined]);
+  assert.doesNotMatch(output, /Latency measured at/, 'a missing value must not be silently treated as uniform');
+  assert.match(output, /\| provider failures \| parallel \| p50 \| p95 \|/);
+  assert.match(output, /\[`target-0`\].*\| 4 \| 100 ms \| 200 ms \|/);
+  assert.match(output, /\[`target-1`\].*\| — \| 101 ms \| 201 ms \|/);
+});
+
 async function withTempReadme(body, run) {
   const dir = await mkdtemp(path.join(tmpdir(), 'readme-tables-test-'));
   try {

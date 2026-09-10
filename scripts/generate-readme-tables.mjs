@@ -182,6 +182,17 @@ async function renderHeadlineTable({ suite, repoRoot, pointer }) {
     new Set(entries.flatMap(({ summary }) => Object.keys(summary.overall?.hit_at ?? {})))
   );
 
+  // A latency figure with no stated concurrency can't be compared to
+  // anything. When every headline row ran at the same `--parallel` value,
+  // say so once beneath the table (reads better, and is correct when it
+  // applies). Otherwise — including when a bundle's own
+  // `run.scheduler.parallel` is simply missing — concurrency becomes a
+  // per-row column instead of being silently dropped; disclosure never
+  // falls back to nothing.
+  const isUniformParallel =
+    entries.every(({ parallel }) => typeof parallel === 'number') &&
+    new Set(entries.map(({ parallel }) => parallel)).size === 1;
+
   const header = mdRow([
     'Target',
     'Rows',
@@ -190,6 +201,7 @@ async function renderHeadlineTable({ suite, repoRoot, pointer }) {
     'MRR',
     'wrong-name rate',
     'provider failures',
+    ...(isUniformParallel ? [] : ['parallel']),
     'p50',
     'p95'
   ]);
@@ -201,11 +213,12 @@ async function renderHeadlineTable({ suite, repoRoot, pointer }) {
     '---:',
     '---:',
     '---:',
+    ...(isUniformParallel ? [] : ['---:']),
     '---:',
     '---:'
   ]);
 
-  const rows = entries.map(({ targetId, target, rel, summary }) => {
+  const rows = entries.map(({ targetId, target, rel, summary, parallel }) => {
     const hitAt = summary.overall?.hit_at ?? {};
     const ci = summary.headline?.ci95;
     const ciText = Array.isArray(ci) ? `[${formatScore(ci[0])}, ${formatScore(ci[1])}]` : '—';
@@ -217,14 +230,15 @@ async function renderHeadlineTable({ suite, repoRoot, pointer }) {
       formatScore(summary.overall?.mrr),
       formatScore(summary.wrong_name?.rate),
       `${summary.providerFailures ?? '—'}/${summary.total ?? '—'}`,
+      ...(isUniformParallel ? [] : [typeof parallel === 'number' ? String(parallel) : '—']),
       formatMs(summary.latency_ms?.p50),
       formatMs(summary.latency_ms?.p95)
     ]);
   });
 
-  const parallels = new Set(entries.map(({ parallel }) => parallel).filter((p) => typeof p === 'number'));
-  const concurrencyLine =
-    parallels.size === 1 ? `\n\nLatency measured at \`--parallel ${[...parallels][0]}\`.` : '';
+  const concurrencyLine = isUniformParallel
+    ? `\n\nLatency measured at \`--parallel ${entries[0].parallel}\`.`
+    : '';
 
   return `${[header, align, ...rows].join('\n')}${concurrencyLine}`;
 }
