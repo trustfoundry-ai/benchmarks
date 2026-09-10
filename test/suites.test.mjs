@@ -7,8 +7,16 @@ import { test } from 'node:test';
 
 import { listSuites, parseTargetRef, resolveTarget } from '../src/core/suites.mjs';
 import { exists } from '../src/core/fs.mjs';
-import { getScorerAdapter } from '../src/core/registry.mjs';
-import { scorerAdapterId } from '../src/core/runner.mjs';
+import {
+  getBenchmarkAdapter,
+  getProviderAdapter,
+  getScorerAdapter
+} from '../src/core/registry.mjs';
+import {
+  benchmarkAdapterId,
+  providerAdapterId,
+  scorerAdapterId
+} from '../src/core/runner.mjs';
 
 // These tests build their own fixture manifests under a temp directory
 // rather than asserting against `suites/` in this repo: suite manifests
@@ -399,31 +407,41 @@ test('resolveTarget succeeds for every real target in every real suite', async (
   }
 });
 
-test('every real target resolves to a registered scorer adapter', async () => {
+test('every real target resolves to registered benchmark, provider and scorer adapters', async () => {
   // The test above proves a target's three config paths exist. It does not
-  // prove the runner can decide WHICH scorer adapter to run, because that id
-  // lives in the configs' contents rather than in their paths: `scorerAdapterId`
-  // reads the benchmark config's `scorer` first and the scorer config's `id`
-  // last, and there is no shipped default. A suite whose configs set neither
-  // therefore passes every path-level check and throws only once a run is
-  // already under way, after provider calls have been spent. Calling the
-  // runner's own resolver keeps this assertion from drifting away from that
-  // precedence, and looking the result up in the registry means a typo'd or
-  // unregistered id fails here too.
+  // prove the runner can decide WHICH adapters to run, because those ids live
+  // in the configs' contents rather than in their paths, and the framework
+  // ships no default for any of the three. A suite whose configs name one of
+  // them nowhere passes every path-level check and throws only once a run is
+  // already under way, after provider calls have been spent.
+  //
+  // All three kinds are checked together on purpose: they fail independently
+  // and in sequence, so covering one kind alone turns a single failure into
+  // several rounds of discovering the next one. Each id is resolved with the
+  // runner's own resolver, which keeps these assertions from drifting away
+  // from the real precedence, and then looked up in the registry, so a typo'd
+  // or unregistered id fails here too.
   const suites = await listSuites({ repoRoot });
+  const readConfig = async (rel) => JSON.parse(await readFile(path.join(repoRoot, rel), 'utf8'));
+
   for (const suite of suites) {
     for (const [targetId, target] of Object.entries(suite.targets)) {
-      const benchmarkConfig = JSON.parse(
-        await readFile(path.join(repoRoot, target.benchmark), 'utf8')
-      );
-      const scorerConfig = JSON.parse(
-        await readFile(path.join(repoRoot, target.scorer), 'utf8')
-      );
-      const id = scorerAdapterId(benchmarkConfig, scorerConfig);
-      assert.ok(
-        getScorerAdapter(id),
-        `${suite.id}/${targetId} names scorer '${id}', which is not registered`
-      );
+      const label = `${suite.id}/${targetId}`;
+      const benchmarkConfig = await readConfig(target.benchmark);
+      const providerConfig = await readConfig(target.provider);
+      const scorerConfig = await readConfig(target.scorer);
+
+      const kinds = [
+        ['benchmark', benchmarkAdapterId(benchmarkConfig), getBenchmarkAdapter],
+        ['provider', providerAdapterId(providerConfig), getProviderAdapter],
+        ['scorer', scorerAdapterId(benchmarkConfig, scorerConfig), getScorerAdapter]
+      ];
+      for (const [kind, id, lookup] of kinds) {
+        assert.ok(
+          lookup(id),
+          `${label} names ${kind} '${id}', which is not registered`
+        );
+      }
     }
   }
 });
