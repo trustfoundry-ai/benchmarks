@@ -439,18 +439,17 @@ test('every benchmark config is claimed by exactly one suite target', async () =
   }
 });
 
-test('every latest.json key is a target id declared by its suite', async () => {
-  const { readFile } = await import('node:fs/promises');
-  const path = await import('node:path');
+test("every latest.json key set exactly matches its suite's declared target ids", async () => {
   for (const suite of await listSuites({ repoRoot })) {
     const pointerPath = path.join(repoRoot, 'results', suite.id, 'latest.json');
     const pointer = JSON.parse(await readFile(pointerPath, 'utf8'));
-    for (const key of Object.keys(pointer.bundles)) {
-      assert.ok(
-        key in suite.targets,
-        `${suite.id}/latest.json key '${key}' is not a declared target`
-      );
-    }
+    const pointerKeys = Object.keys(pointer.bundles).sort();
+    const targetIds = Object.keys(suite.targets).sort();
+    assert.deepEqual(
+      pointerKeys,
+      targetIds,
+      `${suite.id}/latest.json keys ${JSON.stringify(pointerKeys)} must exactly match declared targets ${JSON.stringify(targetIds)}`
+    );
     for (const [key, rel] of Object.entries(pointer.bundles)) {
       assert.ok(
         rel.endsWith(`/${key}`),
