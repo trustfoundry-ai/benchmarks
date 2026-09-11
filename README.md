@@ -1,7 +1,7 @@
 # TrustFoundry Benchmarks
 
 > **Status: Under active development (pre-1.0).**
-> Latest release: **0.10.0** — see the [CHANGELOG](CHANGELOG.md) for what
+> Latest release: **0.11.0** — see the [CHANGELOG](CHANGELOG.md) for what
 > has landed since. This harness is being iterated on in the open.
 > Contracts, artifact schemas, and adapters may change between minor
 > versions until v1.0. Individual benchmark suites carry their own
@@ -24,8 +24,8 @@ The public benchmarks in this space measure adjacent capabilities. [LegalBench](
 <!-- BEGIN GENERATED: suite-status -->
 | Suite | Status | Targets | Published bundles |
 |---|---|---:|---|
-| [`trustfoundry-case-name-lookup`](suites/trustfoundry-case-name-lookup/README.md) | published | 3 | 2 bundles under [`results/trustfoundry-case-name-lookup/2026-09-09/`](results/trustfoundry-case-name-lookup/2026-09-09/) |
-| [`trustfoundry-legal-search`](suites/trustfoundry-legal-search/README.md) | published | 8 | 8 bundles under [`results/trustfoundry-legal-search/2026-07-05/`](results/trustfoundry-legal-search/2026-07-05/) |
+| [`trustfoundry-case-name-lookup`](suites/trustfoundry-case-name-lookup/README.md) | published | 3 | 3 bundles under [`results/trustfoundry-case-name-lookup/2026-09-10/`](results/trustfoundry-case-name-lookup/2026-09-10/) |
+| [`trustfoundry-legal-search`](suites/trustfoundry-legal-search/README.md) | published | 8 | 8 bundles under [`results/trustfoundry-legal-search/2026-09-11/`](results/trustfoundry-legal-search/2026-09-11/) |
 <!-- END GENERATED: suite-status -->
 
 Only suites with `status: published` in their manifest (`suites/<id>/suite.json`) are listed above; `experimental` and `deprecated` suites are left out until they're ready. "Targets" is the number of benchmark × provider × scorer combinations the suite declares; "Published bundles" is how many of them currently have a checked-in, checksummed result bundle under [`results/`](results/) that passes `pnpm verify:results`.
@@ -37,28 +37,29 @@ These are the latest canonical benchmark runs in this repository, one table per 
 <!-- BEGIN GENERATED: latest-benchmarks -->
 #### TrustFoundry Case-Name Lookup
 
-| Target | Rows | hit@1 | hit@3 | hit@5 | hit@10 | 95% CI | MRR | wrong-name rate | provider failures | p50 | p95 |
+| Target | Rows | hit@1 | hit@3 | hit@5 | hit@10 | hit@1 95% CI | MRR | wrong-name rate | provider failures | p50 | p95 |
 | --- | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: |
-| [`public-8850`](results/trustfoundry-case-name-lookup/2026-09-09/public-8850/) | 8850 | 0.9331 | 0.9544 | 0.9584 | 0.9584 | — | 0.9437 | 0.0943 | 0/8850 | 406 ms | 511 ms |
+| [`public-8850`](results/trustfoundry-case-name-lookup/2026-09-10/public-8850/) | 8850 | 0.9331 | 0.9544 | 0.9584 | 0.9584 | [0.9254, 0.9401] | 0.9437 | 0.0943 | 0/8850 | 349 ms | 483 ms |
 
 Latency measured at `--parallel 4`.
 
-- **Invariant population** [`negatives-50`](results/trustfoundry-case-name-lookup/2026-09-09/negatives-50/): false-positive rate 0.8400 (lower is better) — 8/50 correctly returned no match.
+- **Invariant population** [`negatives-50`](results/trustfoundry-case-name-lookup/2026-09-10/negatives-50/): false-positive rate 0.8400 (lower is better) — 8/50 correctly returned no match.
+- Smoke-tier companions (cheap, non-headline): [`public-1050`](results/trustfoundry-case-name-lookup/2026-09-10/public-1050/).
 
 See [`suites/trustfoundry-case-name-lookup/README.md`](suites/trustfoundry-case-name-lookup/README.md) for the per-category and per-axis breakdown.
 
 #### TrustFoundry Legal Search
 
-| Target | Rows | hit@1 | hit@5 | hit@10 | hit@25 | 95% CI | MRR | wrong-name rate | provider failures | p50 | p95 |
+| Target | Rows | hit@1 | hit@5 | hit@10 | hit@25 | hit@25 95% CI | MRR | wrong-name rate | provider failures | p50 | p95 |
 | --- | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: |
-| [`case-questions-5k`](results/trustfoundry-legal-search/2026-07-05/case-questions-5k/) | 5000 | 0.3868 | 0.5758 | 0.6390 | 0.7114 | — | 0.4723 | — | 0/5000 | 857 ms | 1248 ms |
-| [`key-facts-5k`](results/trustfoundry-legal-search/2026-07-05/key-facts-5k/) | 5000 | 0.8734 | 0.9610 | 0.9688 | 0.9766 | — | 0.9128 | — | 0/5000 | 1051 ms | 1798 ms |
-| [`laws-5k`](results/trustfoundry-legal-search/2026-07-05/laws-5k/) | 5000 | 0.6688 | 0.8696 | 0.8988 | 0.9176 | — | 0.7579 | — | 0/5000 | 729 ms | 1156 ms |
-| [`regs-5k`](results/trustfoundry-legal-search/2026-07-05/regs-5k/) | 5000 | 0.5820 | 0.8488 | 0.8830 | 0.9012 | — | 0.6961 | — | 0/5000 | 788 ms | 1148 ms |
+| [`case-questions-5k`](results/trustfoundry-legal-search/2026-09-11/case-questions-5k/) | 5000 | 0.3938 | 0.5830 | 0.6454 | 0.7134 | [0.7007, 0.7258] | 0.4789 | — | 0/5000 | 862 ms | 1248 ms |
+| [`key-facts-5k`](results/trustfoundry-legal-search/2026-09-11/key-facts-5k/) | 5000 | 0.8710 | 0.9600 | 0.9680 | 0.9760 | [0.9714, 0.9799] | 0.9112 | — | 0/5000 | 1079 ms | 1799 ms |
+| [`laws-5k`](results/trustfoundry-legal-search/2026-09-11/laws-5k/) | 5000 | 0.6682 | 0.8660 | 0.8958 | 0.9144 | [0.9063, 0.9218] | 0.7560 | — | 0/5000 | 803 ms | 1210 ms |
+| [`regs-5k`](results/trustfoundry-legal-search/2026-09-11/regs-5k/) | 5000 | 0.5764 | 0.8460 | 0.8794 | 0.8966 | [0.8879, 0.9047] | 0.6913 | — | 0/5000 | 816 ms | 1213 ms |
 
 Latency measured at `--parallel 4`.
 
-- Smoke-tier companions (cheap, non-headline): [`case-questions-200`](results/trustfoundry-legal-search/2026-07-05/case-questions-200/), [`key-facts-200`](results/trustfoundry-legal-search/2026-07-05/key-facts-200/), [`laws-200`](results/trustfoundry-legal-search/2026-07-05/laws-200/), [`regs-200`](results/trustfoundry-legal-search/2026-07-05/regs-200/).
+- Smoke-tier companions (cheap, non-headline): [`case-questions-200`](results/trustfoundry-legal-search/2026-09-11/case-questions-200/), [`key-facts-200`](results/trustfoundry-legal-search/2026-09-11/key-facts-200/), [`laws-200`](results/trustfoundry-legal-search/2026-09-11/laws-200/), [`regs-200`](results/trustfoundry-legal-search/2026-09-11/regs-200/).
 
 See [`suites/trustfoundry-legal-search/README.md`](suites/trustfoundry-legal-search/README.md) for the per-category and per-axis breakdown.
 <!-- END GENERATED: latest-benchmarks -->

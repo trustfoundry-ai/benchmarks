@@ -2,10 +2,15 @@
 
 All notable, publication-relevant changes to the benchmarks harness and datasets are recorded here. Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) style.
 
-## [Unreleased]
+## [0.11.0] - 2026-09-11
 
-Ships the `trustfoundry-case-name-lookup` suite — measuring whether a search backend surfaces
-a case when the user knows its name but not its citation.
+Ships the `trustfoundry-case-name-lookup` suite — measuring whether a search backend
+surfaces a case when the user knows its name but not its citation — on top of a
+harness-hardening pass: a declarative suite registry behind `--target`, one metric
+vocabulary across both suites, gzipped raw evidence reachable by URL, and CI gates that
+bind every published bundle to a harness commit a reader can check out. Both suites were
+re-run for this release, so every bundle under `results/` was produced by code this tag
+contains.
 
 ### Added
 
@@ -15,17 +20,52 @@ a case when the user knows its name but not its citation.
   query is a bare party fragment), not a citation match — case names are the thing
   users type, so gold is the caption itself. Suite docs at
   [`suites/trustfoundry-case-name-lookup/README.md`](suites/trustfoundry-case-name-lookup/README.md).
-- **Two datasets.** An 8,850-row public set — 15 categories × 295 cases, each case
-  queried once under a perturbed caption and once under its own unperturbed control,
-  so a category's score is read against its own baseline rather than a global one —
-  and a 50-row fabricated-name negatives set whose correct answer is an empty page.
-- **First published `trustfoundry-case-name-lookup` result bundles**, under
-  [`results/trustfoundry-case-name-lookup/2026-09-09/`](results/trustfoundry-case-name-lookup/2026-09-09/)
-  (`public-8850` and `negatives-50`), plus
-  [`results/trustfoundry-case-name-lookup/latest.json`](results/trustfoundry-case-name-lookup/latest.json)
-  pointing at both. See the suite README's
-  [Published numbers](suites/trustfoundry-case-name-lookup/README.md#published-numbers)
-  section for the headline, per-category, and negatives figures.
+- **Three case-name targets over two datasets.** An 8,850-row public set — 15 categories × 295
+  cases, each case queried once under a perturbed caption and once under its own unperturbed
+  control, so a category's score is read against its own baseline rather than a global one —
+  a strided 1,050-row subset of it (`public-1050`) for smoke runs and cheap external
+  verification, and a 50-row fabricated-name negatives set whose correct answer is an empty page.
+- **Suite registry.** `suites/<id>/suite.json` declares a suite's targets: each names its
+  benchmark, provider, and scorer config, its row count, its tier, and whether it carries the
+  headline. `src/core/suites.mjs` loads and validates them against
+  [`src/core/contracts/suite-manifest.schema.json`](src/core/contracts/suite-manifest.schema.json).
+  The CLI takes `--target <suite>/<target>` and the container reads the same identifier from
+  `BENCHMARK_CONFIG`, so one string names the config triple, the run, the bundle directory, and
+  the `latest.json` key. New `resolve-target` and `targets` commands print what a target
+  resolves to, and a config under `configs/` that no target references fails the suite tests.
+  Walkthrough in [`docs/adding-a-suite.md`](docs/adding-a-suite.md).
+- **Raw evidence reachable by URL.** A bundle manifest may carry `artifacts.raw.href`;
+  verification uses the bundle's local raw copy when it has one and otherwise streams the href,
+  so evidence stays checkable without every clone carrying every row. `publish-result` accepts
+  `--raw-href URL` to record it at publish time, and `scripts/upload-raw-assets.mjs` uploads each
+  bundle's raw file to a release under a name derived from its bundle path.
+- **Bundle provenance gate.** `scripts/check-bundle-provenance.mjs` requires every published
+  bundle's pinned harness commit to be an ancestor of the base branch, and the working tree to
+  have been clean when it ran. A commit reachable only from a pull-request ref, or rewritten by a
+  force-push, is one a reader following the README cannot check out — so it cannot be published.
+- **`harness.dirty` in the run manifest.** A run from a modified working tree records a commit
+  that does not describe the code that ran; the manifest now says so, and the provenance gate
+  reads it. `manifest.mjs` takes both the revision and the dirty flag from `src/core/git.mjs`
+  rather than carrying its own git helper.
+- **Macro headline with a Wilson interval for `trustfoundry-legal-search`.** The suite reports a
+  macro-averaged headline alongside the pooled figure, with a Wilson score interval, so a
+  headline states its own precision. `wilsonInterval` is shared from `src/core/stats.mjs`.
+- **Smoke baseline check.** `scripts/check-smoke-baseline.mjs` compares a `public-1050` run
+  against a committed per-row baseline, so a corpus or index move surfaces as named rows that
+  changed verdict rather than as an aggregate that drifted.
+- **Generated README tables.** `scripts/generate-readme-tables.mjs` builds the suite and results
+  tables from the registry and the published pointers, so the README cannot describe a target or
+  a bundle that does not exist.
+- **Reproduction docs.** [`docs/reproducing.md`](docs/reproducing.md) is the recipe for re-running
+  a published bundle from a clone, and [`docs/reproducibility.md`](docs/reproducibility.md)
+  documents the two-PR publication workflow — a bundle pins the commit that produced it, which
+  is not the commit that publishes it.
+- **Published result bundles for both suites.**
+  [`results/trustfoundry-case-name-lookup/2026-09-10/`](results/trustfoundry-case-name-lookup/2026-09-10/)
+  (`public-8850`, `public-1050`, `negatives-50`) and
+  [`results/trustfoundry-legal-search/2026-09-11/`](results/trustfoundry-legal-search/2026-09-11/)
+  (all eight targets), with each suite's `latest.json` pointing at them. See the suite READMEs'
+  published-numbers sections for the headline, per-category, and negatives figures.
 
 ### Changed
 
@@ -58,6 +98,25 @@ a case when the user knows its name but not its citation.
   Anyone holding a bookmarked bundle path built from the previous two-segment
   layout will need to update it to the flat `<target>` leaf.
 
+- **Published raw evidence is always gzipped.** A bundle ships `raw.jsonl.gz` whatever its row
+  count, so a reader writes one command for every bundle instead of one per size.
+
+- **One metric vocabulary across both suites.** Both scorers report the same summary keys for the
+  same quantities, so a summary can be read — and compared — without first learning which suite
+  produced it.
+
+- **Version numbers are bound together.** A test asserts that `CITATION.cff`, the README status
+  block, and the newest released `CHANGELOG` heading name one version, that `CITATION.cff`'s
+  `date-released` matches that heading's date, and that `package.json` is at or ahead of it.
+
+### Removed
+
+- **Superseded result bundles.** The `trustfoundry-legal-search` bundles dated `2026-07-05`
+  and the `trustfoundry-case-name-lookup` bundles dated `2026-09-09` are replaced by the
+  bundles this release publishes, and are no longer checked in. `results/` holds the current
+  canonical bundle for each target and `latest.json` points at it; earlier bundles remain
+  in this repository's history at the tags that shipped them.
+
 ### Fixed
 
 - **Documentation links now resolve.** `docs/adapter-contracts.md` pointed both of
@@ -66,6 +125,13 @@ a case when the user knows its name but not its citation.
   instead. The README's status block named a release four versions behind. A test
   (`test/doc-links.test.mjs`) now resolves every relative link in every markdown
   file, so a link to a path this repository does not contain fails CI.
+
+- **`trustfoundry-legal-search` configs declare their adapter ids.** The harness ships no default
+  for any of the three adapter kinds, and the suite's scorer and provider configs named none, so
+  running one of its targets — including by the documented reproduction recipe, which passes
+  config paths and no ids — failed at resolution. Both configs now declare an id, matching what
+  `trustfoundry-case-name-lookup` already did, and a test resolves all three kinds for every
+  registered target and looks each one up in the registry.
 
 ## [0.10.0] - 2026-07-08
 

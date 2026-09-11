@@ -24,9 +24,9 @@ pnpm benchmark run \
 ```bash
 pnpm benchmark publish-result \
   --run runs/trustfoundry-legal-search-case-questions-200 \
-  --out results/trustfoundry-legal-search/2026-07-05/case-questions-200 \
+  --out results/trustfoundry-legal-search/2026-09-11/case-questions-200 \
   --force
-pnpm benchmark verify-result results/trustfoundry-legal-search/2026-07-05/case-questions-200
+pnpm benchmark verify-result results/trustfoundry-legal-search/2026-09-11/case-questions-200
 ```
 
 ## Interpretation
