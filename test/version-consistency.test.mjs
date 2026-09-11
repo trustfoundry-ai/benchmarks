@@ -6,15 +6,6 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-function compareSemver(a, b) {
-  const pa = a.split('.').map(Number);
-  const pb = b.split('.').map(Number);
-  for (let i = 0; i < 3; i += 1) {
-    if ((pa[i] ?? 0) !== (pb[i] ?? 0)) return (pa[i] ?? 0) - (pb[i] ?? 0);
-  }
-  return 0;
-}
-
 test('CITATION.cff, README, and CHANGELOG name the same released version', async () => {
   const changelog = await readFile(path.join(root, 'CHANGELOG.md'), 'utf8');
   const released = changelog.match(/^## \[(\d+\.\d+\.\d+)\]/m)?.[1];
@@ -33,12 +24,14 @@ test('CITATION.cff, README, and CHANGELOG name the same released version', async
   assert.equal(readmeVersion, released, 'README status block must name the newest released version');
 });
 
-test('package.json version is at or ahead of the newest released version', async () => {
+// package.json is what `pnpm pack` names the release tarball after, what an
+// install from the tag self-reports, and what every run manifest records as
+// `harness.version`. A version that runs ahead of the newest release puts a
+// number on all three that was never released, so the two must be equal and
+// the bump belongs in the release change itself.
+test('package.json version is the newest released version', async () => {
   const changelog = await readFile(path.join(root, 'CHANGELOG.md'), 'utf8');
   const released = changelog.match(/^## \[(\d+\.\d+\.\d+)\]/m)[1];
   const pkg = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
-  assert.ok(
-    compareSemver(pkg.version, released) >= 0,
-    `package.json ${pkg.version} is behind released ${released}`
-  );
+  assert.equal(pkg.version, released, 'package.json must name the newest released version');
 });

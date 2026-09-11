@@ -2,6 +2,17 @@
 
 All notable, publication-relevant changes to the benchmarks harness and datasets are recorded here. Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) style.
 
+## [Unreleased]
+
+### Fixed
+
+- **`package.json` names the released version.** It had been kept one minor ahead of
+  the newest release, which is the number `pnpm pack` writes into the release tarball's
+  filename, the number an install from the tag self-reports, and the number every run
+  manifest records as `harness.version` — none of which had ever been released. The
+  version now equals the newest released version, and the bump belongs in the change
+  that cuts the release.
+
 ## [0.11.0] - 2026-09-11
 
 Ships the `trustfoundry-case-name-lookup` suite — measuring whether a search backend
