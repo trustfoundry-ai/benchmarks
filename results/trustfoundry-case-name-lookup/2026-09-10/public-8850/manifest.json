@@ -1,0 +1,38 @@
+{
+  "artifacts": {
+    "raw": {
+      "href": "https://github.com/trustfoundry-ai/benchmarks/releases/download/v0.11.0/trustfoundry-case-name-lookup__2026-09-10__public-8850__raw.jsonl.gz",
+      "path": "raw.jsonl.gz",
+      "rows": 8850,
+      "sha256": "995959396a3a110d06db1c47107e6771ea6952a233677c1bc8c0f45ac4c7688b"
+    },
+    "result": {
+      "path": "result.json",
+      "sha256": "a3ae1848b42615e7f28c5ad437d468fe8b6bc007cb1bcb64f29495f47309aec4"
+    }
+  },
+  "generated_at": "2026-09-11T02:04:29.970Z",
+  "schema_version": "trustfoundry.benchmarks.result-manifest.v1",
+  "source_run_id": "trustfoundry-case-name-lookup-case_name-20260910T203503Z",
+  "status": "self-reported",
+  "verification_inputs": {
+    "benchmark_config": {
+      "path": "configs/benchmarks/trustfoundry-case-name-lookup/v2-public.json",
+      "sha256": "6d70bf3ccd6d6fe9264c7f03ace5bd849c36ae4bd46ea2b873ffef6cf270d8ac"
+    },
+    "data_files": [
+      {
+        "path": "data/trustfoundry-case-name-lookup/v2-public.jsonl",
+        "sha256": "4d306a6eedc3e1b9fcad0ffc7c9a79b492303f5cf69c38d975eabfcdf4d22014"
+      }
+    ],
+    "provider_config": {
+      "path": "configs/providers/trustfoundry-case-name-lookup.json",
+      "sha256": "169d7890a1921fd8baf7c3e86bd506bfa4a6aa0ff0a163302628e6e4ffed4fdc"
+    },
+    "scorer_config": {
+      "path": "configs/scorers/trustfoundry-case-name-lookup.json",
+      "sha256": "080f4b468e7cfe4aa46d1e43f9df07de0aac9bfc49a57c130282591bf478e195"
+    }
+  }
+}
