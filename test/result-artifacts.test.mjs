@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFile } from 'node:child_process';
 import { mkdtemp, readFile, unlink, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -19,6 +20,7 @@ import { trustfoundryLegalSearchScorerAdapter } from '../src/adapters/scorers/tr
 import { defaultRegistry } from '../src/core/registry.mjs';
 
 const gunzipAsync = promisify(gunzip);
+const execFileAsync = promisify(execFile);
 
 // A minimal scorer that deliberately omits one scored case's caseScore, to
 // exercise publishResultBundle's guard against publishing a raw row with no
@@ -540,4 +542,61 @@ test('reconstructPairFromRawRow accepts both raw-row score shapes without throwi
   assert.equal(oldPair.providerResult.status, 'completed');
   assert.equal(newPair.providerResult.status, 'completed');
   assert.deepEqual(oldPair.providerResult, newPair.providerResult);
+});
+
+// ---- CLI surface for `--raw-href` ----
+//
+// `publishResultBundle` accepts `rawHref` and writes it into the manifest
+// before checksums are computed, so a bundle published with the flag is
+// final as written: the href needs no later rewrite of a tracked file.
+
+test('publish-result --raw-href records the href and checksums the manifest as written', async () => {
+  const repoRoot = process.cwd();
+  const root = await mkdtemp(path.join(os.tmpdir(), 'tf-benchmarks-raw-href-'));
+  const runDir = await makeRun(repoRoot, root);
+  const outDir = path.join(root, 'bundle');
+  const href = 'https://github.com/owner/name/releases/download/v9.9.9/suite__date__target__raw.jsonl.gz';
+
+  await execFileAsync('node', [
+    'bin/benchmarks.mjs',
+    'publish-result',
+    '--run',
+    runDir,
+    '--out',
+    outDir,
+    '--raw-href',
+    href
+  ]);
+
+  const manifestPath = path.join(outDir, 'manifest.json');
+  const manifest = await readJson(manifestPath);
+  assert.equal(manifest.artifacts.raw.href, href);
+
+  const checksums = await readFile(path.join(outDir, 'checksums.txt'), 'utf8');
+  const manifestLine = checksums
+    .split('\n')
+    .find((line) => line.endsWith('  manifest.json'));
+  assert.ok(manifestLine, 'checksums.txt has no manifest.json line');
+  assert.equal(manifestLine.split('  ')[0], await sha256File(manifestPath));
+});
+
+test('publish-result --raw-href with no value exits non-zero', async () => {
+  const repoRoot = process.cwd();
+  const root = await mkdtemp(path.join(os.tmpdir(), 'tf-benchmarks-raw-href-empty-'));
+  const runDir = await makeRun(repoRoot, root);
+  const outDir = path.join(root, 'bundle');
+
+  await assert.rejects(
+    () =>
+      execFileAsync('node', [
+        'bin/benchmarks.mjs',
+        'publish-result',
+        '--run',
+        runDir,
+        '--out',
+        outDir,
+        '--raw-href'
+      ]),
+    /--raw-href requires a URL/
+  );
 });

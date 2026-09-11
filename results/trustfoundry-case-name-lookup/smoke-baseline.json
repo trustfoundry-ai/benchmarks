@@ -1,0 +1,6305 @@
+{
+  "rows": {
+    "case-name-v2-public-00000": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00000-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00008": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00008-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00016": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00016-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00024": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00024-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00032": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00032-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00040": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00040-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00048": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00048-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00056": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00056-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00064": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00064-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00072": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00072-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00080": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00080-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00088": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00088-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00096": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00096-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00104": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00104-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00112": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00112-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00120": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00120-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00128": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00128-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00136": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00136-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00144": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00144-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00152": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00152-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00160": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00160-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00168": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": false,
+      "rank": 2
+    },
+    "case-name-v2-public-00168-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": false,
+      "rank": 2
+    },
+    "case-name-v2-public-00176": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00176-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00184": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00184-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00192": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00192-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00200": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00200-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00208": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00208-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00216": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00216-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00224": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00224-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00232": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00232-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00240": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00240-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00248": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00248-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00256": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00256-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00264": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00264-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00272": {
+      "arm": "perturbed",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00272-control": {
+      "arm": "control",
+      "category": "abbreviation_contract",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00295": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00295-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00303": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00303-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00311": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00311-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00319": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00319-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00327": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00327-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00335": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00335-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00343": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00343-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00351": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00351-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00359": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00359-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00367": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00367-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00375": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00375-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00383": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00383-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00391": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00391-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00399": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00399-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00407": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00407-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00415": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00415-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00423": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00423-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00431": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00431-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00439": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00439-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00447": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00447-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00455": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00455-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00463": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00463-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00471": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00471-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00479": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00479-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00487": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00487-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00495": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00495-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00503": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00503-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00511": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00511-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00519": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00519-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00527": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00527-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00535": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00535-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00543": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00543-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00551": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-00551-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-00559": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00559-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00567": {
+      "arm": "perturbed",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00567-control": {
+      "arm": "control",
+      "category": "amp_and_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00590": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00590-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00598": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00598-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00606": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00606-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00614": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00614-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00622": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00622-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00630": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00630-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00638": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00638-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00646": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00646-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00654": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": false,
+      "rank": 2
+    },
+    "case-name-v2-public-00654-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": false,
+      "rank": 2
+    },
+    "case-name-v2-public-00662": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00662-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00670": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00670-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00678": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00678-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00686": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00686-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00694": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00694-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00702": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00702-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00710": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00710-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00718": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00718-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00726": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00726-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00734": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00734-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00742": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00742-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00750": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00750-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00758": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00758-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00766": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00766-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00774": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00774-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00782": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00782-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00790": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00790-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00798": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00798-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00806": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00806-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00814": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00814-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00822": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00822-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00830": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00830-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00838": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00838-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00846": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00846-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00854": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00854-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00862": {
+      "arm": "perturbed",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00862-control": {
+      "arm": "control",
+      "category": "ampersand_elide",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00885": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00885-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00893": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00893-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00901": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00901-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00909": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00909-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00917": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00917-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00925": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00925-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00933": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00933-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00941": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00941-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00949": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00949-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00957": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00957-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00965": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00965-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00973": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00973-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00981": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00981-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00989": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00989-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00997": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-00997-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01005": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01005-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01013": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01013-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01021": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01021-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01029": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01029-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01037": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01037-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01045": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-01045-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-01053": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01053-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01061": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01061-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01069": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01069-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01077": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01077-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01085": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01085-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01093": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01093-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01101": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01101-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01109": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01109-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01117": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01117-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01125": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01125-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01133": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01133-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01141": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01141-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01149": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01149-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01157": {
+      "arm": "perturbed",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01157-control": {
+      "arm": "control",
+      "category": "case_toggle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01475": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01475-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01483": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01483-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01491": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01491-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01499": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01499-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01507": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01507-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01515": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01515-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01523": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01523-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01531": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01531-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01539": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01539-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01547": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01547-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01555": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01555-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01563": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01563-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01571": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01571-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01579": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01579-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01587": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01587-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01595": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01595-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01603": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01603-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01611": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01611-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01619": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01619-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01627": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01627-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01635": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01635-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01643": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01643-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01651": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01651-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01659": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01659-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01667": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01667-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01675": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01675-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01683": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01683-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01691": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01691-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01699": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01699-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01707": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01707-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01715": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01715-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01723": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01723-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01731": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01731-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01739": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01739-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01747": {
+      "arm": "perturbed",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01747-control": {
+      "arm": "control",
+      "category": "corporate_suffix_drop",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01770": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01770-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01778": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": false,
+      "rank": 3
+    },
+    "case-name-v2-public-01778-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": false,
+      "rank": 3
+    },
+    "case-name-v2-public-01786": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01786-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01794": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01794-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01802": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01802-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01810": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01810-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01818": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01818-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01826": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": false,
+      "rank": 2
+    },
+    "case-name-v2-public-01826-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": false,
+      "rank": 2
+    },
+    "case-name-v2-public-01834": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01834-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01842": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": false,
+      "rank": 3
+    },
+    "case-name-v2-public-01842-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": false,
+      "rank": 3
+    },
+    "case-name-v2-public-01850": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01850-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01858": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01858-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01866": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01866-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01874": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01874-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01882": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01882-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01890": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01890-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01898": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01898-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01906": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01906-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01914": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01914-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01922": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01922-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01930": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01930-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01938": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01938-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01946": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01946-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01954": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01954-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01962": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01962-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01970": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01970-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01978": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01978-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01986": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01986-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01994": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-01994-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02002": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02002-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02010": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02010-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02018": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02018-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02026": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02026-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02034": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02034-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02042": {
+      "arm": "perturbed",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02042-control": {
+      "arm": "control",
+      "category": "country_form",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02065": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02065-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02073": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02073-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02081": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02081-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02089": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02089-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02097": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02097-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02105": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02105-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02113": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02113-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02121": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02121-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02129": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02129-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02137": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02137-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02145": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02145-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02153": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02153-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02161": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02161-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02169": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02169-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02177": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02177-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02185": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02185-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02193": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02193-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02201": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02201-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02209": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02209-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02217": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02217-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02225": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02225-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02233": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02233-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02241": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-02241-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-02249": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02249-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02257": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02257-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02265": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02265-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02273": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02273-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02281": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02281-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02289": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02289-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02297": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02297-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02305": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02305-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02313": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02313-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02321": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02321-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02329": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02329-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02337": {
+      "arm": "perturbed",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02337-control": {
+      "arm": "control",
+      "category": "diacritic_inject",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02360": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02360-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02368": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02368-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02376": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02376-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02384": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02384-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02392": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02392-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02400": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02400-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02408": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02408-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02416": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02416-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02424": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-02424-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-02432": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02432-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02440": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02440-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02448": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02448-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02456": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02456-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02464": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02464-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02472": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02472-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02480": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02480-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02488": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02488-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02496": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02496-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02504": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02504-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02512": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02512-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02520": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02520-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02528": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02528-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02536": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02536-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02544": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02544-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02552": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02552-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02560": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02560-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02568": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02568-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02576": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02576-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02584": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02584-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02592": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02592-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02600": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02600-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02608": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02608-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02616": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02616-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02624": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02624-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02632": {
+      "arm": "perturbed",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02632-control": {
+      "arm": "control",
+      "category": "diacritic_strip",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02655": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02655-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02663": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02663-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02671": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02671-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02679": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02679-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02687": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02687-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02695": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02695-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02703": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02703-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02711": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02711-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02719": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02719-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02727": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02727-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02735": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02735-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02743": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02743-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02751": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02751-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02759": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02759-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02767": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02767-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02775": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02775-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02783": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02783-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02791": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02791-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02799": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02799-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02807": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02807-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02815": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02815-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02823": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02823-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02831": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02831-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02839": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02839-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02847": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02847-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02855": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02855-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02863": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02863-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02871": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02871-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02879": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02879-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02887": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02887-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02895": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02895-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02903": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02903-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02911": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02911-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02919": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02919-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02927": {
+      "arm": "perturbed",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02927-control": {
+      "arm": "control",
+      "category": "initial_spacing",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02950": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-02950-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02958": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02958-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02966": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02966-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02974": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02974-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02982": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02982-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02990": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02990-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02998": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-02998-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03006": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-03006-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03014": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03014-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03022": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03022-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03030": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-03030-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03038": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03038-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03046": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03046-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03054": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03054-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03062": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03062-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03070": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03070-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03078": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03078-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03086": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03086-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03094": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03094-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03102": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03102-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03110": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03110-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03118": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03118-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03126": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03126-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03134": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03134-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03142": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-03142-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03150": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03150-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03158": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-03158-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03166": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-03166-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03174": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03174-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03182": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03182-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03190": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03190-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03198": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03198-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03206": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03206-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03214": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03214-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03222": {
+      "arm": "perturbed",
+      "category": "party_misspell",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-03222-control": {
+      "arm": "control",
+      "category": "party_misspell",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03245": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-03245-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03253": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03253-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03261": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03261-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03269": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03269-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03277": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03277-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03285": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03285-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03293": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03293-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03301": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03301-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03309": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03309-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03317": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03317-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03325": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03325-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03333": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03333-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03341": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03341-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03349": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03349-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03357": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03357-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03365": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03365-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03373": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03373-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03381": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03381-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03389": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03389-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03397": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03397-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03405": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03405-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03413": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03413-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03421": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03421-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03429": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03429-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03437": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03437-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03445": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03445-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03453": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03453-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03461": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03461-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03469": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03469-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03477": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03477-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03485": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03485-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03493": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03493-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03501": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03501-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03509": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": false,
+      "rank": 3
+    },
+    "case-name-v2-public-03509-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03517": {
+      "arm": "perturbed",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03517-control": {
+      "arm": "control",
+      "category": "party_order_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03540": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03540-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03548": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03548-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03556": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03556-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03564": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03564-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03572": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-03572-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03580": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03580-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03588": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03588-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03596": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": false,
+      "rank": 2
+    },
+    "case-name-v2-public-03596-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03604": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03604-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03612": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": false,
+      "rank": 2
+    },
+    "case-name-v2-public-03612-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03620": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03620-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03628": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03628-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03636": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03636-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03644": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03644-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03652": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03652-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03660": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03660-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03668": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03668-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03676": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03676-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03684": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": false,
+      "rank": 3
+    },
+    "case-name-v2-public-03684-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03692": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03692-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03700": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03700-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03708": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03708-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03716": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03716-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03724": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03724-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03732": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03732-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03740": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03740-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03748": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-03748-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03756": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": false,
+      "rank": 2
+    },
+    "case-name-v2-public-03756-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03764": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03764-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03772": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03772-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03780": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03780-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03788": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03788-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03796": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03796-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03804": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03804-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03812": {
+      "arm": "perturbed",
+      "category": "party_truncate",
+      "hit": false,
+      "rank": 2
+    },
+    "case-name-v2-public-03812-control": {
+      "arm": "control",
+      "category": "party_truncate",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03835": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03835-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03843": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03843-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03851": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03851-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03859": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03859-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03867": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03867-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03875": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03875-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03883": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03883-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03891": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03891-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03899": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03899-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03907": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03907-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03915": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03915-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03923": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03923-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03931": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03931-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03939": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03939-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03947": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03947-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03955": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03955-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03963": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03963-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03971": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03971-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03979": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03979-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03987": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03987-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03995": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-03995-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04003": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04003-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04011": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04011-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04019": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04019-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04027": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04027-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04035": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04035-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04043": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04043-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04051": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-04051-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04059": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04059-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04067": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04067-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04075": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04075-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04083": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04083-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04091": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04091-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04099": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04099-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04107": {
+      "arm": "perturbed",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04107-control": {
+      "arm": "control",
+      "category": "separator_swap",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04130": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04130-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04138": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": false,
+      "rank": 5
+    },
+    "case-name-v2-public-04138-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04146": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04146-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04154": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04154-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04162": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04162-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04170": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": false,
+      "rank": 2
+    },
+    "case-name-v2-public-04170-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04178": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": false,
+      "rank": 2
+    },
+    "case-name-v2-public-04178-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04186": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04186-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04194": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04194-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04202": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": false,
+      "rank": 4
+    },
+    "case-name-v2-public-04202-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04210": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-04210-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04218": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04218-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04226": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04226-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04234": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04234-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04242": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04242-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04250": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": false,
+      "rank": 2
+    },
+    "case-name-v2-public-04250-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04258": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04258-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04266": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04266-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04274": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04274-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04282": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04282-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04290": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04290-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04298": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-04298-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04306": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04306-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04314": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-04314-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04322": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04322-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04330": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04330-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04338": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": false,
+      "rank": 3
+    },
+    "case-name-v2-public-04338-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04346": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04346-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04354": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04354-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04362": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04362-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04370": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04370-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04378": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-04378-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04386": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04386-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04394": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04394-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04402": {
+      "arm": "perturbed",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04402-control": {
+      "arm": "control",
+      "category": "single_party_search",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04425": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04425-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04433": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04433-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04441": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04441-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04449": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04449-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04457": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04457-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04465": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04465-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04473": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04473-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04481": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04481-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04489": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04489-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04497": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04497-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04505": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04505-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04513": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04513-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04521": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04521-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04529": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04529-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04537": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04537-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04545": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04545-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04553": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04553-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04561": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04561-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04569": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04569-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04577": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-04577-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": false,
+      "rank": null
+    },
+    "case-name-v2-public-04585": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04585-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04593": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04593-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04601": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04601-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04609": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04609-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04617": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04617-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04625": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04625-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04633": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04633-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04641": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04641-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04649": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04649-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04657": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04657-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04665": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04665-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04673": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04673-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04681": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04681-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04689": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04689-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04697": {
+      "arm": "perturbed",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    },
+    "case-name-v2-public-04697-control": {
+      "arm": "control",
+      "category": "whitespace_mangle",
+      "hit": true,
+      "rank": 1
+    }
+  },
+  "target": "trustfoundry-case-name-lookup/public-1050"
+}

@@ -34,7 +34,7 @@ Commands:
       [--shard-index N] [--shard-count N] [--retries N]
       [--resume | --force]
   score --run DIR [--scorer ID] [--scorer-config PATH]
-  publish-result --run DIR --out DIR [--force]
+  publish-result --run DIR --out DIR [--raw-href URL] [--force]
   verify-result DIR
   merge-runs --runs DIR[,DIR,...] --out DIR [--prefer POLICY] [--force]
   retry-failed --run DIR --out DIR [--parallel N] [--retries N] [--force]
@@ -258,11 +258,16 @@ async function scoreCommand(options) {
 async function publishResultCommand(options) {
   if (!options.run || options.run === true) throw new Error('publish-result requires --run DIR');
   if (!options.out || options.out === true) throw new Error('publish-result requires --out DIR');
+  // A flag passed with no value parses as `true`. Reject that rather than
+  // publishing a bundle whose manifest records no href -- an omission
+  // verification only surfaces once the local raw copy is gone.
+  if (options['raw-href'] === true) throw new Error('publish-result --raw-href requires a URL');
   const result = await publishResultBundle({
     repoRoot: repoRoot(),
     runDir: options.run,
     outDir: options.out,
-    force: Boolean(options.force)
+    force: Boolean(options.force),
+    rawHref: stringOption(options['raw-href']) ?? null
   });
   console.log(`published: ${path.relative(repoRoot(), result.outDir)}`);
 }

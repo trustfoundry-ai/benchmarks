@@ -1,0 +1,38 @@
+{
+  "artifacts": {
+    "raw": {
+      "href": "https://github.com/trustfoundry-ai/benchmarks/releases/download/evidence-2026-09-11/trustfoundry-legal-search__2026-09-11__regs-5k__raw.jsonl.gz",
+      "path": "raw.jsonl.gz",
+      "rows": 5000,
+      "sha256": "199f7fb9e09f320ae3707e44e963f390088d0a2fc9bb2ffb4a4cab546f63dbf4"
+    },
+    "result": {
+      "path": "result.json",
+      "sha256": "628398808c6b7c513db087590a8d268c5bbddf5b922ca7213cc37b0624e984b6"
+    }
+  },
+  "generated_at": "2026-09-11T02:04:57.724Z",
+  "schema_version": "trustfoundry.benchmarks.result-manifest.v1",
+  "source_run_id": "trustfoundry-legal-search-per-row-20260911T013021Z",
+  "status": "self-reported",
+  "verification_inputs": {
+    "benchmark_config": {
+      "path": "configs/benchmarks/trustfoundry-legal-search/regs-5k.json",
+      "sha256": "0b69cb71097d03fb940a8cd53bbf746c8d0208bc842b57859913941aa87134ea"
+    },
+    "data_files": [
+      {
+        "path": "data/trustfoundry-legal-search/regs.jsonl",
+        "sha256": "416c20e890d36afbbff2134295c67128991a2e398331c5cc7a6d2baec7be7498"
+      }
+    ],
+    "provider_config": {
+      "path": "configs/providers/trustfoundry-legal-search.json",
+      "sha256": "ca8c0acc156b4b3fa60577bfa2ddc4da9ced80b859d5058a324f879f4f82bee1"
+    },
+    "scorer_config": {
+      "path": "configs/scorers/trustfoundry-legal-search.json",
+      "sha256": "2cf0c0ee076a89d55057fca2d8cc420be1335b7bbcff3a43e58c2587c3038388"
+    }
+  }
+}

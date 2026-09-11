@@ -80,8 +80,8 @@ async function runCli(args) {
   return result;
 }
 
-const REGS_200 = path.join(repoRoot, 'results/trustfoundry-legal-search/2026-07-05/regs-200');
-const LAWS_200 = path.join(repoRoot, 'results/trustfoundry-legal-search/2026-07-05/laws-200');
+const REGS_200 = path.join(repoRoot, 'results/trustfoundry-legal-search/2026-09-11/regs-200');
+const LAWS_200 = path.join(repoRoot, 'results/trustfoundry-legal-search/2026-09-11/laws-200');
 
 test('comparable on two identical published bundles exits 0 and confirms on stdout', async () => {
   const { stdout, stderr, exitCode } = await runCli(['comparable', REGS_200, REGS_200]);

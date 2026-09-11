@@ -159,7 +159,7 @@ from the headline by construction.
 
 `public-1050` runs 15 categories × 35 pairs × 2 arms from the same dataset as
 `public-8850`, selected by walking each category's 295 pairs with a stride of 8.
-It takes about 105 seconds at `--parallel 4`; with the 50-row negatives arm, a
+It runs in 96.5 seconds at `--parallel 4`; with the 50-row negatives arm, a
 complete smoke is under two minutes.
 
 Both numbers are published with their intervals, so you can run the cheap tier,
@@ -197,7 +197,7 @@ verifiable with `pnpm benchmark verify-result <bundle>`.
 | `wrong_name` rate (headline population) | 0.0943 — share of returned *results*, pooled across the 4,423 of 4,425 rows the metric applies to; 2 rows excluded because every query token is on the stoplist |
 | Rows | 8,850 (4,425 pairs — one perturbed row and one control row per case — across 15 categories × 295 pairs) |
 | `providerFailures` | 0 |
-| Latency | p50 406 ms, p95 511 ms, mean 429 ms — measured at 4 concurrent requests (`--parallel 4`), 8,850 requests, 1019 s elapsed, 8.68 rows/s |
+| Latency | p50 349 ms, p95 483 ms, mean 367 ms — measured at 4 concurrent requests (`--parallel 4`), 8,850 requests, 853 s elapsed, 10.4 rows/s |
 
 ### Per-category hit@1
 
@@ -283,19 +283,20 @@ set. That is what the cost ratio at the top of this document rests on: a wrong r
 on the page is a real opinion a reader can open and rule out, not a confabulation, which
 is why this suite treats it as the cheaper failure mode next to returning nothing.
 
-Latency on the negatives set: p50 321 ms, p95 1038 ms, mean 598 ms — measured at 4
+Latency on the negatives set: p50 369 ms, p95 541 ms, mean 379 ms — measured at 4
 concurrent requests, 50 requests.
 
 ### Bundles
 
 | Date | Target | Bundle |
 |---|---|---|
-| 2026-09-09 | public | [`8850`](../../results/trustfoundry-case-name-lookup/2026-09-09/public-8850/) |
-| 2026-09-09 | negatives | [`50`](../../results/trustfoundry-case-name-lookup/2026-09-09/negatives-50/) |
+| 2026-09-10 | public | [`8850`](../../results/trustfoundry-case-name-lookup/2026-09-10/public-8850/) |
+| 2026-09-10 | public (smoke tier) | [`1050`](../../results/trustfoundry-case-name-lookup/2026-09-10/public-1050/) |
+| 2026-09-10 | negatives | [`50`](../../results/trustfoundry-case-name-lookup/2026-09-10/negatives-50/) |
 
 **Latest pointer.** [`results/trustfoundry-case-name-lookup/latest.json`](../../results/trustfoundry-case-name-lookup/latest.json) maps each target id to its currently-canonical dated bundle. `pnpm verify:results` verifies the pointer and every bundle it references.
 
-For a concrete example of what a bundle's scored summary looks like, see [`results/trustfoundry-case-name-lookup/2026-09-09/public-8850/result.json`](../../results/trustfoundry-case-name-lookup/2026-09-09/public-8850/result.json). The full checked-in bundle also carries the raw row-level evidence, manifest, and checksums.
+For a concrete example of what a bundle's scored summary looks like, see [`results/trustfoundry-case-name-lookup/2026-09-10/public-8850/result.json`](../../results/trustfoundry-case-name-lookup/2026-09-10/public-8850/result.json). The full checked-in bundle also carries the raw row-level evidence, manifest, and checksums.
 
 ## Test data schema
 
