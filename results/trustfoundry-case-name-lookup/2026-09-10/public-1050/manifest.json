@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "raw": {
-      "href": "https://github.com/trustfoundry-ai/benchmarks/releases/download/v0.11.0/trustfoundry-case-name-lookup__2026-09-10__public-1050__raw.jsonl.gz",
+      "href": "https://github.com/trustfoundry-ai/benchmarks/releases/download/evidence-2026-09-11/trustfoundry-case-name-lookup__2026-09-10__public-1050__raw.jsonl.gz",
       "path": "raw.jsonl.gz",
       "rows": 1050,
       "sha256": "23b79110cd7f0aa483ee33dcb964eec967f548b1f874c5e16c0aa271a73272e6"

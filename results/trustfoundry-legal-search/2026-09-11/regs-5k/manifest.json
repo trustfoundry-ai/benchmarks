@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "raw": {
-      "href": "https://github.com/trustfoundry-ai/benchmarks/releases/download/v0.11.0/trustfoundry-legal-search__2026-09-11__regs-5k__raw.jsonl.gz",
+      "href": "https://github.com/trustfoundry-ai/benchmarks/releases/download/evidence-2026-09-11/trustfoundry-legal-search__2026-09-11__regs-5k__raw.jsonl.gz",
       "path": "raw.jsonl.gz",
       "rows": 5000,
       "sha256": "199f7fb9e09f320ae3707e44e963f390088d0a2fc9bb2ffb4a4cab546f63dbf4"
