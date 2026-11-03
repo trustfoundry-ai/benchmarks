@@ -4,6 +4,12 @@ All notable, publication-relevant changes to the benchmarks harness and datasets
 
 ## [Unreleased]
 
+### Changed
+
+- **Node.js 26 or later.** `engines.node` is `>=26`, and CI, the release workflow and
+  the container image run Node 26 LTS. The image installs pnpm with npm, since Node 26
+  does not bundle corepack.
+
 ### Fixed
 
 - **`package.json` names the released version.** It had been kept one minor ahead of
