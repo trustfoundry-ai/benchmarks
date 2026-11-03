@@ -20,7 +20,7 @@
 # entrypoint can stamp it into output paths. Manual builds default it to
 # "unknown".
 
-ARG NODE_IMAGE=node:20-bookworm-slim@sha256:2cf067cfed83d5ea958367df9f966191a942351a2df77d6f0193e162b5febfc0
+ARG NODE_IMAGE=node:26-bookworm-slim@sha256:bc0a2afd3b74ce12222fc8bab99271e66257f021078f5f4a5d687a77d280c1d9
 FROM ${NODE_IMAGE}
 
 ARG HARNESS_COMMIT_SHA=unknown
@@ -42,7 +42,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends google-cloud-cli \
     && rm -rf /var/lib/apt/lists/*
 
-RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
+RUN npm i -g pnpm@9.15.9
 
 WORKDIR /app
 

@@ -56,7 +56,7 @@
     "generate:readme": "node scripts/generate-readme-tables.mjs"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=26"
   },
   "packageManager": "pnpm@9.15.9",
   "devDependencies": {
